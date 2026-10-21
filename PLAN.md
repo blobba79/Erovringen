@@ -24,6 +24,7 @@ src/
   engine/            spelmotor: brickor, karta, områden, tur, poäng (grundspelet)
   expansions/<namn>/ en modul per expansion, även river och abbot
   tiles/             brickdata i eget JSON-format (genererad)
+  geometry/          brickans former (från brickdatan), gemensam för alla stilar
   server/            HTTP, WebSocket, spelrum, QR, sparning, logg, webbläsarstart
   screen/            storskärmens klient
   phone/             telefonens klient
@@ -38,7 +39,7 @@ Varje mapp ägs av en del i fas 1, så att två agenter aldrig ändrar samma fil
 
 ## 3. Grunden som läggs fast i fas 0 (bara gränssnitt, ingen logik)
 
-- **Brickdata:** en brickstyp har id, expansion, antal, fyra kanter (varje kant delad i tre delar: fält–väg/flod–fält eller stad) och en lista med områden (stad, väg, fält, kloster, flod, plus expansionernas typer). Varje område säger vilka kantdelar det täcker och har egenskaper (sköld, värdshus, katedral, vara, guld, symbol …). Ingen grafik i datan, bara *vad* som finns var. Konverteras med skript från JCloisterZones XML, och antalen kontrolleras mot regel-PDF:en.
+- **Brickdata:** en brickstyp har id, expansion, antal, fyra kanter (varje kant delad i tre delar: fält–väg/flod–fält eller stad) och en lista med områden (stad, väg, fält, kloster, flod, plus expansionernas typer). Varje område säger vilka kantdelar det täcker och har egenskaper (sköld, värdshus, katedral, vara, guld, symbol …). Ingen grafik i datan, bara *vad* som finns var. Konverteras med skript från JCloisterZones XML, och antalen kontrolleras mot regel-PDF:en. Grundspelet tas från utgåvan `basic:2`, som har trädgårdarna som abboten behöver.
 - **Speltillstånd:** ett vanligt JSON-objekt (karta, hög, händer, pjäser, poäng, tur och fas, expansionernas egna fält). Motorn är en ren funktion `utför(tillstånd, drag) → nytt tillstånd + händelser`, med slumpfrö i tillståndet. Det ger repris, testspelare, ångra av delsteg och sparning på köpet.
 - **Expansionsmoduler:** varje modul anmäler sina brickor, pjäser, områdestyper, extra turfaser, poängregler och drag via krokar i motorn. Påslagen eller avslagen vid spelstart.
 - **Meddelanden:** typade meddelanden mellan server, storskärm och telefon (anslut, startval, delsteg, bekräfta, ångra, kartstyrning, markera område, reaktioner, tillstånd, händelser).

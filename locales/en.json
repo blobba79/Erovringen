@@ -1,0 +1,16 @@
+{
+  "_name": "English",
+  "game.title": "Erövringen",
+  "expansion.base": "Base game",
+  "expansion.river": "The River",
+  "expansion.abbot": "The Abbot",
+  "expansion.inns-cathedrals": "Inns & Cathedrals",
+  "expansion.traders-builders": "Traders & Builders",
+  "expansion.princess-dragon": "The Princess & the Dragon",
+  "expansion.flying-machines": "The Flying Machines",
+  "expansion.ferries": "The Ferries",
+  "expansion.gold-mines": "The Gold Mines",
+  "expansion.mage-witch": "Mage & Witch",
+  "expansion.crop-circles-2": "Crop Circles II",
+  "score.points": { "one": "{count} point", "other": "{count} points" }
+}

@@ -1,6 +1,37 @@
 # Erövringen
 
-Digitalt brickläggningsspel för webbläsaren: en storskärm och en telefon per spelare. **`SPEC.md` är facit** för vad som ska byggas. Läs bara de avsnitt du behöver.
+Digitalt brickläggningsspel för webbläsaren: en storskärm och en telefon per spelare. **`SPEC.md` är facit** för vad som ska byggas. Läs bara de avsnitt du behöver. `PLAN.md` beskriver teknikval, formaten och byggordningen.
+
+## Projektet
+
+TypeScript med Bun (installerat lokalt: `npx bun …`). `npm run typecheck` kontrollerar typerna, `npx bun test` kör testerna. Regler läses i `regler/sammanfattning/` (index och tveksamheter i `README.md` där).
+
+**Gemensamma gränssnitt i `src/shared/`** (bara typer). Alla delar bygger på dem, och bara samordnaren ändrar dem:
+- `tiles.ts`: brickdata (kanter N/E/S/W, fält per halvkant, som i JCloisterZone)
+- `state.ts`: speltillstånd, delsteg, händelser, `Engine`
+- `expansion.ts`: `ExpansionModule` med krokar och regelvarianter
+- `messages.ts`: meddelanden mellan server, storskärm och telefon, och format för sparade spel
+- `style.ts`: `GraphicStyle` och brickgeometri
+- `i18n.ts`: språkfilernas format
+
+**Vem äger vad** (en del = en agent; ingen rör en annan dels filer):
+
+| Del | Äger |
+|---|---|
+| Samordnaren | `src/shared/`, `CLAUDE.md`, `SPEC.md`, `PLAN.md`, `package.json`, `tsconfig.json`, `.gitignore` |
+| Brickdata | `scripts/tiles/`, `src/tiles/` |
+| Regelmotor för grundspelet | `src/engine/`, `tests/engine/` |
+| En expansion | `src/expansions/<id>/`, `tests/expansions/<id>/` |
+| Brickgeometri | `src/geometry/` |
+| Grafikstil | `src/styles/<stil>/` |
+| Server | `src/server/` |
+| Storskärm | `src/screen/` |
+| Telefon | `src/phone/` |
+| Språkfiler | `locales/` |
+| Paketering | `scripts/build/`, `.github/workflows/` |
+| Testspelare | `tests/players/` |
+
+Behöver en del ett nytt beroende i `package.json` eller en ändring i `src/shared/`, ska den säga det i sin rapport i stället för att göra ändringen.
 
 <!-- Fas 0 fyller i: teknikval, mappstruktur, gränssnitt mellan delarna, kommandon för att bygga, testa och köra testspelarna. -->
 

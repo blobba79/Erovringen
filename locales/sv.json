@@ -1,0 +1,28 @@
+{
+  "_name": "Svenska",
+  "_untranslated": [
+    "expansion.river",
+    "expansion.abbot",
+    "expansion.inns-cathedrals",
+    "expansion.traders-builders",
+    "expansion.princess-dragon",
+    "expansion.flying-machines",
+    "expansion.ferries",
+    "expansion.gold-mines",
+    "expansion.mage-witch",
+    "expansion.crop-circles-2"
+  ],
+  "game.title": "Erövringen",
+  "expansion.base": "Grundspelet",
+  "expansion.river": "The River",
+  "expansion.abbot": "The Abbot",
+  "expansion.inns-cathedrals": "Inns & Cathedrals",
+  "expansion.traders-builders": "Traders & Builders",
+  "expansion.princess-dragon": "The Princess & the Dragon",
+  "expansion.flying-machines": "The Flying Machines",
+  "expansion.ferries": "The Ferries",
+  "expansion.gold-mines": "The Gold Mines",
+  "expansion.mage-witch": "Mage & Witch",
+  "expansion.crop-circles-2": "Crop Circles II",
+  "score.points": { "one": "{count} poäng", "other": "{count} poäng" }
+}

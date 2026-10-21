@@ -3,3 +3,10 @@ regler/*.pdf
 
 # Egna foton av brickor, bara för privat bruk
 foton/
+
+node_modules/
+dist/
+
+# Allt programmet sparar bredvid programfilen
+sparade/
+logg/
