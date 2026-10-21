@@ -13,3 +13,6 @@ logg/
 
 # Agenternas worktrees
 .claude/worktrees/
+
+# Nedladdad brickdata från JCloisterZone
+scripts/tiles/cache/
