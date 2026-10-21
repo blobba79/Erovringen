@@ -1,0 +1,1331 @@
+{
+ "set": {
+  "expansion": "base",
+  "source": "jcz@0f66860787:basic:2",
+  "tiles": [
+   {
+    "type": "base/L",
+    "count": 4
+   },
+   {
+    "type": "base/LR",
+    "count": 2
+   },
+   {
+    "type": "base/RCr",
+    "count": 4
+   },
+   {
+    "type": "base/Cccc+",
+    "count": 1
+   },
+   {
+    "type": "base/CccR+",
+    "count": 2
+   },
+   {
+    "type": "base/CccR",
+    "count": 1
+   },
+   {
+    "type": "base/CFc+",
+    "count": 2
+   },
+   {
+    "type": "base/CFc.1",
+    "count": 1
+   },
+   {
+    "type": "base/Cc.1",
+    "count": 2
+   },
+   {
+    "type": "base/CcG",
+    "count": 1
+   },
+   {
+    "type": "base/Cc+",
+    "count": 1
+   },
+   {
+    "type": "base/Cc+G",
+    "count": 1
+   },
+   {
+    "type": "base/CcRr",
+    "count": 3
+   },
+   {
+    "type": "base/CcRr+",
+    "count": 2
+   },
+   {
+    "type": "base/Ccc",
+    "count": 2
+   },
+   {
+    "type": "base/CccG",
+    "count": 1
+   },
+   {
+    "type": "base/Ccc+",
+    "count": 1
+   },
+   {
+    "type": "base/CRr",
+    "count": 3
+   },
+   {
+    "type": "base/CRRR",
+    "count": 3
+   },
+   {
+    "type": "base/RrC",
+    "count": 3
+   },
+   {
+    "type": "base/C",
+    "count": 4
+   },
+   {
+    "type": "base/CG",
+    "count": 1
+   },
+   {
+    "type": "base/CFC.2",
+    "count": 2
+   },
+   {
+    "type": "base/CFCG",
+    "count": 1
+   },
+   {
+    "type": "base/CC.2",
+    "count": 1
+   },
+   {
+    "type": "base/CCG",
+    "count": 1
+   },
+   {
+    "type": "base/RRRR",
+    "count": 1
+   },
+   {
+    "type": "base/RRR",
+    "count": 4
+   },
+   {
+    "type": "base/Rr",
+    "count": 8
+   },
+   {
+    "type": "base/RrG",
+    "count": 1
+   },
+   {
+    "type": "base/RFr",
+    "count": 7
+   },
+   {
+    "type": "base/RFrG",
+    "count": 1
+   }
+  ],
+  "start": "base/RCr"
+ },
+ "tiles": [
+  {
+   "id": "base/L",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/LR",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/RCr",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/Cccc+",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "S",
+      "E"
+     ],
+     "pennants": 1
+    }
+   ]
+  },
+  {
+   "id": "base/CccR+",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "E"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CccR",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CFc+",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CFc.1",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/Cc.1",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CcG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/Cc+",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/Cc+G",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CcRr",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/CcRr+",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/Ccc",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "E",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CccG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "E",
+      "W"
+     ]
+    },
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/Ccc+",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "E",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CRr",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "WL",
+      "WR",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/CRRR",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/RrC",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/C",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CFC.2",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CFCG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CC.2",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER",
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/CCG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER",
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "base/RRRR",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road3",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/RRR",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/Rr",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/RrG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/RFr",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "base/RFrG",
+   "expansion": "base",
+   "features": [
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  }
+ ]
+}

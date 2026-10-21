@@ -1,0 +1,324 @@
+{
+ "set": {
+  "expansion": "flying-machines",
+  "source": "jcz@0f66860787:flier:1",
+  "tiles": [
+   {
+    "type": "flying-machines/F.d",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/F.o",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/RFr.d",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/RFr.NS.o",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/RFr.WE.o",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/Rr.d",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/Rr.NW.o",
+    "count": 1
+   },
+   {
+    "type": "flying-machines/Rr.SW.o",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "flying-machines/F.d",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "SL",
+      "SR",
+      "WL",
+      "WR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:NW"
+   ]
+  },
+  {
+   "id": "flying-machines/F.o",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "SL",
+      "SR",
+      "WL",
+      "WR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:W"
+   ]
+  },
+  {
+   "id": "flying-machines/RFr.d",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:NW"
+   ]
+  },
+  {
+   "id": "flying-machines/RFr.NS.o",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL",
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:W"
+   ]
+  },
+  {
+   "id": "flying-machines/RFr.WE.o",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:W"
+   ]
+  },
+  {
+   "id": "flying-machines/Rr.d",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL",
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:NW"
+   ]
+  },
+  {
+   "id": "flying-machines/Rr.NW.o",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:W"
+   ]
+  },
+  {
+   "id": "flying-machines/Rr.SW.o",
+   "expansion": "flying-machines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "flier:W"
+   ]
+  }
+ ]
+}

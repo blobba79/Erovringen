@@ -1,0 +1,220 @@
+{
+ "set": {
+  "expansion": "ferries",
+  "source": "jcz@0f66860787:ferries",
+  "tiles": [
+   {
+    "type": "ferries/CRRR",
+    "count": 3
+   },
+   {
+    "type": "ferries/RRR",
+    "count": 4
+   },
+   {
+    "type": "ferries/RRRR",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "ferries/CRRR",
+   "expansion": "ferries",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "ferry"
+   ]
+  },
+  {
+   "id": "ferries/RRR",
+   "expansion": "ferries",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "ferry"
+   ]
+  },
+  {
+   "id": "ferries/RRRR",
+   "expansion": "ferries",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road3",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "ferry"
+   ]
+  }
+ ]
+}

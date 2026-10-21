@@ -1,0 +1,309 @@
+{
+ "set": {
+  "expansion": "crop-circles-2",
+  "source": "jcz@0f66860787:corn-circles/2",
+  "tiles": [
+   {
+    "type": "crop-circles-2/RRr",
+    "count": 1
+   },
+   {
+    "type": "crop-circles-2/RRRr",
+    "count": 1
+   },
+   {
+    "type": "crop-circles-2/CFR",
+    "count": 1
+   },
+   {
+    "type": "crop-circles-2/RCR",
+    "count": 1
+   },
+   {
+    "type": "crop-circles-2/CFC",
+    "count": 1
+   },
+   {
+    "type": "crop-circles-2/CcCc",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "crop-circles-2/RRr",
+   "expansion": "crop-circles-2",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "crop-circle:road"
+   ]
+  },
+  {
+   "id": "crop-circles-2/RRRr",
+   "expansion": "crop-circles-2",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "crop-circle:road"
+   ]
+  },
+  {
+   "id": "crop-circles-2/CFR",
+   "expansion": "crop-circles-2",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "WL",
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "crop-circle:field"
+   ]
+  },
+  {
+   "id": "crop-circles-2/RCR",
+   "expansion": "crop-circles-2",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "crop-circle:field"
+   ]
+  },
+  {
+   "id": "crop-circles-2/CFC",
+   "expansion": "crop-circles-2",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ],
+   "symbols": [
+    "crop-circle:city"
+   ]
+  },
+  {
+   "id": "crop-circles-2/CcCc",
+   "expansion": "crop-circles-2",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "E",
+      "S"
+     ]
+    }
+   ],
+   "symbols": [
+    "crop-circle:city"
+   ]
+  }
+ ]
+}

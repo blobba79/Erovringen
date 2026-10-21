@@ -1,0 +1,479 @@
+{
+ "set": {
+  "expansion": "mage-witch",
+  "source": "jcz@0f66860787:mage-and-witch:1",
+  "tiles": [
+   {
+    "type": "mage-witch/CRRR.3",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CcRr.1",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CCCR.3",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CRcR",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CFC",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CccR.1",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CRRr.2",
+    "count": 1
+   },
+   {
+    "type": "mage-witch/CCRr.2",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "mage-witch/CRRR.3",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CcRr.1",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CCCR.3",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city2",
+     "kind": "city",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1",
+      "city2"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city2"
+     ]
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CRcR",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "E",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CFC",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CccR.1",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CRRr.2",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  },
+  {
+   "id": "mage-witch/CCRr.2",
+   "expansion": "mage-witch",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "mage"
+   ]
+  }
+ ]
+}

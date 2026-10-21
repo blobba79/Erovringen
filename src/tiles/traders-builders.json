@@ -1,0 +1,1290 @@
+{
+ "set": {
+  "expansion": "traders-builders",
+  "source": "jcz@0f66860787:traders-and-builders:1",
+  "tiles": [
+   {
+    "type": "traders-builders/Cc.g",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/Cc.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CCc.c",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CCc.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/Ccc.g",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcCC.c",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcRR!.c",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcRR.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcRC.c",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcRC.g",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcR.c",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcR!.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CccR.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CcCc.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CFc.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CR",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CRc.g",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CRc.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/CRcR.w",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/LRRR",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/RCc.g",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/RCc!.g",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/RRC",
+    "count": 1
+   },
+   {
+    "type": "traders-builders/RRrr",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "traders-builders/Cc.g",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "grain"
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/Cc.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CCc.c",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "cloth"
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "I"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CCc.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "I"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/Ccc.g",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "grain"
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcCC.c",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "cloth"
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "city2",
+     "kind": "city",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "I"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city2",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcRR!.c",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "cloth"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcRR.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcRC.c",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "cloth"
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcRC.g",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "grain"
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcR.c",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "cloth"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcR!.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CccR.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CcCc.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "I"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CFc.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CR",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "SL",
+      "SR",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CRc.g",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "grain"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CRc.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/CRcR.w",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "E",
+      "W"
+     ],
+     "props": {
+      "goods": "wine"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/LRRR",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/RCc.g",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "grain"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/RCc!.g",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "goods": "grain"
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/RRC",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "traders-builders/RRrr",
+   "expansion": "traders-builders",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "S"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  }
+ ]
+}
