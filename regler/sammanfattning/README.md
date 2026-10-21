@@ -32,7 +32,7 @@ The summaries were written from extracted text only; pictures were not seen.
 - Trade goods majority when a player has 0 (traders-builders.md).
 - I&C 50/100 tiles: score-track markers only (inns-cathedrals.md).
 
-**3. Choices between rule versions → decided by the owner.** See the open questions in the phase 0 plan:
+**3. Choices between rule versions → selectable rule variants at game start** (see `PLAN.md`, section 5; HiG rule is the default):
 - Dragon moves before scoring (HiG/ZMG) or after (RGG).
 - River set (River I 2001 or 2014 version), where the lake goes, what happens to the normal start tile.
 - The crop circle tile packed with each mini (Flying Machines, Ferries, Gold Mines, Mage & Witch: "9 = 8 + 1 crop circle") is one of the six Crop Circles II tiles (s. 166). Proposal: each mini has its 8 own tiles; the six crop circle tiles belong to Crop Circles II only.

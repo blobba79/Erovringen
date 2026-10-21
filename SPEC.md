@@ -149,6 +149,7 @@ Tecknad stil med svarta konturer och skarpa skuggor i två toner, som i tecknade
   - Storskärmens språk (engelska eller svenska).
   - Antal brickor på hand (1 = vanliga regler).
   - Om det ska visas hur många brickor i högen som kan stänga en öppning.
+  - **Regelvarianter:** där regel-PDF:en beskriver olika versioner av en regel (t.ex. om draken flyttar före eller efter poängräkningen) går varianten att välja, med Hans im Glücks regel som standard. Se `PLAN.md`.
   - Starta nytt spel eller fortsätt ett sparat.
 - **Startvalen kommer ihåg från förra gången.**
 
