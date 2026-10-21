@@ -10,3 +10,6 @@ dist/
 # Allt programmet sparar bredvid programfilen
 sparade/
 logg/
+
+# Agenternas worktrees
+.claude/worktrees/
