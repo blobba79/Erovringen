@@ -1,0 +1,451 @@
+{
+ "set": {
+  "expansion": "gold-mines",
+  "source": "jcz@0f66860787:goldmines",
+  "tiles": [
+   {
+    "type": "gold-mines/LRr",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/LCc",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/LCcRr",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/LRrRr",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/RrRr",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/CcRr",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/CRcr",
+    "count": 1
+   },
+   {
+    "type": "gold-mines/RRrr.X",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "gold-mines/LRr",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/LCc",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/LCcRr",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/LRrRr",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/RrRr",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "WR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "ER"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/CcRr",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/CRcr",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  },
+  {
+   "id": "gold-mines/RRrr.X",
+   "expansion": "gold-mines",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "S"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "gold"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,544 @@
+{
+ "set": {
+  "expansion": "river",
+  "source": "jcz@0f66860787:river/1:2",
+  "tiles": [
+   {
+    "type": "river/s",
+    "count": 1
+   },
+   {
+    "type": "river/CICI",
+    "count": 1
+   },
+   {
+    "type": "river/CIRI",
+    "count": 1
+   },
+   {
+    "type": "river/LIRI",
+    "count": 1
+   },
+   {
+    "type": "river/RIrI",
+    "count": 1
+   },
+   {
+    "type": "river/IFI",
+    "count": 2
+   },
+   {
+    "type": "river/CcII",
+    "count": 1
+   },
+   {
+    "type": "river/RrII",
+    "count": 1
+   },
+   {
+    "type": "river/II",
+    "count": 1
+   },
+   {
+    "type": "river/IIG",
+    "count": 1
+   },
+   {
+    "type": "river/I.e",
+    "count": 1
+   }
+  ],
+  "start": "river/s"
+ },
+ "tiles": [
+  {
+   "id": "river/s",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "E"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/CICI",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "WL"
+     ],
+     "adjacentCities": [
+      "city1"
+     ]
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "E"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/CIRI",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "E"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/LIRI",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "E"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/RIrI",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "N",
+      "S"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/IFI",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SL",
+      "SR",
+      "ER"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "E"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/CcII",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "S",
+      "E"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/RrII",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "S"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/II",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "S"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/IIG",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "garden",
+     "kind": "garden"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W",
+      "S"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "river/I.e",
+   "expansion": "river",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "river0",
+     "kind": "river",
+     "edges": [
+      "W"
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,306 @@
+{
+ "BASIC GAME": {
+  "cccc": 1,
+  "cccf": 4,
+  "cccr": 3,
+  "ccff": 7,
+  "ccrr": 5,
+  "cfcf": 6,
+  "cfff": 5,
+  "cfrr": 3,
+  "crfr": 4,
+  "crrf": 3,
+  "crrr": 3,
+  "ffff": 4,
+  "fffr": 2,
+  "ffrr": 9,
+  "frfr": 8,
+  "frrr": 4,
+  "rrrr": 1
+ },
+ "INNS AND CATHEDRALS": {
+  "cccc": 3,
+  "cccf": 2,
+  "ccfr": 1,
+  "ccrf": 1,
+  "ccrr": 1,
+  "cfff": 1,
+  "cfrf": 1,
+  "cfrr": 1,
+  "crcr": 2,
+  "ffrr": 1,
+  "frfr": 2,
+  "frrr": 1,
+  "rrrr": 1
+ },
+ "TRADERS AND BUILDERS": {
+  "cccc": 2,
+  "cccf": 3,
+  "cccr": 3,
+  "ccff": 2,
+  "ccfr": 2,
+  "ccrf": 2,
+  "ccrr": 2,
+  "cfcf": 1,
+  "cfcr": 2,
+  "cfrr": 1,
+  "crcr": 1,
+  "crff": 1,
+  "frrr": 1,
+  "rrrr": 1
+ },
+ "KING AND ROBBER BARON": {
+  "cccc": 1,
+  "ccrr": 1,
+  "cfff": 1,
+  "cffr": 1,
+  "crrr": 1
+ },
+ "THE TOWER": {
+  "cccc": 1,
+  "cccr": 1,
+  "ccff": 2,
+  "ccrf": 1,
+  "cfff": 2,
+  "cfrf": 1,
+  "cfrr": 1,
+  "crcr": 2,
+  "crfr": 1,
+  "ffff": 2,
+  "ffrr": 1,
+  "frrr": 1,
+  "rrrr": 2
+ },
+ "ABBEY AND MAYOR": {
+  "cccc": 2,
+  "cccf": 1,
+  "ccrr": 1,
+  "cfff": 1,
+  "cffr": 1,
+  "cfrr": 1,
+  "crcr": 1,
+  "crrf": 1,
+  "fffr": 1,
+  "frrr": 1,
+  "rrrr": 1
+ },
+ "THE CATAPULT": {
+  "cccc": 1,
+  "ccff": 1,
+  "cfcf": 1,
+  "cfff": 2,
+  "ffff": 2,
+  "ffrr": 1,
+  "frfr": 1,
+  "frrr": 2,
+  "rrrr": 1
+ },
+ "THE WHEEL OF FORTUNE": {
+  "cccc": 1,
+  "cccf": 4,
+  "cccr": 3,
+  "ccff": 6,
+  "ccfr": 1,
+  "ccrf": 1,
+  "ccrr": 4,
+  "cfcf": 5,
+  "cfff": 4,
+  "cffr": 1,
+  "cfrf": 1,
+  "cfrr": 1,
+  "crff": 1,
+  "crfr": 4,
+  "crrf": 2,
+  "crrr": 3,
+  "ffff": 4,
+  "fffr": 2,
+  "ffrr": 8,
+  "frfr": 9,
+  "frrr": 4,
+  "rrrr": 2
+ },
+ "BRIDGES, CASTLES AND BAZAARS": {
+  "cccc": 2,
+  "cccr": 1,
+  "cfcf": 2,
+  "cfrf": 2,
+  "ffff": 1,
+  "fffr": 1,
+  "frfr": 3
+ },
+ "LA PORXADA": {
+  "cccc": 1
+ },
+ "THE FESTIVAL": {
+  "cccc": 1,
+  "cccf": 1,
+  "cffr": 1,
+  "cfrf": 1,
+  "cfrr": 1,
+  "crcr": 1,
+  "crff": 1,
+  "crrf": 1,
+  "ffrr": 1,
+  "rrrr": 1
+ },
+ "CROP CIRCLES II": {
+  "cccc": 1,
+  "cfcf": 1,
+  "cfrf": 1,
+  "crfr": 1,
+  "frrr": 1,
+  "rrrr": 1
+ },
+ "DARMSTADT PROMO": {
+  "cccc": 1,
+  "ffrr": 1,
+  "rrrr": 1
+ },
+ "THE PRINCESS AND THE DRAGON": {
+  "cccf": 4,
+  "ccff": 4,
+  "ccrr": 2,
+  "cfcf": 1,
+  "cfff": 2,
+  "cfrr": 2,
+  "crcr": 1,
+  "crrf": 2,
+  "crrr": 1,
+  "ffff": 1,
+  "fffr": 1,
+  "ffrr": 3,
+  "frfr": 2,
+  "frrr": 3,
+  "rrrr": 1
+ },
+ "THE BESIEGERS": {
+  "cccf": 1,
+  "ccfr": 1,
+  "ccrf": 1,
+  "cfrf": 1,
+  "cfrr": 1,
+  "crrf": 1
+ },
+ "HILLS & SHEEP": {
+  "cccf": 2,
+  "ccff": 3,
+  "ccfr": 1,
+  "cfcf": 2,
+  "cfff": 2,
+  "cfrf": 1,
+  "cfrr": 1,
+  "crrf": 2,
+  "ffrr": 1,
+  "frfr": 1,
+  "frrr": 2
+ },
+ "MAGE AND WITCH": {
+  "cccr": 2,
+  "ccrr": 2,
+  "cfcf": 1,
+  "crcr": 1,
+  "crrr": 2
+ },
+ "THE CATHARS": {
+  "ccff": 1,
+  "ccrr": 1,
+  "cfff": 1,
+  "crfr": 1
+ },
+ "CULT, SIEGE & CREATIVITY": {
+  "ccff": 1,
+  "ccrr": 1,
+  "cfff": 1,
+  "cfrf": 1,
+  "crfr": 2,
+  "ffff": 1,
+  "fffr": 1,
+  "frfr": 1
+ },
+ "CROP CIRCLES": {
+  "ccff": 2,
+  "cfrr": 1,
+  "crff": 1,
+  "ffrr": 1,
+  "frrr": 1
+ },
+ "THE PLAGUE": {
+  "ccff": 2,
+  "ccrr": 1,
+  "cfrr": 1,
+  "ffrr": 1,
+  "rrrr": 1
+ },
+ "THE GOLDMINES": {
+  "ccff": 1,
+  "ccrr": 2,
+  "crcr": 1,
+  "ffrr": 1,
+  "rrrr": 1
+ },
+ "WIND ROSES": {
+  "ccff": 2,
+  "cfcf": 1,
+  "cfrf": 1,
+  "cfrr": 1,
+  "ffrr": 1
+ },
+ "THE ROBBERS": {
+  "cfcf": 1,
+  "cfff": 1,
+  "crrf": 1,
+  "ffrr": 2,
+  "frfr": 2,
+  "frrr": 1
+ },
+ "SHRINES AND HERETICS": {
+  "cfff": 1,
+  "cfrf": 1,
+  "ffff": 1,
+  "fffr": 1,
+  "frfr": 1
+ },
+ "THE SPIELBOX ALMANAC": {
+  "cfff": 1,
+  "cfrf": 1,
+  "ffff": 1,
+  "fffr": 1,
+  "frfr": 1
+ },
+ "THE TUNNEL": {
+  "crfr": 1,
+  "crrr": 1,
+  "ffrr": 1,
+  "rrrr": 1
+ },
+ "THE FERRIES": {
+  "crrr": 3,
+  "frrr": 4,
+  "rrrr": 1
+ },
+ "THE FLIER": {
+  "ffff": 2,
+  "ffrr": 3,
+  "frfr": 3
+ },
+ "MONASTERIES IN GERMANY": {
+  "ffff": 4,
+  "fffr": 2
+ },
+ "MONASTERIES IN THE NETHERLANDS & BELGIUM": {
+  "ffff": 4,
+  "fffr": 2
+ },
+ "THE RIVER": {
+  "rrrr": 12
+ },
+ "THE RIVER II": {
+  "rrrr": 12
+ },
+ "HALFLINGS I": {
+  "rrrr": 12
+ },
+ "HALFLINGS II": {
+  "rrrr": 12
+ }
+}

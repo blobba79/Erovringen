@@ -1,0 +1,1339 @@
+{
+ "set": {
+  "expansion": "princess-dragon",
+  "source": "jcz@0f66860787:princess-and-dragon:1",
+  "tiles": [
+   {
+    "type": "princess-dragon/F.v",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RrRr.g",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/R.v",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/C.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/C.v",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/LRRR.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RRR.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RRR.g",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CRRR.p",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CCc+.p",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/Ccc.p",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/Ccc+.g",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/LCcc.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/Rr.d",
+    "count": 2
+   },
+   {
+    "type": "princess-dragon/Rr.v",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RFr.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RFr.v",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/Cc!.p",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/Cc.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/Cc.p",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CC.v",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CFc+.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CcRr.p",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CcRr.g",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CRcr.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RrC.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/RrC.g",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CRr.d",
+    "count": 1
+   },
+   {
+    "type": "princess-dragon/CRr.g",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "princess-dragon/F.v",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "volcano"
+   ]
+  },
+  {
+   "id": "princess-dragon/RrRr.g",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "WR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "ER"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "portal"
+   ]
+  },
+  {
+   "id": "princess-dragon/R.v",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "volcano"
+   ]
+  },
+  {
+   "id": "princess-dragon/C.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/C.v",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER",
+      "SL",
+      "SR",
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "volcano"
+   ]
+  },
+  {
+   "id": "princess-dragon/LRRR.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/RRR.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/RRR.g",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "portal"
+   ]
+  },
+  {
+   "id": "princess-dragon/CRRR.p",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ],
+     "props": {
+      "princess": true
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "princess-dragon/CCc+.p",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ],
+     "props": {
+      "princess": true
+     }
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "E",
+      "S"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "I"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "princess-dragon/Ccc.p",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "E",
+      "W"
+     ],
+     "props": {
+      "princess": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "princess-dragon/Ccc+.g",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "E",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "portal"
+   ]
+  },
+  {
+   "id": "princess-dragon/LCcc.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "E",
+      "W"
+     ]
+    },
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/Rr.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/Rr.v",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "volcano"
+   ]
+  },
+  {
+   "id": "princess-dragon/RFr.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SL",
+      "SR",
+      "ER"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/RFr.v",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SL",
+      "SR",
+      "ER"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "volcano"
+   ]
+  },
+  {
+   "id": "princess-dragon/Cc!.p",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "princess": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "princess-dragon/Cc.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/Cc.p",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "princess": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "princess-dragon/CC.v",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city1",
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "volcano"
+   ]
+  },
+  {
+   "id": "princess-dragon/CFc+.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/CcRr.p",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "props": {
+      "princess": true
+     }
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "princess-dragon/CcRr.g",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "portal"
+   ]
+  },
+  {
+   "id": "princess-dragon/CRcr.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "E",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "S"
+     ],
+     "props": {
+      "tunnel": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/RrC.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/RrC.g",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S",
+      "W"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "portal"
+   ]
+  },
+  {
+   "id": "princess-dragon/CRr.d",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "WL",
+      "WR",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "dragon"
+   ]
+  },
+  {
+   "id": "princess-dragon/CRr.g",
+   "expansion": "princess-dragon",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "WL",
+      "WR",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ],
+   "symbols": [
+    "portal"
+   ]
+  }
+ ]
+}

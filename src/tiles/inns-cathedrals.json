@@ -1,0 +1,857 @@
+{
+ "set": {
+  "expansion": "inns-cathedrals",
+  "source": "jcz@0f66860787:inns-and-cathedrals:1",
+  "tiles": [
+   {
+    "type": "inns-cathedrals/Cccc.c",
+    "count": 2
+   },
+   {
+    "type": "inns-cathedrals/LRFR",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CCCC",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CCC",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CRCR",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CCc+",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/C!",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CFR",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CcR",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CRcR+",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/RCc.i",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/RrC.i",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/CcRr+.i",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/RRR.i",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/RFr.i",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/Rr.i",
+    "count": 1
+   },
+   {
+    "type": "inns-cathedrals/RrRr",
+    "count": 1
+   }
+  ]
+ },
+ "tiles": [
+  {
+   "id": "inns-cathedrals/Cccc.c",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W",
+      "S",
+      "E"
+     ],
+     "props": {
+      "cathedral": true
+     }
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/LRFR",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "cloister",
+     "kind": "cloister"
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "NL",
+      "NR",
+      "WR"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CCCC",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "city2",
+     "kind": "city",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "city3",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "I"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1",
+      "city2",
+      "city3"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CCC",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "city2",
+     "kind": "city",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1",
+      "city2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CRCR",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "ER"
+     ],
+     "adjacentCities": [
+      "city1"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL"
+     ],
+     "adjacentCities": [
+      "city1"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "WR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CCc+",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "city1",
+     "kind": "city",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0",
+      "city1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/C!",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CFR",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "WR",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CcR",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CRcR+",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "E",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "NR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field3",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/RCc.i",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "S"
+     ],
+     "props": {
+      "inn": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "EL",
+      "ER"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/RrC.i",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N"
+     ]
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ],
+     "props": {
+      "inn": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/CcRr+.i",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "city0",
+     "kind": "city",
+     "edges": [
+      "N",
+      "W"
+     ],
+     "pennants": 1
+    },
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E",
+      "S"
+     ],
+     "props": {
+      "inn": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "ER"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "EL"
+     ],
+     "adjacentCities": [
+      "city0"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/RRR.i",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "E"
+     ],
+     "props": {
+      "inn": true
+     }
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "W"
+     ]
+    },
+    {
+     "id": "road2",
+     "kind": "road",
+     "edges": [
+      "S"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "WL",
+      "SR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/RFr.i",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "E"
+     ],
+     "props": {
+      "inn": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "ER",
+      "SL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/Rr.i",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "W",
+      "S"
+     ],
+     "props": {
+      "inn": true
+     }
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "WR",
+      "NL",
+      "NR",
+      "EL",
+      "ER",
+      "SL"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  },
+  {
+   "id": "inns-cathedrals/RrRr",
+   "expansion": "inns-cathedrals",
+   "features": [
+    {
+     "id": "road0",
+     "kind": "road",
+     "edges": [
+      "N",
+      "W"
+     ]
+    },
+    {
+     "id": "road1",
+     "kind": "road",
+     "edges": [
+      "S",
+      "E"
+     ]
+    },
+    {
+     "id": "field0",
+     "kind": "field",
+     "halfEdges": [
+      "NL",
+      "WR"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field1",
+     "kind": "field",
+     "halfEdges": [
+      "SL",
+      "ER"
+     ],
+     "adjacentCities": []
+    },
+    {
+     "id": "field2",
+     "kind": "field",
+     "halfEdges": [
+      "NR",
+      "EL",
+      "SR",
+      "WL"
+     ],
+     "adjacentCities": []
+    }
+   ]
+  }
+ ]
+}
