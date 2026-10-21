@@ -19,17 +19,17 @@ TypeScript med Bun (installerat lokalt: `npx bun …`). `npm run typecheck` kont
 | Del | Äger |
 |---|---|
 | Samordnaren | `src/shared/`, `CLAUDE.md`, `SPEC.md`, `PLAN.md`, `package.json`, `tsconfig.json`, `.gitignore` |
-| Brickdata | `scripts/tiles/`, `src/tiles/` |
-| Regelmotor för grundspelet | `src/engine/`, `tests/engine/` |
+| Brickdata | `scripts/tiles/`, `src/tiles/`, `tests/tiles/` |
+| Regelmotor för grundspelet (med River och Abbot) | `src/engine/`, `src/expansions/river/`, `src/expansions/abbot/`, `tests/engine/`, `tests/players/` |
 | En expansion | `src/expansions/<id>/`, `tests/expansions/<id>/` |
-| Brickgeometri | `src/geometry/` |
-| Grafikstil | `src/styles/<stil>/` |
+| Brickgeometri och grafikstil | `src/geometry/`, `src/styles/<stil>/`, `tests/geometry/` |
 | Server | `src/server/` |
 | Storskärm | `src/screen/` |
 | Telefon | `src/phone/` |
-| Språkfiler | `locales/` |
+| Språk | `locales/`, `src/i18n/`, `scripts/i18n/`, `tests/i18n/` |
 | Paketering | `scripts/build/`, `.github/workflows/` |
-| Testspelare | `tests/players/` |
+
+I en ny worktree saknas `node_modules/`: kör `npm ci` först.
 
 Behöver en del ett nytt beroende i `package.json` eller en ändring i `src/shared/`, ska den säga det i sin rapport i stället för att göra ändringen.
 
