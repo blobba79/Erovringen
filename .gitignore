@@ -1,0 +1,5 @@
+# Regel-PDF:er innehåller förlagets bilder och text
+regler/*.pdf
+
+# Egna foton av brickor, bara för privat bruk
+foton/
