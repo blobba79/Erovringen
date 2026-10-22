@@ -23,6 +23,9 @@ export const CORE: Entry[] = [
   ["variant.river.startTile", "River start tile", null],
   ["variant.river.startTile.shuffle", "Shuffle the start tile in", null],
   ["variant.river.startTile.afterRiver", "Start tile after the river", null],
+  ["variant.river.deadEnds", "River dead ends", "Flodens återvändsgränder"],
+  ["variant.river.deadEnds.allow", "Allowed (original rule: only immediate U-turns are forbidden)", "Tillåtna (originalregeln: bara direkt U-sväng är förbjuden)"],
+  ["variant.river.deadEnds.forbid", "Forbidden (the river must always be able to continue)", "Förbjudna (floden måste alltid kunna fortsätta)"],
   // Speltur
   ["turn.yourTurn", "Your turn", "Din tur"],
   ["turn.waiting", "Waiting for {player}", "Väntar på {player}"],

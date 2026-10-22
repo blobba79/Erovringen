@@ -119,5 +119,8 @@
   "error.illegalFigure": "Pjäsen kan inte placeras där.",
   "error.noFigureLeft": "Du har inga sådana pjäser kvar.",
   "error.featureOccupied": "Det står redan någon där.",
-  "error.nothingToUndo": "Det finns inget att ångra."
+  "error.nothingToUndo": "Det finns inget att ångra.",
+  "variant.river.deadEnds": "Flodens återvändsgränder",
+  "variant.river.deadEnds.allow": "Tillåtna (originalregeln: bara direkt U-sväng är förbjuden)",
+  "variant.river.deadEnds.forbid": "Förbjudna (floden måste alltid kunna fortsätta)"
 }

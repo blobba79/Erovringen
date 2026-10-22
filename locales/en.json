@@ -94,5 +94,8 @@
   "error.illegalFigure": "That figure cannot be placed there.",
   "error.noFigureLeft": "You have no figure of that kind left.",
   "error.featureOccupied": "Someone is already there.",
-  "error.nothingToUndo": "There is nothing to undo."
+  "error.nothingToUndo": "There is nothing to undo.",
+  "variant.river.deadEnds": "River dead ends",
+  "variant.river.deadEnds.allow": "Allowed (original rule: only immediate U-turns are forbidden)",
+  "variant.river.deadEnds.forbid": "Forbidden (the river must always be able to continue)"
 }
