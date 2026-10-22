@@ -2,7 +2,7 @@
 
 import type { GameEvent, GameState, PlayerId } from "../shared/state";
 import { analyze, type Area } from "./features";
-import { activeModules, baseExt, makeCtx, playerOf, type Env } from "./context";
+import { activeModules, baseExt, engineHook, makeCtx, playerOf, type Env } from "./context";
 import { scoreCompleted, scoreFinal } from "./scoring";
 import { phaseForHand, placedStep } from "./turnstate";
 
@@ -57,6 +57,13 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
   delete baseExt(state).snapshot;
   state.turn.pending = [];
   const again = activeModules(env, state.setup).some((m) => m.hooks.extraTurn?.(ctx));
+  for (const m of activeModules(env, state.setup)) {
+    const handled = engineHook(m, "dealAfterTurn")?.(ctx);
+    if (handled === undefined) continue;
+    if (handled === null) endGame(env, state, events);
+    else beginTurn(state, handled, events);
+    return;
+  }
   refillHand(state, player, events);
   const next = again && playerOf(state, player).hand.length > 0 ? player : nextPlayerWithTiles(state, player);
   if (next === null) endGame(env, state, events);
