@@ -13,9 +13,12 @@ export function defaultOptions(): StartOptions {
 
 /** Mappen bredvid programmet: den körbara filen, eller projektroten under utveckling. */
 export function baseDir(): string {
-  const exe = process.execPath;
-  const isBun = /(^|[\\/])bun(\.exe)?$/i.test(exe);
-  return isBun ? resolve(import.meta.dir, "..", "..") : dirname(exe);
+  return isCompiled() ? dirname(process.execPath) : resolve(import.meta.dir, "..", "..");
+}
+
+/** Sant när programmet körs som färdig programfil, falskt under `bun` (utveckling och tester). */
+export function isCompiled(exe: string = process.execPath): boolean {
+  return !/(^|[\\/])bun(\.exe)?$/i.test(exe);
 }
 
 /**

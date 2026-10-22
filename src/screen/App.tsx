@@ -7,7 +7,7 @@ import type { Translate } from "../shared/i18n";
 import { LOCALES, availableLanguages, createTranslator } from "../i18n/index";
 import { MapCanvas } from "./MapCanvas";
 import { type Model, seatsToShow } from "./store";
-import { phaseKey, standings } from "./logic";
+import { isFullscreenNow, phaseKey, standings, wantsF11, withoutF11 } from "./logic";
 import { ReplayPlayer, type ReplayView, shownScore } from "./replay";
 import { ReactionBoard } from "./reactions";
 import { axisTicks, reasonRows, recordMarks, scoreChart } from "./stats";
@@ -363,12 +363,31 @@ function Game({ model, tr }: { model: Model; tr: Translate }) {
   );
 }
 
+function F11Hint({ tr }: { tr: Translate }) {
+  const [wanted] = useState(() => wantsF11(location.search));
+  const [full, setFull] = useState(() => isFullscreenNow(document, window));
+  useEffect(() => {
+    if (!wanted) return;
+    history.replaceState(null, "", location.pathname + withoutF11(location.search) + location.hash);
+    const update = () => setFull(isFullscreenNow(document, window));
+    window.addEventListener("resize", update);
+    document.addEventListener("fullscreenchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      document.removeEventListener("fullscreenchange", update);
+    };
+  }, [wanted]);
+  if (!wanted || full) return null;
+  return <div class="f11-hint">{tr("screen.f11")}</div>;
+}
+
 export function App({ model }: { model: Model }): ComponentChildren {
   const tr = useMemo(() => createTranslator(model.lang in LOCALES ? model.lang : "en"), [model.lang]);
   return (
     <>
       {model.state ? <Game model={model} tr={tr} /> : <Lobby model={model} tr={tr} />}
       <Waiting model={model} tr={tr} />
+      <F11Hint tr={tr} />
       {!model.connected && <div class="toast">{tr("reconnect.lost")}</div>}
       {model.errorKey && <div class="toast err">{tr(model.errorKey)}</div>}
     </>
