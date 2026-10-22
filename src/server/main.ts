@@ -4,7 +4,9 @@ import { join } from "node:path";
 import screenPage from "../screen/index.html";
 import phonePage from "../phone/index.html";
 import { createFileLogger } from "./log";
-import { baseDir } from "./options";
+import { VERSION } from "../shared/version";
+import { openBrowser, shouldOpenBrowser } from "./browser";
+import { baseDir, isCompiled } from "./options";
 import { createServer } from "./server";
 
 const DEFAULT_PORT = 8765;
@@ -20,7 +22,11 @@ const running = createServer({
   logger,
 });
 
-console.log("Erövringen är igång.");
+console.log(`Erövringen ${VERSION} är igång.`);
+console.log("Stäng det här fönstret för att avsluta programmet.");
+logger.info(`version ${VERSION}`);
 console.log(`Öppna storskärmen: ${running.screenUrl}`);
 console.log(`Spelarna ansluter via ${running.baseUrl}/p (QR-koden visas på storskärmen)`);
 logger.info(`storskärm ${running.screenUrl}, spelare ${running.baseUrl}`);
+
+if (shouldOpenBrowser(process.argv, isCompiled())) openBrowser(running.screenUrl, logger);

@@ -241,3 +241,24 @@ export function standings(players: readonly { id: string; score: number }[]): { 
     return { id: p.id, score: p.score, rank };
   });
 }
+
+/** Har adressen `?f11=1`? (webbläsaren startades utan helskärm) */
+export function wantsF11(search: string): boolean {
+  return new URLSearchParams(search).get("f11") === "1";
+}
+
+/** Adressens sökdel utan `f11`-parametern. */
+export function withoutF11(search: string): string {
+  const p = new URLSearchParams(search);
+  p.delete("f11");
+  const s = p.toString();
+  return s ? `?${s}` : "";
+}
+
+/** Är sidan i helskärm? Riktig helskärm, eller ett fönster som fyller skärmen (F11). */
+export function isFullscreenNow(
+  doc: { fullscreenElement: unknown },
+  win: { innerWidth: number; innerHeight: number; screen: { width: number; height: number } },
+): boolean {
+  return !!doc.fullscreenElement || (win.innerWidth >= win.screen.width && win.innerHeight >= win.screen.height);
+}
