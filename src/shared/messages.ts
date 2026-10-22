@@ -55,6 +55,8 @@ export type EdgeChoice = 0 | 1 | 2 | 3 | "all";
 export interface Preview {
   /** Valt kant i steget "Placera brickan"; storskärmen visar siffror på platserna. */
   edge?: EdgeChoice;
+  /** Platserna för den valda kanten, i nummerordning (plats 1 först). Räknas ut av telefonen. */
+  spots?: Pos[];
   /** Området som spelaren håller på att välja i steget "Välj pjäs" (innan delsteget görs). */
   feature?: { pos: Pos; feature: string };
 }
