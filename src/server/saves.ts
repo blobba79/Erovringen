@@ -1,8 +1,7 @@
 // Sparade spel: `sparade/<id>.json` i formatet SavedGame (plus några extra fält som äldre läsare
 // ignorerar). Inget här får kasta fel utåt: en trasig fil är bara "inte läsbar".
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import type { FileStore } from "./store";
 import type { SavedGame, SavedGameInfo } from "../shared/messages";
 import type { TrackerData } from "./stats";
 
@@ -38,37 +37,34 @@ export function validateSave(x: unknown, maxStateVersion: number, known: Set<str
   return snap.players.every((p) => isObj(p) && typeof p.id === "string" && typeof p.score === "number");
 }
 
-export function readSave(dir: string | undefined, id: string, maxStateVersion: number, known: Set<string>): SaveFile | null {
-  if (!dir || !isSafeId(id)) return null;
+export function readSave(store: FileStore | undefined, id: string, maxStateVersion: number, known: Set<string>): SaveFile | null {
+  if (!store || !isSafeId(id)) return null;
   try {
-    const raw = JSON.parse(readFileSync(join(dir, `${id}.json`), "utf8"));
+    const text = store.read(`${id}.json`);
+    if (text === null) return null;
+    const raw = JSON.parse(text);
     return validateSave(raw, maxStateVersion, known) ? raw : null;
   } catch {
     return null;
   }
 }
 
-export function writeSave(dir: string | undefined, id: string, file: SaveFile): boolean {
-  if (!dir || !isSafeId(id)) return false;
+export function writeSave(store: FileStore | undefined, id: string, file: SaveFile): boolean {
+  if (!store || !isSafeId(id)) return false;
   try {
-    mkdirSync(dir, { recursive: true });
-    const target = join(dir, `${id}.json`);
-    const tmp = `${target}.tmp`;
-    writeFileSync(tmp, JSON.stringify(file));
-    renameSync(tmp, target);
-    return true;
+    return store.write(`${id}.json`, JSON.stringify(file));
   } catch {
     return false;
   }
 }
 
 /** Alla sparade spel, nyast först. Oläsliga filer ingår med `readable: false`. */
-export function listSaves(dir: string | undefined, maxStateVersion: number, known: Set<string>): SavedGameInfo[] {
-  if (!dir || !existsSync(dir)) return [];
+export function listSaves(store: FileStore | undefined, maxStateVersion: number, known: Set<string>): SavedGameInfo[] {
+  if (!store) return [];
   const out: (SavedGameInfo & { t: number })[] = [];
   let names: string[] = [];
   try {
-    names = readdirSync(dir).filter((n) => n.endsWith(".json"));
+    names = store.list().filter((n) => n.endsWith(".json"));
   } catch {
     return [];
   }
@@ -77,11 +73,11 @@ export function listSaves(dir: string | undefined, maxStateVersion: number, know
     if (!isSafeId(id)) continue;
     let mtime = 0;
     try {
-      mtime = statSync(join(dir, n)).mtimeMs;
+      mtime = store.modified?.(n) ?? 0;
     } catch {
       /* ignoreras */
     }
-    const save = readSave(dir, id, maxStateVersion, known);
+    const save = readSave(store, id, maxStateVersion, known);
     if (!save) {
       out.push({ id, savedAt: new Date(mtime).toISOString(), players: [], expansions: [], tilesPlaced: 0, readable: false, t: mtime });
       continue;

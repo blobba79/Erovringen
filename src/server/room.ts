@@ -20,6 +20,7 @@ import { loadOptions, sanitizeOptions, saveOptions } from "./options";
 import { toPublicState } from "./publicState";
 import { SAVE_VERSION, isSafeId, listSaves, newSaveId, readSave, writeSave, type SaveFile } from "./saves";
 import { StatsTracker } from "./stats";
+import { nodeFileStore, type FileStore } from "./store";
 
 /** Emojis som får skickas som snabbreaktioner. */
 export const ALLOWED_EMOJIS = ["👍", "👏", "😂", "😮", "😢", "😡", "🎉", "🤔", "❤️", "🔥", "🙈", "😴"];
@@ -39,7 +40,9 @@ export interface RoomOptions {
   engine?: EngineApi;
   modules?: ExpansionModule[];
   logger?: Logger;
-  /** Mappen `sparade/` för startvalen; utelämnad = ingen sparning. */
+  /** Var sparade spel och startval ligger; utelämnad = ingen sparning. */
+  store?: FileStore;
+  /** Förenkling för datorn: mappen `sparade/`. Används om `store` saknas. */
   savedDir?: string;
   /** Slumpfrö för ett nytt spel. */
   seed?: () => number;
@@ -89,7 +92,7 @@ export class Room {
   private readonly engine: EngineApi;
   private readonly modules: ExpansionModule[];
   private readonly log: Logger;
-  private readonly savedDir: string | undefined;
+  private readonly store: FileStore | undefined;
   private readonly opts: RoomOptions;
   private readonly bindings = new Map<Conn, Binding>();
   private baseUrl: string;
@@ -118,17 +121,17 @@ export class Room {
     this.modules = opts.modules ?? MODULES;
     this.engine = opts.engine ?? createGameEngine(this.modules);
     this.log = opts.logger ?? nullLogger;
-    this.savedDir = opts.savedDir;
+    this.store = opts.store ?? (opts.savedDir ? nodeFileStore(opts.savedDir) : undefined);
     this.gameCode = opts.gameCode ?? hex(8);
     this.baseUrl = opts.baseUrl ?? "";
-    this.options = loadOptions(this.savedDir, this.modules);
+    this.options = loadOptions(this.store, this.modules);
     this.now = opts.now ?? Date.now;
     this.known = new Set(this.modules.map((m) => m.id));
     this.refreshSaves();
   }
 
   private refreshSaves(): void {
-    this.saves = listSaves(this.savedDir, STATE_VERSION, this.known);
+    this.saves = listSaves(this.store, STATE_VERSION, this.known);
   }
 
   private warningsFor(state: GameState, player: PlayerId): Warning[] {
@@ -308,7 +311,7 @@ export class Room {
     if (this.phase !== "lobby") return this.error(conn, "error.gameStarted");
     this.options = sanitizeOptions(options, this.modules, this.options);
     this.selectSave(conn, seat);
-    if (!this.options.savedGame) saveOptions(this.savedDir, this.options);
+    if (!this.options.savedGame) saveOptions(this.store, this.options);
     this.sendScreenInfo();
     this.broadcastLobby();
   }
@@ -332,7 +335,7 @@ export class Room {
     if (!id) return this.clearPendingSave();
     if (this.pendingSave?.id === id) return;
     this.refreshSaves();
-    const file = isSafeId(id) ? readSave(this.savedDir, id, STATE_VERSION, this.known) : null;
+    const file = isSafeId(id) ? readSave(this.store, id, STATE_VERSION, this.known) : null;
     if (!file) {
       delete this.options.savedGame;
       this.error(conn, "error.savedGameUnreadable");
@@ -431,7 +434,7 @@ export class Room {
     this.elapsedBefore = 0;
     this.startedAt = this.now();
     this.endedAt = null;
-    saveOptions(this.savedDir, this.options);
+    saveOptions(this.store, this.options);
     this.log.info(`spelet startade med ${this.seats.length} spelare, frö ${seed}, expansioner ${o.expansions.join(",")}`);
     this.camera = this.fitCamera();
     this.broadcastGame(true);
@@ -643,9 +646,9 @@ export class Room {
 
   private save(): void {
     const state = this.state;
-    if (!state || !this.savedDir) return;
+    if (!state || !this.store) return;
     if (!this.saveId) {
-      const used = new Set(listSaves(this.savedDir, STATE_VERSION, this.known).map((x) => x.id));
+      const used = new Set(listSaves(this.store, STATE_VERSION, this.known).map((x) => x.id));
       const base = newSaveId();
       let id = base;
       for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
@@ -660,7 +663,7 @@ export class Room {
       elapsedSeconds: Math.round(this.duration()),
       ...(this.tracker ? { stats: this.tracker.toData() } : {}),
     };
-    if (!writeSave(this.savedDir, this.saveId, file)) this.log.warn(`kunde inte spara spelet ${this.saveId}`);
+    if (!writeSave(this.store, this.saveId, file)) this.log.warn(`kunde inte spara spelet ${this.saveId}`);
   }
 
   private statsMessage(): ServerMessage | null {

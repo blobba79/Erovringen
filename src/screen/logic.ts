@@ -247,6 +247,11 @@ export function wantsF11(search: string): boolean {
   return new URLSearchParams(search).get("f11") === "1";
 }
 
+/** Har adressen `?android=1`? (storskärmen körs i Android-appen) */
+export function isAndroidApp(search: string): boolean {
+  return new URLSearchParams(search).get("android") === "1";
+}
+
 /** Adressens sökdel utan `f11`-parametern. */
 export function withoutF11(search: string): string {
   const p = new URLSearchParams(search);

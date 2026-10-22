@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { findBrowser, openBrowser, planLaunch, shouldOpenBrowser, type FindDeps } from "../../src/server/browser";
-import { isCompiled } from "../../src/server/options";
+import { isCompiled } from "../../src/server/paths";
 import { nullLogger, type Logger } from "../../src/server/log";
 
 const win = (files: string[], extra: Partial<FindDeps> = {}): FindDeps => ({
