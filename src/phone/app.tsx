@@ -6,6 +6,7 @@ import type { Client } from "./client";
 import { ClientCtx, TCtx, useClientState } from "./ui/common";
 import { JoinView, LobbyView, ScanView } from "./ui/connect";
 import { GameView } from "./ui/game";
+import { savedColors } from "./logic/options";
 
 export function App({ client }: { client: Client }) {
   const s = useClientState(client);
@@ -38,7 +39,7 @@ export function App({ client }: { client: Client }) {
   let body;
   if (s.state && s.joined) body = <GameView s={s} />;
   else if (s.joined) body = <LobbyView />;
-  else if (s.plan.kind === "join") body = <JoinView takenColors={new Set(s.lobby?.seats.map((x) => x.color) ?? [])} />;
+  else if (s.plan.kind === "join") body = <JoinView takenColors={new Set(s.lobby?.seats.map((x) => x.color) ?? [])} savedColors={savedColors(s.lobby?.options, s.lobby?.saves)} />;
   else if (s.plan.kind === "rejoin" || s.seatToken) body = <p class="view hint">{t("reconnect.connecting")}</p>;
   else body = <ScanView />;
 

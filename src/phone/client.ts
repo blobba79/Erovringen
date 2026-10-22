@@ -2,13 +2,14 @@
 // Ingen DOM här: lagring, adress och transport kommer in utifrån, så att allt går att testa.
 
 import type {
-  ClientMessage, EdgeChoice, HostAction, LobbySeat, MapControl, Preview, PublicState, ServerMessage, StartOptions,
+  AvailableOptions, ClientMessage, EdgeChoice, GameStats, HostAction, LobbySeat, MapControl, Preview, PublicState, SavedGameInfo,
+  ServerMessage, StartOptions, Warning,
 } from "../shared/messages";
 import type { PlayerId, Pos, Step } from "../shared/state";
 import type { Rotation } from "../shared/tiles";
 import { initialRotation, nextRotation, placementsOf, rotationsAt, spotsFor, type Placement } from "./logic/spots";
 import {
-  clearSeat, loadLang, loadSeat, pickLang, planStart, saveLang, saveSeat, type StartPlan, type StorageLike,
+  clearSeat, loadLang, loadSeat, loadWarnings, pickLang, planStart, saveLang, saveSeat, saveWarnings, type StartPlan, type StorageLike,
 } from "./logic/session";
 
 export interface TransportHandlers {
@@ -44,7 +45,13 @@ export interface PhoneState {
   player: PlayerId | null;
   seatToken: string | null;
   isHost: boolean;
-  lobby: { seats: LobbySeat[]; options: StartOptions; gameCode: string } | null;
+  lobby: {
+    seats: LobbySeat[];
+    options: StartOptions;
+    gameCode: string;
+    available: AvailableOptions;
+    saves: SavedGameInfo[];
+  } | null;
   state: PublicState | null;
   hand: string[];
   legal: Step[];
@@ -58,6 +65,14 @@ export interface PhoneState {
   edge: EdgeChoice | null;
   /** Vald del i steget "Välj pjäs". */
   feature: { pos: Pos; feature: string } | null;
+  /** Varningar för nybörjare slagna på (sparas på telefonen). */
+  warningsOn: boolean;
+  /** Varningar om de väntande delstegen (bara när de är på och det är min tur). */
+  warnings: Warning[];
+  /** Markerad bricka på handen (index), för "Visa för alla" och byte. */
+  selectedTile: number | null;
+  /** Statistik när spelet är slut. */
+  stats: GameStats | null;
 }
 
 type Listener = () => void;
@@ -91,6 +106,10 @@ export class Client {
       turnNonce: 0,
       edge: null,
       feature: null,
+      warningsOn: loadWarnings(deps.storage),
+      warnings: [],
+      selectedTile: null,
+      stats: null,
     };
     this.transport = factory({
       open: () => this.onOpen(),
@@ -153,11 +172,15 @@ export class Client {
         this.deps.replaceSearch?.(`?s=${encodeURIComponent(m.seatToken)}`);
         this.pendingJoin = null;
         this.set({ joined: true, player: m.player, seatToken: m.seatToken, isHost: m.isHost });
+        this.send({ type: "setWarnings", on: this.s.warningsOn });
         return;
       }
       case "lobby": {
         const me = m.seats.find((x) => x.player === this.s.player);
-        this.set({ lobby: { seats: m.seats, options: m.options, gameCode: m.gameCode }, ...(me ? { isHost: me.isHost } : {}) });
+        this.set({
+          lobby: { seats: m.seats, options: m.options, gameCode: m.gameCode, available: m.available, saves: m.saves },
+          ...(me ? { isHost: me.isHost } : {}),
+        });
         return;
       }
       case "state":
@@ -172,6 +195,12 @@ export class Client {
         this.continueRotation(m.steps);
         return;
       }
+      case "warnings":
+        this.set({ warnings: m.warnings });
+        return;
+      case "stats":
+        this.set({ stats: m.stats });
+        return;
       case "waitingFor":
         this.set({ waiting: m.seats });
         return;
@@ -197,12 +226,14 @@ export class Client {
     if (!mine) {
       patch.legal = [];
       patch.placements = [];
+      patch.warnings = [];
     }
     const uiKey = `${state.turn.player}/${state.turn.phase}/${state.turn.pending.length}`;
     if (uiKey !== this.uiKey) {
       this.uiKey = uiKey;
       patch.edge = null;
       patch.feature = null;
+      patch.selectedTile = null;
     }
     this.set(patch);
   }
@@ -268,6 +299,20 @@ export class Client {
 
   inspect(): void {
     this.send({ type: "inspect" });
+  }
+
+  selectTile(index: number | null): void {
+    this.set({ selectedTile: index });
+  }
+
+  react(emoji: string): void {
+    this.send({ type: "react", emoji });
+  }
+
+  setWarningsOn(on: boolean): void {
+    saveWarnings(this.deps.storage, on);
+    this.set({ warningsOn: on, ...(on ? {} : { warnings: [] }) });
+    this.send({ type: "setWarnings", on });
   }
 
   showToAll(handIndex: number): void {

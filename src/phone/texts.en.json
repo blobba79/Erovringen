@@ -14,5 +14,20 @@
   "phone.figureCount": "{figure}: {left} of {total}",
   "phone.hand": "Your tiles",
   "phone.exchangeHint": "None of your tiles fit anywhere. Swap one for a new tile.",
-  "phone.padHint": "Touchpad: drag to move the map, pinch to zoom, twist to rotate, tap to select an area."
+  "phone.padHint": "Touchpad: drag to move the map, pinch to zoom, twist to rotate, tap to select an area.",
+  "phone.pickTile": "Tap the tile you want to play.",
+  "phone.playTile": "Play this tile",
+  "phone.react": "React",
+  "phone.warningsOn": "Warnings for beginners",
+  "phone.yourPlace": "You finished in place {place}.",
+  "phone.statsOnScreen": "The statistics are shown on the big screen.",
+  "start.savedTiles": {"one":"{count} tile placed","other":"{count} tiles placed"},
+  "start.unreadable": "Cannot be read (saved by another version)",
+  "help.phase.chooseTile": "Choose which of your tiles to play. If none of them can be placed anywhere, you may swap one for a new tile from the stack.",
+  "help.phase.placeTile": "Place the tile. Tap the edge of the tile that should touch the map, then the number of a position. You can also pick All positions. The tile must fit its neighbours on every side.",
+  "help.phase.placeFigure": "You may place one figure on the tile you just placed, on a part that no one else already has a figure in. Tap the part, then the figure. You may also skip it.",
+  "help.phase.confirm": "Check your move. Tap Confirm move to finish your turn, or Undo to go back one step.",
+  "help.phase.other": "Follow the choices shown on your phone. Undo takes back the last step, and nothing is final until you confirm the move.",
+  "help.expansion.river": "The River: the river tiles are laid first, and each new river tile must continue the river without turning back on itself. Players have no tiles in hand until the lake is placed.",
+  "help.expansion.abbot": "The Abbot: instead of a normal figure you may place your abbot on a garden or a monastery, or take your abbot back from the board to score its points."
 }
