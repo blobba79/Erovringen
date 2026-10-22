@@ -50,6 +50,14 @@ export function makeRiverModule(
   const lake = tiles.find((t) => t.id !== set.start && riverCount(t) === 1)?.id;
   const ext = (s: GameState) => s.ext.river as RiverExt;
 
+  /** Variant "afterRiver": lägg den vanliga startbrickan överst i högen. */
+  function releaseStart(s: GameState): void {
+    const r = ext(s);
+    if (r.waitingStart === undefined) return;
+    s.drawPile.unshift(r.waitingStart);
+    delete r.waitingStart;
+  }
+
   return {
     id: "river",
     requires: ["base"],
@@ -98,12 +106,17 @@ export function makeRiverModule(
       afterTilePlaced(ctx, pos) {
         const placed = ctx.state.board[posKey(pos)];
         if (!placed || placed.type !== lake) return;
-        const r = ext(ctx.state);
-        r.done = true;
-        if (r.waitingStart !== undefined) {
-          ctx.state.drawPile.unshift(r.waitingStart);
-          delete r.waitingStart;
-        }
+        ext(ctx.state).done = true;
+        releaseStart(ctx.state);
+      },
+      // Anropas när en tur avslutas, före påfyllningen av handen. Går floden aldrig att avsluta
+      // (sjön kastad, inga flodbrickor kvar) släpps den väntande startbrickan ändå.
+      extraTurn(ctx) {
+        const s = ctx.state;
+        if (ext(s).waitingStart === undefined) return false;
+        const hands = s.players.flatMap((p) => p.hand);
+        if (![...s.drawPile, ...hands].some((t) => ids.has(t))) releaseStart(s);
+        return false;
       },
     },
   };

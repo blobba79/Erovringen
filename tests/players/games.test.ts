@@ -1,0 +1,61 @@
+// Testspelare: många seedade partier med slumpmässiga tillåtna drag.
+// Antalet kan ökas: GAMES=3000 npx bun test tests/players
+
+import { describe, expect, test } from "bun:test";
+import { realEngine, setupOf } from "../engine/helpers";
+import { playGame, type Strategy } from "./random-player";
+
+const eng = realEngine();
+const GAMES = Number(process.env.GAMES ?? 300);
+
+function setupFor(i: number) {
+  const n = 2 + (i % 5); // 2-6 spelare
+  const variant = i % 7 === 3 ? "afterRiver" : "shuffle";
+  return setupOf(["base", "river", "abbot"], {
+    n, seed: 1000 + i, handSize: i % 11 === 5 ? 3 : 1, variants: { "river.startTile": variant },
+  });
+}
+
+describe("slumpspelare", () => {
+  test(`${GAMES} partier med grundspel, flod och abbot går att spela färdigt`, () => {
+    let totalTurns = 0;
+    let withScore = 0;
+    for (let i = 0; i < GAMES; i++) {
+      const strategy: Strategy = i % 2 ? "eager" : "random";
+      try {
+        const r = playGame(eng, setupFor(i), { strategy });
+        totalTurns += r.turns;
+        if (r.state.players.some((p) => p.score > 0)) withScore++;
+        expect(r.state.finished).toBe(true);
+      } catch (e) {
+        throw new Error(`parti ${i} (frö ${1000 + i}): ${(e as Error).message}`);
+      }
+    }
+    expect(totalTurns).toBeGreaterThan(GAMES * 30);
+    expect(withScore).toBe(GAMES);
+  }, 3_600_000);
+
+  test("grundspelet utan expansioner och med bara flod", () => {
+    for (let i = 0; i < 20; i++) {
+      playGame(eng, setupOf(["base"], { n: 3, seed: 50 + i }));
+      playGame(eng, setupOf(["base", "river"], { n: 2, seed: 70 + i }));
+    }
+  }, 600_000);
+
+  test("samma frö ger samma parti", () => {
+    const a = playGame(eng, setupFor(4), { strategy: "random" });
+    const b = playGame(eng, setupFor(4), { strategy: "random" });
+    expect(JSON.stringify(a.state)).toBe(JSON.stringify(b.state));
+    expect(a.events).toEqual(b.events);
+  });
+
+  test("flodbrickor ligger i en sammanhängande flod från källan", () => {
+    for (let i = 0; i < 30; i++) {
+      const r = playGame(eng, setupOf(["base", "river"], { n: 2, seed: 300 + i }), { checkUndo: false });
+      const an = eng.analyze(r.state);
+      const rivers = an.areas.filter((a) => a.kind === "river");
+      // Allt vatten hänger ihop så länge floden inte kastats sönder.
+      expect(rivers.length).toBeLessThanOrEqual(2);
+    }
+  }, 600_000);
+});
