@@ -2,8 +2,8 @@
 // Samma för alla grafikstilar och för foton (markeringar och pjäsplatser).
 import type { Edge, FieldFeature, HalfEdge, TileType } from "../shared/tiles";
 import type { FeatureGeometry, GeometryFn, Point, Shape, TileGeometry } from "../shared/style";
-import { EDGES, HALF_EDGE_SEG, circle, clockwise, pointInShape, polyDist, polyMidpoint } from "./math";
-import { cityPolygon, clipToOwnSide } from "./cities";
+import { HALF_EDGE_SEG, circle, clockwise, pointInShape, polyDist, polyMidpoint } from "./math";
+import { cityPolygon } from "./cities";
 import { RIVER_HALF, ROAD_HALF, bandShape, centerline, extendedLine } from "./lines";
 import { flood, maskOf, nearestFree, pole, seedCells, traceMask } from "./raster";
 
@@ -20,10 +20,6 @@ function centerShape(kind: string): Point[] {
   return circle([0.5, 0.5], 0.15, 16);
 }
 
-function neighbours(e: Edge): Edge[] {
-  const i = EDGES.indexOf(e);
-  return [EDGES[(i + 1) % 4] as Edge, EDGES[(i + 3) % 4] as Edge];
-}
 
 const cache = new WeakMap<TileType, TileGeometry>();
 
@@ -35,14 +31,7 @@ export const computeGeometry: GeometryFn = (tile) => {
 
   const cities = tile.features.filter((f) => f.kind === "city") as Extract<TileType["features"][number], { kind: "city" }>[];
   for (const c of cities) {
-    let poly = cityPolygon(c.edges);
-    for (const e of c.edges) {
-      for (const n of neighbours(e)) {
-        if (c.edges.includes(n)) continue;
-        if (cities.some((o) => o !== c && o.edges.includes(n))) poly = clipToOwnSide(poly, e, n);
-      }
-    }
-    const shape: Shape = [clockwise(poly)];
+    const shape: Shape = [clockwise(cityPolygon(c.edges))];
     blockers.push((p) => pointInShape(p, shape));
     const m = maskOf((p) => pointInShape(p, shape));
     feats.push({ feature: c.id, kind: "city", area: shape, anchor: pole(m) ?? [0.5, 0.5] });

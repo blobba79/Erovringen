@@ -57,7 +57,7 @@ export function symbolSpots(count: number, geo: readonly FeatureGeometry[], take
   const spots: Point[] = [];
   for (let n = 0; n < count; n++) {
     let best: Point = [0.5, 0.5], bs = -Infinity;
-    for (let i = 1; i < 10; i++) for (let j = 1; j < 10; j++) {
+    for (let i = 2; i < 9; i++) for (let j = 2; j < 9; j++) {
       const p: Point = [i / 10, j / 10];
       let s = Math.min(clearance(p, hard), 0.35) + 0.01 * (Math.min(p[0], 1 - p[0], p[1], 1 - p[1]));
       for (const t of [...taken, ...spots]) s = Math.min(s, dist(t, p) - 0.1);

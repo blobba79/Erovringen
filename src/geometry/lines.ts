@@ -58,7 +58,7 @@ export function bandShape(line: readonly Point[], half: number): Shape {
     const nx = (-dy / l) * half, ny = (dx / l) * half;
     polys.push([[a[0] + nx, a[1] + ny], [b[0] + nx, b[1] + ny], [b[0] - nx, b[1] - ny], [a[0] - nx, a[1] - ny]]);
   }
-  for (let i = 1; i + 1 < line.length; i++) polys.push(circle(line[i] as Point, half, 10));
-  if (line.length === 2 && line[0]![0] === line[1]![0] && line[0]![1] === line[1]![1]) polys.push(circle(line[0] as Point, half, 10));
+  // rund knut vid varje punkt som inte ligger på brickans kant (så att vägarna möts utan glapp i mitten)
+  for (const p of line) if (p[0] > 0 && p[0] < 1 && p[1] > 0 && p[1] < 1) polys.push(circle(p, half, 10));
   return polys.map(clockwise);
 }

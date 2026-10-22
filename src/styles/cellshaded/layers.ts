@@ -55,36 +55,46 @@ function strokeLine(ctx: Ctx, line: readonly Point[], w: number, color: string, 
   ctx.stroke();
 }
 
-/** Väg eller flod: kontur, mörk bas, ljus yta förskjuten uppåt vänster så att en mörk skuggrand blir kvar nere/höger. */
-export function drawBand(ctx: Ctx, kind: "road" | "river", line: readonly Point[], area: Shape): void {
+export interface Band { line: readonly Point[]; area: Shape }
+
+function pond(ctx: Ctx, e: Point, r: number, fill: string, dx = 0): void {
+  ctx.beginPath();
+  ctx.arc(e[0] + dx, e[1] + dx, r, 0, Math.PI * 2);
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
+
+/**
+ * Vägar eller floder av en sort. Först alla konturer, sedan alla ytor, så att delar som möts
+ * (t.ex. två vägar som ändar i mitten) smälter ihop utan synlig söm.
+ * Ytan: mörk bas, och en ljus yta förskjuten uppåt vänster så att en mörk skuggrand blir kvar nere/höger.
+ */
+export function drawBands(ctx: Ctx, kind: "road" | "river", bands: readonly Band[]): void {
   const t = kind === "road" ? THEME.road : THEME.river;
-  const l = reach(line);
-  strokeLine(ctx, l, t.width + ow * 2, THEME.outline);
-  ctx.save();
-  pathShape(ctx, area);
-  ctx.clip();
-  strokeLine(ctx, l, t.width + ow * 2, t.dark);
-  strokeLine(ctx, l, t.width, t.light, -t.shade, -t.shade);
-  if (kind === "river") {
-    ctx.setLineDash([...THEME.river.dash]);
-    strokeLine(ctx, l, THEME.river.glintW, THEME.river.glint, -t.width * 0.22, -t.width * 0.22);
-    ctx.setLineDash([]);
+  const lakes = kind === "river" ? bands.filter((b) => b.line.length === 2 && b.line[0] !== b.line[1]).map((b) => b.line[1] as Point) : [];
+  for (const b of bands) strokeLine(ctx, reach(b.line), t.width + ow * 2, THEME.outline);
+  for (const e of lakes) pond(ctx, e, t.width * 0.72 + ow, THEME.outline);
+  for (const pass of ["dark", "light"] as const) for (const b of bands) {
+    const l = reach(b.line);
+    ctx.save();
+    pathShape(ctx, b.area);
+    ctx.clip();
+    if (pass === "dark") {
+      strokeLine(ctx, l, t.width + ow * 2, t.dark);
+      ctx.restore();
+      continue;
+    }
+    strokeLine(ctx, l, t.width, t.light, -t.shade, -t.shade);
+    if (kind === "river") {
+      ctx.setLineDash([...THEME.river.dash]);
+      strokeLine(ctx, l, THEME.river.glintW, THEME.river.glint, -t.width * 0.22, -t.width * 0.22);
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
   }
-  ctx.restore();
-  if (kind === "river" && line.length === 2 && line[0] !== line[1]) {
-    // källa/sjö: runt vattenfång i änden
-    const e = line[1] as Point;
-    ctx.beginPath();
-    ctx.arc(e[0], e[1], t.width * 0.72, 0, Math.PI * 2);
-    ctx.fillStyle = t.dark;
-    ctx.fill();
-    ctx.lineWidth = ow;
-    ctx.strokeStyle = THEME.outline;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(e[0] - t.shade, e[1] - t.shade, t.width * 0.66, 0, Math.PI * 2);
-    ctx.fillStyle = t.light;
-    ctx.fill();
+  for (const e of lakes) {
+    pond(ctx, e, t.width * 0.72, t.dark);
+    pond(ctx, e, t.width * 0.66, t.light, -t.shade);
   }
 }
 

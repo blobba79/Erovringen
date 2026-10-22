@@ -1,7 +1,7 @@
 // Stadsytor: polygoner längs kanterna, byggda i en kanonisk vridning som sedan roteras.
 import type { Edge } from "../shared/tiles";
 import type { Point } from "../shared/style";
-import { EDGES, EDGE_MID, rotatePoint, clipHalfPlane, circle } from "./math";
+import { EDGES, rotatePoint, circle } from "./math";
 
 /** Hur djupt en enkel stad går in från sin kant (mitt på kanten). */
 export const CITY_DEPTH = 0.3;
@@ -53,17 +53,4 @@ export function cityPolygon(edges: readonly Edge[]): Point[] {
     if (poly) return poly.map((p) => rotatePoint(p, (4 - k) * 90));
   }
   return circle([0.5, 0.5], 0.2);
-}
-
-const CORNER: Record<string, Point> = { NE: [1, 0], EN: [1, 0], ES: [1, 1], SE: [1, 1], SW: [0, 1], WS: [0, 1], WN: [0, 0], NW: [0, 0] };
-
-/** Dela två separata städer som möts i ett hörn längs hörnets diagonal. */
-export function clipToOwnSide(poly: Point[], edge: Edge, neighbour: Edge): Point[] {
-  const c = CORNER[edge + neighbour];
-  if (!c) return poly;
-  const m = EDGE_MID[edge];
-  const dx = c[0] - 0.5, dy = c[1] - 0.5;
-  let n: Point = [-dy, dx];
-  if (n[0] * (m[0] - 0.5) + n[1] * (m[1] - 0.5) < 0) n = [dy, -dx];
-  return clipHalfPlane(poly, [0.5, 0.5], n);
 }

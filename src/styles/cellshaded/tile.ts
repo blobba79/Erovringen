@@ -5,7 +5,7 @@ import { EDGE_MID, lerp, pointInShape, rotatePoint, rotateShape } from "../../ge
 import { THEME } from "./theme";
 import { cloisterBuilding, garden, house, shield, tree } from "./buildings";
 import { housesFor, symbolSpots, treesFor } from "./decor";
-import { drawBand, drawCityBody, drawGrass } from "./layers";
+import { drawBands, drawCityBody, drawGrass } from "./layers";
 import { drawSymbol } from "./symbols";
 import { pathPoly } from "./util";
 
@@ -36,7 +36,7 @@ export function drawTile({ ctx, tile, geometry, rotation, size }: DrawTileArgs):
   drawGrass(ctx, tile.id);
 
   for (const kind of ["river", "road"] as const) {
-    for (const g of feats) if (g.kind === kind && g.centerline) drawBand(ctx, kind, g.centerline.map(R), rotateShape(g.area, rotation));
+    drawBands(ctx, kind, feats.filter((g) => g.kind === kind && g.centerline).map((g) => ({ line: g.centerline!.map(R), area: rotateShape(g.area, rotation) })));
   }
 
   const icons: Icon[] = [];
