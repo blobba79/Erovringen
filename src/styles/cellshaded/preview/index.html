@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>Cellshadad - förhandsvisning</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { margin: 0; padding: 12px; background: #2E5E3A; color: #FFF4DC; font: 14px system-ui, sans-serif; }
+  label { margin-right: 12px; }
+  #grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .cell { display: flex; flex-direction: column; align-items: center; font-size: 11px; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<label>Expansion <select id="exp"></select></label>
+<label>Rotation <select id="rot"><option>0</option><option>90</option><option>180</option><option>270</option></select></label>
+<div id="grid"></div>
+<canvas id="figs" width="580" height="420"></canvas>
+<script src="/main.js"></script>
+</body>
+</html>
