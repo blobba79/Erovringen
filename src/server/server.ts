@@ -38,10 +38,17 @@ const LOCAL = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 /** Datorns adress på det lokala nätet; helst en privat adress (192.168…, 10…, 172.16–31…). */
 export function lanAddress(): string {
   const all: string[] = [];
-  for (const list of Object.values(networkInterfaces()))
-    for (const i of list ?? []) if (i.family === "IPv4" && !i.internal) all.push(i.address);
-  const isPrivate = (a: string) => /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(a);
-  return all.find(isPrivate) ?? all[0] ?? "localhost";
+  // Virtuella nätverkskort (WSL, Hyper-V, Docker, VPN …) nås inte från telefonerna.
+  const isVirtual = /vEthernet|WSL|Hyper-V|VirtualBox|VMware|docker|br-|veth|virbr|tun|tap|Bluetooth|Loopback/i;
+  for (const [name, list] of Object.entries(networkInterfaces()))
+    for (const i of list ?? [])
+      if (i.family === "IPv4" && !i.internal && !isVirtual.test(name)) all.push(i.address);
+  const ranked = [/^192\.168\./, /^10\./, /^172\.(1[6-9]|2\d|3[01])\./];
+  for (const r of ranked) {
+    const a = all.find((x) => r.test(x));
+    if (a) return a;
+  }
+  return all[0] ?? "localhost";
 }
 
 export function createServer(opts: ServerOptions = {}): RunningServer {

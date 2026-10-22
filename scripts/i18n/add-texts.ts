@@ -3,13 +3,14 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { CORE } from "./texts-core";
 import { FIGURES } from "./texts-figures";
+import { UI } from "./texts-ui";
 
 const read = (p: string) => JSON.parse(readFileSync(p, "utf8")) as Record<string, unknown>;
 const en = read("locales/en.json");
 const sv = read("locales/sv.json");
 const untranslated = new Set<string>((sv._untranslated as string[]) ?? []);
 
-for (const [key, e, s] of [...CORE, ...FIGURES]) {
+for (const [key, e, s] of [...CORE, ...FIGURES, ...UI]) {
   en[key] = e;
   if (s === null) {
     sv[key] = e;
