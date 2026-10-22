@@ -6,10 +6,12 @@ import type { GameState, PlayerId, Pos } from "../shared/state";
 import type { TileType } from "../shared/tiles";
 import type { Warning } from "../shared/messages";
 import { fitsGeometry, getType, toTileTypes, type TileTypes } from "./board";
-import { baseExt } from "./context";
+import type { ExpansionModule } from "../shared/expansion";
+import { baseExt, makeCtx, type Env } from "./context";
+import { baseModule } from "./base-module";
 import { analyze, type Area } from "./features";
 import { ROTATIONS, neighbour } from "./geometry";
-import { areaValue, majorityOwners } from "./scoring";
+import { adjustedPoints, areaValue, majorityOwners } from "./scoring";
 import { rotateTile } from "./tileinfo";
 import { allTileTypes } from "../tiles/index";
 
@@ -17,10 +19,12 @@ let defaultTypes: TileTypes | undefined;
 
 /**
  * Varningar för `state.turn.pending`. Tom lista om inget är värt att varna för.
- * `types` är brickdata (standard: alla brickor i `src/tiles`).
+ * `types` är brickdata (standard: alla brickor i `src/tiles`). `modules` är modulerna som påverkar
+ * poängen (standard: bara grundspelet); ange samma lista som motorn har för att räkna med expansioner.
  */
 export function stepWarnings(
   state: GameState, player: PlayerId, types?: Iterable<TileType> | Map<string, TileType>,
+  modules?: ExpansionModule[],
 ): Warning[] {
   const pending = state.turn.pending;
   if (state.finished || state.turn.player !== player || pending.length === 0) return [];
@@ -34,6 +38,8 @@ export function stepWarnings(
   const before = snap ? analyze(snap.board, snap.figures, tt) : undefined;
   const nameOf = (id: PlayerId) => state.players.find((p) => p.id === id)?.name ?? id;
   const pool = remainingTypes(state, tt);
+  // Före turen: brickorna som fanns kvar då (inklusive den som lagts nu).
+  const poolBefore = snap ? remainingTypes(snap, tt) : pool;
 
   // Områden (stad/väg) där spelaren har pjäs och som inte går att avsluta.
   const newFigureId = placedFig && snap ? justPlacedFigure(state, snap, player) : undefined;
@@ -49,56 +55,76 @@ export function stepWarnings(
       out.push({ key: "warning.figureUnfinishable", params: { area: a.kind }, pos });
     } else if (before && snap) {
       const ba = before.areaAt(f.location.pos, f.location.feature);
-      if (ba && !unfinishableOpening(ba, snap.board, tt, pool)) {
+      if (ba && !unfinishableOpening(ba, snap.board, tt, poolBefore)) {
         out.push({ key: "warning.tileBlocks", params: { area: a.kind }, pos });
       }
     }
   }
 
-  // Sista pjäsen i förrådet.
-  if (placedFig && placedFig.type === "placeFigure") {
+  // Sista pjäsen i förrådet (inte abboten, och inte om området avslutas nu så att pjäsen kommer tillbaka).
+  if (placedFig && placedFig.type === "placeFigure" && placedFig.kind !== "abbot") {
     const left = state.figures.filter(
       (f) => f.owner === player && f.kind === placedFig.kind && f.location.at === "supply",
     ).length;
-    if (left === 0) out.push({ key: "warning.lastFigure", params: { kind: placedFig.kind }, pos: placedFig.pos });
+    const area = an.areaAt(placedFig.pos, placedFig.feature);
+    if (left === 0 && !area?.complete) {
+      out.push({ key: "warning.lastFigure", params: { kind: placedFig.kind }, pos: placedFig.pos });
+    }
   }
 
   if (placed && placed.type === "placeTile" && before) {
-    // Motståndare får majoritet, eller lika, där spelaren hade majoritet.
+    const names = (ids: PlayerId[]) => ids.map(nameOf).join(", ");
     const done = new Set<number>();
+    // Motståndare får majoritet, eller lika, där spelaren hade majoritet.
     for (const ba of before.areas) {
       if (ba.kind !== "city" && ba.kind !== "road" && ba.kind !== "field") continue;
       const bo = majorityOwners(ba);
       if (!bo.includes(player) || bo.some((p) => p !== player)) continue;
       const node = ba.nodes[0]!;
       const a = an.areaAt(node.pos, node.feature);
-      if (!a || a.complete || done.has(a.id)) continue;
+      if (!a || done.has(a.id)) continue;
       const owners = majorityOwners(a);
       const rivals = owners.filter((p) => p !== player);
       if (rivals.length === 0) continue;
       done.add(a.id);
       out.push({
         key: owners.includes(player) ? "warning.majorityTied" : "warning.majorityLost",
-        params: { area: a.kind, player: nameOf(rivals[0]!) },
+        params: { area: a.kind, player: names(rivals) },
         pos: placed.pos,
       });
     }
-    // Stänger ett område som bara en motståndare får poäng för.
+    const env: Env = { modules: modules ?? [baseModule], types: tt };
+    const ctx = makeCtx(env, state, player, []);
     for (const a of an.areas) {
       if (!a.complete || !["city", "road", "cloister", "garden"].includes(a.kind)) continue;
-      if (!a.tiles.some((t) => t.x === placed.pos.x && t.y === placed.pos.y)) continue;
+      if (!nearPlaced(a, placed.pos) || done.has(a.id)) continue;
       const owners = majorityOwners(a);
-      if (owners.length === 0 || owners.includes(player)) continue;
-      const points = areaValue(an, a);
+      if (owners.length === 0) continue;
+      const rivals = owners.filter((p) => p !== player);
+      if (rivals.length === 0) continue;
+      done.add(a.id);
+      if (owners.includes(player)) {
+        // Brickan avslutar ett område där spelaren delar majoriteten.
+        out.push({ key: "warning.majorityTied", params: { area: a.kind, player: names(rivals) }, pos: placed.pos });
+        continue;
+      }
+      // Stänger ett område som bara motståndare får poäng för.
+      const points = adjustedPoints(ctx, a, areaValue(an, a), false);
       if (points <= 0) continue;
       out.push({
         key: "warning.opponentScores",
-        params: { area: a.kind, player: nameOf(owners[0]!), points },
+        params: { area: a.kind, player: names(rivals), points },
         pos: placed.pos,
       });
     }
   }
   return out;
+}
+
+function nearPlaced(a: Area, pos: Pos): boolean {
+  if (a.kind === "cloister" || a.kind === "garden")
+    return a.nodes.some((n) => Math.abs(n.pos.x - pos.x) <= 1 && Math.abs(n.pos.y - pos.y) <= 1);
+  return a.tiles.some((t) => t.x === pos.x && t.y === pos.y);
 }
 
 /** Pjäsen som ställdes under turen (låg i förrådet i ögonblicksbilden). */
