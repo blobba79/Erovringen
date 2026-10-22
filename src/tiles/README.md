@@ -41,3 +41,7 @@ Startbrickan i grundspelet är JCZ:s `BA/RCr` (inte markerad i XML-filen). River
 
 Summor stämmer (72/12/18/24/30/8/8/8/8/6). Dessutom jämförs antalet per kantmönster (t.ex. `ccrr`, roterat) per källa mot förteckningen s. 224-273: allt stämmer utom att PDF:ens förteckning räknar bara 6 av Gold Mines 8 brickor (JCZ och komponentlistan har 8; de två saknade har fyra vägkanter).
 River jämförs inte per mönster (förteckningen s. 267-269 blandar River I/II); där kontrolleras antalet 12 och att sjön är sist.
+
+## Avvikelse från JCZ: genomgående stad med sköld
+
+Nya utgåvan (`basic:2`) har 1 genomgående stad (CFCF) med sköld och 2 utan: "one CFCF tile with a pennant has had it removed" (regel-PDF:en s. 196). JCZ:s data har 2 + 1. Skriptet `scripts/tiles/convert.ts` rättar det (`base/CFc+` 1 st, `base/CFc.1` 2 st); summan är fortfarande 72. Kör skriptet i stället för att ändra `base.json` för hand.

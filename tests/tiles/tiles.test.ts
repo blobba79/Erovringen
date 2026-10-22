@@ -76,10 +76,14 @@ describe("innehåll", () => {
     const d = TILE_DATA[e]!;
     return d.set.tiles.reduce((a, r) => a + (pred(d.tiles.find((t) => t.id === r.type)!) ? r.count : 0), 0);
   };
-  test("grundspelet: 8 trädgårdar, 4 kloster utan väg + 2 med, 12 sköldar", () => {
+  test("grundspelet: 8 trädgårdar, 4 kloster utan väg + 2 med, 9 brickor med sköld (en CFCF-sköld borttagen)", () => {
     expect(count("base", (t) => t.features.some((f) => f.kind === "garden"))).toBe(8);
     expect(count("base", (t) => t.features.some((f) => f.kind === "cloister"))).toBe(6);
-    expect(count("base", (t) => t.features.some((f) => f.kind === "city" && "pennants" in f))).toBe(10);
+    expect(count("base", (t) => t.features.some((f) => f.kind === "city" && "pennants" in f))).toBe(9);
+  });
+  test("grundspelet: genomgående stad CFCF, 1 med sköld och 2 utan (PDF s. 196)", () => {
+    const n = (id: string) => TILE_DATA.base!.set.tiles.find((t) => t.type === id)?.count;
+    expect([n("base/CFc+"), n("base/CFc.1")]).toEqual([1, 2]);
   });
   test("River I: en trädgård", () => {
     expect(count("river", (t) => t.features.some((f) => f.kind === "garden"))).toBe(1);

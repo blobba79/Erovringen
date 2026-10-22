@@ -104,6 +104,12 @@ export function convertSource(src: Source, xml: string): { tiles: TileType[]; se
   const set = findAll(doc, "tile-set").find((s) => s.attrs.id === src.set);
   if (!set) throw new Error(`Mängden ${src.set} saknas`);
   let refs = set.children.filter((c) => c.name === "ref").map((r) => ({ jcz: r.attrs.tile!, count: Number(r.attrs.count) }));
+  if (src.set === "basic:2") {
+    // Avvikelse från JCZ: i nya utgåvan (New Carcassonne, regel-PDF:en s. 196) har en av de genomgående
+    // städerna med sköld (CFCF) fått skölden borttagen: 1 med sköld och 2 utan, inte 2 + 1 som JCZ har.
+    const fix: Record<string, number> = { "BA/CFc+": 1, "BA/CFc.1": 2 };
+    refs = refs.map((r) => (r.jcz in fix ? { ...r, count: fix[r.jcz]! } : r));
+  }
   if (src.expansion === "river") {
     // Källa utan start/sjö-ordning: källan först, sjön sist.
     const lake = refs.filter((r) => defs.get(r.jcz)?.attrs.group === "river-lake");
