@@ -16,3 +16,12 @@ logg/
 
 # Nedladdad brickdata från JCloisterZone
 scripts/tiles/cache/
+
+# Android: byggda webbfiler och Gradles mappar
+android/app/src/main/assets/web/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+*.jks

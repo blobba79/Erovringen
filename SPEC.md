@@ -131,7 +131,7 @@ Tecknad stil med svarta konturer och skarpa skuggor i två toner, som i tecknade
 
 ## Paketering och start
 
-- Det färdiga spelet är **en enda programfil per operativsystem**, som går att ta med på ett USB-minne: en för **Windows** och en för **Linux** (vanliga 64-bitars datorer). Båda byggs från samma kod, och båda kan ligga i samma mapp och dela sparade spel. **Allt finns i programfilen**, även alla expansioner.
+- Det färdiga spelet är **en enda programfil per operativsystem**, som går att ta med på ett USB-minne: en för **Windows** och en för **Linux** (vanliga 64-bitars datorer). Dessutom finns en Android-app som nödlösning (se nedan). Båda byggs från samma kod, och båda kan ligga i samma mapp och dela sparade spel. **Allt finns i programfilen**, även alla expansioner.
 - Man dubbelklickar på filen för sitt operativsystem. Den startar servern och öppnar webbläsaren med storskärmen **direkt i helskärm**. Ingen installation och inga andra program ska behövas, utöver en webbläsare som redan finns på datorn.
 - Programmet hittar själv en installerad webbläsare och startar den i helskärm. Går inte det öppnas standardwebbläsaren med en tydlig uppmaning att trycka F11.
 - Det ska finnas ett enkelt sätt för mig att bygga båda programfilerna, t.ex. ett enda kommando.
@@ -140,6 +140,16 @@ Tecknad stil med svarta konturer och skarpa skuggor i två toner, som i tecknade
 - **Nya versioner:** sparade spel och startval ska fungera även efter en uppdatering. Går ett sparat spel inte att öppna ska storskärmen säga det tydligt, aldrig krascha.
 - Allt spelet sparar (sparade spel, senaste startvalen) hamnar i en mapp **bredvid programfilen**, så att allt följer med på USB-minnet.
 - Om datorns brandvägg frågar om nätverksåtkomst första gången ska storskärmen förklara kort vad man ska svara.
+
+### Android-app (nödlösning)
+
+- En **Android-app** gör att en surfplatta eller telefon kan vara både server och storskärm, t.ex. på jobbet eller på resande fot. Datorn är fortfarande det vanliga sättet att spela.
+- Appen öppnas och visar storskärmen direkt, med QR-koden. Spelarnas telefoner ansluter som vanligt med webbläsaren.
+- Det ska fungera **utan internet**: telefonerna kan ansluta till surfplattans wifi-hotspot. Storskärmen förklarar kort hur man slår på hotspot om ingen telefon kan ansluta.
+- Samma regler, samma storskärm och samma telefonvy som på datorn, byggda från samma kod. Alla expansioner finns med.
+- Sparade spel och senaste startvalen sparas i appen, och sparade spel fungerar efter en uppdatering av appen.
+- Skärmen hålls tänd medan appen är öppen. Appen visas i liggande läge.
+- APK-filen byggs av GitHub Actions tillsammans med Windows- och Linux-filen och läggs på release-sidan. Den installeras direkt från filen, inte via Google Play.
 
 ## Värd och startval
 
@@ -271,7 +281,8 @@ För varje extra pjäs som ska placeras visar storskärmen siffror på de bricko
   2. Telefonstyrning, kartstyrning och områdesmarkering.
   3. Hand med brickor, repris, varningar, statistik, emojis och spara/fortsätt.
   4. Paketering till en programfil för Windows och en för Linux, som startar i helskärm.
-  5. En expansion i taget, i den ordning du föreslår.
+  5. Android-appen (nödlösning).
+  6. En expansion i taget, i den ordning du föreslår.
 - Skriv automatiska tester för regler och poängräkning.
 - **Testspelare:** osynliga datorspelare som gör slumpade men tillåtna drag, och som bara används i testerna. De ska kunna spela tusentals partier med olika kombinationer av expansioner för att hitta fel och krascher. De syns aldrig i spelet.
 - Håll den här filen uppdaterad när vi bestämmer nya saker.

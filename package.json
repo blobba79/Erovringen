@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "dev": "bun --hot src/server/main.ts",
-    "build": "bun scripts/build/build.ts"
+    "build": "bun scripts/build/build.ts",
+    "build:android-web": "bun scripts/build/android-web.ts"
   },
   "devDependencies": {
     "@types/bun": "1.2.17",

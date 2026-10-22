@@ -12,6 +12,8 @@ TypeScript med Bun (installerat lokalt: `npx bun …`). `npm run typecheck` kont
 - `expansion.ts`: `ExpansionModule` med krokar och regelvarianter
 - `messages.ts`: meddelanden mellan server, storskärm och telefon, och format för sparade spel
 - `style.ts`: `GraphicStyle` och brickgeometri
+- `android.ts`: bryggan mellan Android-appen och spelrummet
+- `version.ts`: programmets version
 - `i18n.ts`: språkfilernas format
 
 **Vem äger vad** (en del = en agent; ingen rör en annan dels filer):
@@ -28,6 +30,7 @@ TypeScript med Bun (installerat lokalt: `npx bun …`). `npm run typecheck` kont
 | Telefon | `src/phone/`, `tests/phone/` |
 | Språk | `locales/`, `src/i18n/`, `scripts/i18n/`, `tests/i18n/` |
 | Paketering | `scripts/build/`, `.github/workflows/` |
+| Android-appen | `android/`, `scripts/build/android-*`, `.github/workflows/android.yml` |
 
 I en ny worktree saknas `node_modules/`: kör `npm ci` först.
 

@@ -80,6 +80,16 @@ Fas 4, parallellt: servern (webbläsarstart) och paketeringen (bygge och GitHub 
 - Sparade spel och loggen hamnar i `sparade/` och `logg/` bredvid programfilen (`baseDir()` i `src/server/options.ts`).
 - GitHub Actions: `.github/workflows/release.yml` körs när en release publiceras. Den kör typkontroll och tester, bygger båda filerna på `ubuntu-latest` och laddar upp dem till releasen.
 
+Fas 5, parallellt: spelrummet i webbläsaren (servern) och Android-appen. Se `SPEC.md`, "Android-app (nödlösning)". Expansionerna kommer i fas 6.
+
+**Konventioner för fas 5:**
+- Appen ligger i `android/` (Kotlin, Gradle, minSdk 26). Den har två WebView: storskärmen (synlig, `http://127.0.0.1:<port>/?android=1`) och spelrummet (dold, `http://127.0.0.1:<port>/room`). Bryggan mellan dem och appen är `src/shared/android.ts`.
+- Appens server lyssnar på alla nätverkskort, port 8765 eller en ledig. Den serverar de byggda filerna (`/` storskärmen, `/p` telefonen, `/room` spelrummet, bara från enheten själv), tar emot `/ws` och skickar `/qr.svg` och `/join-colors` vidare till spelrummet med `EmbeddedRoom.http`. En anslutning är lokal om den kommer från 127.0.0.1 eller ::1.
+- Spelrummet i webbläsaren: samma `Room` som på datorn. Filerna läses och skrivs genom ett gränssnitt (`FileStore` i `src/server/`), med en version för Node och en för bryggan. Sidan för spelrummet ligger i `src/server/embedded/`.
+- `npm run build:android-web` (`scripts/build/android-web.ts`) bygger storskärmen, telefonen och spelrummet till `android/app/src/main/assets/web/`. Mappen är ignorerad av git.
+- APK:n byggs av `.github/workflows/android.yml` (`ubuntu-latest`), som körs på samma sätt som `release.yml` (release och `workflow_dispatch`) och laddar upp `erovringen-android.apk`. `release.yml` rörs inte. APK:n signeras med en nyckel ur GitHub-hemligheter om de finns, annars med debug-nyckeln.
+- Med `?android=1` visar storskärmen hur man slår på wifi-hotspot i stället för texten om brandväggen.
+
 **Förslag på expansionsordning** (enklast först, de som påverkar mest sist):
 1. Inns & Cathedrals, 2. Traders & Builders, 3. The Gold Mines, 4. Mage & Witch, 5. The Ferries, 6. The Flying Machines, 7. Crop Circles II, 8. The Princess & the Dragon.
 
