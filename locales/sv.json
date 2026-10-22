@@ -110,5 +110,14 @@
   "figure.barn": "Lada",
   "figure.flying-machine": "Flying machine",
   "figure.ferry": "Ferry",
-  "figure.gold-bar": "Gold bar"
+  "figure.gold-bar": "Gold bar",
+  "error.gameFinished": "Spelet är slut.",
+  "error.illegalStep": "Det draget går inte att göra nu.",
+  "error.invalidTile": "Den brickan finns inte på din hand.",
+  "error.noPlacement": "Brickan går inte att lägga någonstans.",
+  "error.exchangeNotAllowed": "Du får bara byta bricka när ingen av dina brickor passar.",
+  "error.illegalFigure": "Pjäsen kan inte placeras där.",
+  "error.noFigureLeft": "Du har inga sådana pjäser kvar.",
+  "error.featureOccupied": "Det står redan någon där.",
+  "error.nothingToUndo": "Det finns inget att ångra."
 }

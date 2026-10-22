@@ -85,5 +85,14 @@
   "figure.barn": "Barn",
   "figure.flying-machine": "Flying machine",
   "figure.ferry": "Ferry",
-  "figure.gold-bar": "Gold bar"
+  "figure.gold-bar": "Gold bar",
+  "error.gameFinished": "The game is over.",
+  "error.illegalStep": "That move is not allowed now.",
+  "error.invalidTile": "That tile is not in your hand.",
+  "error.noPlacement": "The tile cannot be placed anywhere.",
+  "error.exchangeNotAllowed": "You can only swap a tile when none of your tiles fit.",
+  "error.illegalFigure": "That figure cannot be placed there.",
+  "error.noFigureLeft": "You have no figure of that kind left.",
+  "error.featureOccupied": "Someone is already there.",
+  "error.nothingToUndo": "There is nothing to undo."
 }
