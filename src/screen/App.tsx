@@ -7,12 +7,15 @@ import type { Translate } from "../shared/i18n";
 import { LOCALES, availableLanguages, createTranslator } from "../i18n/index";
 import { MapCanvas } from "./MapCanvas";
 import { type Model, seatsToShow } from "./store";
-import { isFullscreenNow, phaseKey, standings, wantsF11, withoutF11 } from "./logic";
+import { isAndroidApp, isFullscreenNow, phaseKey, standings, wantsF11, withoutF11 } from "./logic";
 import { ReplayPlayer, type ReplayView, shownScore } from "./replay";
 import { ReactionBoard } from "./reactions";
 import { axisTicks, reasonRows, recordMarks, scoreChart } from "./stats";
 import { style, tileTypes } from "./data";
 import { tileImage } from "./render";
+
+/** Läses en gång när sidan startar, så att det gäller även efter återanslutning och byte av vy. */
+const ANDROID_APP = typeof location !== "undefined" && isAndroidApp(location.search);
 
 const qrSrc = (text: string) => `/qr.svg?text=${encodeURIComponent(text)}`;
 
@@ -83,7 +86,15 @@ function Lobby({ model, tr }: { model: Model; tr: Translate }) {
         )}
       </div>
       <aside class="firewall">
-        <strong>{tr("screen.firewall.title")}</strong> {tr("screen.firewall.text")}
+        {ANDROID_APP ? (
+          <>
+            <strong>{tr("screen.hotspot.title")}</strong> {tr("screen.hotspot.text")}
+          </>
+        ) : (
+          <>
+            <strong>{tr("screen.firewall.title")}</strong> {tr("screen.firewall.text")}
+          </>
+        )}
       </aside>
     </div>
   );

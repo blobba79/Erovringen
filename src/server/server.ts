@@ -3,7 +3,7 @@
 
 import { networkInterfaces } from "node:os";
 import { createFileLogger, nullLogger, type Logger } from "./log";
-import { MAX_QR_TEXT, qrSvg } from "./qr";
+import { roomHttp } from "./http";
 import { Room, type Conn, type RoomOptions } from "./room";
 
 export interface ServerOptions {
@@ -66,18 +66,12 @@ export function createServer(opts: ServerOptions = {}): RunningServer {
         if (server.upgrade(req, { data })) return undefined;
         return new Response("WebSocket krävs", { status: 426 });
       }
-      if (url.pathname === "/qr.svg") {
-        const text = url.searchParams.get("text") ?? "";
-        if (!text || text.length > MAX_QR_TEXT) return new Response("Ogiltig text", { status: 400 });
-        return new Response(qrSvg(text), {
-          headers: { "content-type": "image/svg+xml", "cache-control": "no-store" },
+      const reply = roomHttp(room, url.pathname, url.searchParams);
+      if (reply)
+        return new Response(reply.body, {
+          status: reply.status,
+          headers: { "content-type": reply.contentType, ...(reply.status === 200 ? { "cache-control": "no-store" } : {}) },
         });
-      }
-      if (url.pathname === "/join-colors") {
-        const colors = room.joinColors(url.searchParams.get("g") ?? "");
-        if (!colors) return new Response("Hittades inte", { status: 404 });
-        return Response.json(colors, { headers: { "cache-control": "no-store" } });
-      }
       return new Response("Hittades inte", { status: 404 });
     },
     websocket: {

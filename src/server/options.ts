@@ -1,7 +1,6 @@
 // Startvalen: standardvärden, rensning av inkommande val och sparning av senaste valen i `sparade/`.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import type { FileStore } from "./store";
 import type { StartOptions } from "../shared/messages";
 import type { ExpansionModule } from "../shared/expansion";
 
@@ -9,16 +8,6 @@ export const MAX_HAND_SIZE = 8;
 
 export function defaultOptions(): StartOptions {
   return { expansions: ["base"], variants: {}, screenLang: "en", handSize: 1, showClosingTiles: false };
-}
-
-/** Mappen bredvid programmet: den körbara filen, eller projektroten under utveckling. */
-export function baseDir(): string {
-  return isCompiled() ? dirname(process.execPath) : resolve(import.meta.dir, "..", "..");
-}
-
-/** Sant när programmet körs som färdig programfil, falskt under `bun` (utveckling och tester). */
-export function isCompiled(exe: string = process.execPath): boolean {
-  return !/(^|[\\/])bun(\.exe)?$/i.test(exe);
 }
 
 /**
@@ -52,13 +41,13 @@ export function sanitizeOptions(raw: unknown, modules: ExpansionModule[], fallba
 
 const FILE = "startval.json";
 
-export function loadOptions(dir: string | undefined, modules: ExpansionModule[]): StartOptions {
+export function loadOptions(store: FileStore | undefined, modules: ExpansionModule[]): StartOptions {
   const def = defaultOptions();
-  if (!dir) return def;
+  if (!store) return def;
   try {
-    const file = join(dir, FILE);
-    if (!existsSync(file)) return def;
-    const o = sanitizeOptions(JSON.parse(readFileSync(file, "utf8")), modules, def);
+    const text = store.read(FILE);
+    if (text === null) return def;
+    const o = sanitizeOptions(JSON.parse(text), modules, def);
     delete o.savedGame; // ett sparat spel väljs på nytt varje gång
     return o;
   } catch {
@@ -66,12 +55,11 @@ export function loadOptions(dir: string | undefined, modules: ExpansionModule[])
   }
 }
 
-export function saveOptions(dir: string | undefined, options: StartOptions): void {
-  if (!dir) return;
+export function saveOptions(store: FileStore | undefined, options: StartOptions): void {
+  if (!store) return;
   try {
-    mkdirSync(dir, { recursive: true });
     const { savedGame: _s, ...rest } = options;
-    writeFileSync(join(dir, FILE), JSON.stringify(rest, null, 2));
+    store.write(FILE, JSON.stringify(rest, null, 2));
   } catch {
     // Att inte kunna spara startvalen får inte stoppa spelet.
   }

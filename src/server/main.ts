@@ -6,7 +6,7 @@ import phonePage from "../phone/index.html";
 import { createFileLogger } from "./log";
 import { VERSION } from "../shared/version";
 import { openBrowser, shouldOpenBrowser } from "./browser";
-import { baseDir, isCompiled } from "./options";
+import { baseDir, isCompiled } from "./paths";
 import { createServer } from "./server";
 
 const DEFAULT_PORT = 8765;
