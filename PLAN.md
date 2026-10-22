@@ -67,6 +67,9 @@ Se `regler/sammanfattning/README.md`. Brickornas utseende och de flesta kantfall
 | Draken flyttar | före poängräkning (HiG/ZMG) | efter poängräkning (RGG) |
 | Guldtackor delas ut | en i taget i tur (HiG) | en per poängräknat område |
 | Floden | River I, källan är startbricka, sjön sist i flodhögen, vanliga startbrickan blandas in | vanliga startbrickan läggs när floden är klar |
+| Flodens återvändsgränder | bara direkt U-sväng är förbjuden (originalregeln) | förbjud också lägen där floden inte kan fortsätta (som JCloisterZone) |
+
+Under flodfasen har ingen brickor på hand, oavsett handstorlek: man drar en flodbricka i början av sin tur. Händerna delas ut när sjön är lagd.
 
 Fler varianter läggs till på samma sätt när de dyker upp.
 
