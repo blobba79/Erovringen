@@ -23,9 +23,9 @@ TypeScript med Bun (installerat lokalt: `npx bun …`). `npm run typecheck` kont
 | Regelmotor för grundspelet (med River och Abbot) | `src/engine/`, `src/expansions/river/`, `src/expansions/abbot/`, `tests/engine/`, `tests/players/` |
 | En expansion | `src/expansions/<id>/`, `tests/expansions/<id>/` |
 | Brickgeometri och grafikstil | `src/geometry/`, `src/styles/<stil>/`, `tests/geometry/` |
-| Server | `src/server/` |
-| Storskärm | `src/screen/` |
-| Telefon | `src/phone/` |
+| Server | `src/server/`, `tests/server/` |
+| Storskärm | `src/screen/`, `tests/screen/` |
+| Telefon | `src/phone/`, `tests/phone/` |
 | Språk | `locales/`, `src/i18n/`, `scripts/i18n/`, `tests/i18n/` |
 | Paketering | `scripts/build/`, `.github/workflows/` |
 
