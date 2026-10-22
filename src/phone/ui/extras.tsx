@@ -14,9 +14,13 @@ export function Warnings({ s }: { s: PhoneState }) {
   if (!s.warningsOn || s.warnings.length === 0) return null;
   return (
     <section class="warnings" role="alert">
-      {s.warnings.map((w) => (
-        <p>⚠ {t(w.key, w.params)}</p>
-      ))}
+      {s.warnings.map((w) => {
+        // Motorn skickar områdets och pjäsens id; de översätts här.
+        const p = { ...w.params };
+        if (typeof p.area === "string") p.area = t(`warning.area.${p.area}`);
+        if (typeof p.kind === "string") p.kind = t(`figure.${p.kind}`);
+        return <p>⚠ {t(w.key, p)}</p>;
+      })}
     </section>
   );
 }
