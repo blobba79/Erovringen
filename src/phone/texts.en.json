@@ -1,0 +1,18 @@
+{
+  "phone.scanQr": "Scan the QR code on the big screen to join the game.",
+  "phone.you": "(you)",
+  "phone.notConnected": "{player} is not connected.",
+  "phone.hostWait": "Wait",
+  "phone.hostSkip": "Skip",
+  "phone.hostRemove": "Remove",
+  "phone.pickEdge": "Tap the edge of the tile that should touch the map, or use All positions.",
+  "phone.pickSpot": "Pick the number of a position.",
+  "phone.noSpots": "The tile cannot be placed with that edge connected.",
+  "phone.pickFeature": "Tap the part of the tile where the figure should stand.",
+  "phone.takeBack": "Take back {figure}",
+  "phone.gameOver": "The game is over",
+  "phone.figureCount": "{figure}: {left} of {total}",
+  "phone.hand": "Your tiles",
+  "phone.exchangeHint": "None of your tiles fit anywhere. Swap one for a new tile.",
+  "phone.padHint": "Touchpad: drag to move the map, pinch to zoom, twist to rotate, tap to select an area."
+}
