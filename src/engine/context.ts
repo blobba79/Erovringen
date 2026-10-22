@@ -1,0 +1,47 @@
+// Gemensamma typer för motorns delar: miljön (moduler och brickor) och krokarnas utvidgade sammanhang.
+
+import type { ExpansionModule, HookContext } from "../shared/expansion";
+import type { GameEvent, GameSetup, GameState, PlayerId } from "../shared/state";
+import type { TileTypes } from "./board";
+
+/** Det som är fast för en motorinstans. */
+export interface Env {
+  /** Alla registrerade moduler (grundspelet först). */
+  modules: ExpansionModule[];
+  types: TileTypes;
+}
+
+/** Krokarnas sammanhang. Modulerna i det här repot får läsa `types` och `env`. */
+export interface EngineHookContext extends HookContext {
+  types: TileTypes;
+  env: Env;
+  /** I `canPlaceTile`: brickstypen som prövas. */
+  tile?: string;
+}
+
+/** Motorns egna data i `state.ext.base`. */
+export interface BaseExt {
+  /** Brickor som kastats (ingen passade). */
+  discarded: string[];
+  /** Ögonblicksbild av tillståndet vid turens början, finns medan delsteg väntar. */
+  snapshot?: GameState;
+}
+
+export function baseExt(state: GameState): BaseExt {
+  return state.ext.base as BaseExt;
+}
+
+/** Moduler som är påslagna i spelet; grundspelet alltid, i registreringsordning. */
+export function activeModules(env: Env, setup: GameSetup): ExpansionModule[] {
+  return env.modules.filter((m) => m.id === "base" || setup.expansions.includes(m.id));
+}
+
+export function makeCtx(env: Env, state: GameState, player: PlayerId, events: GameEvent[]): EngineHookContext {
+  return { state, player, emit: (e) => events.push(e), types: env.types, env };
+}
+
+export function playerOf(state: GameState, id: PlayerId) {
+  const p = state.players.find((x) => x.id === id);
+  if (!p) throw new Error(`unknown player ${id}`);
+  return p;
+}
