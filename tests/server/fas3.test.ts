@@ -224,6 +224,29 @@ function room_step(room: Room, c: FakeConn, ...types: string[]): void {
   }
 }
 
+describe("färger innan telefonen går med", () => {
+  test("upptagna färger, sparade färger och fel spelkod", () => {
+    const dir = tmp();
+    const g = startedRoom({ savedDir: dir });
+    playTurns(g.room, g.byPlayer, 2);
+    const id = saveFiles(dir)[0]!.slice(0, -5);
+
+    const room = makeRoom({ savedDir: dir });
+    expect(room.joinColors("fel")).toBeNull();
+    expect(room.joinColors(room.gameCode)).toEqual({ taken: [], saved: [] });
+    const host = joinRoom(room, "Anna", "red");
+    expect(room.joinColors(room.gameCode)).toEqual({ taken: ["red"], saved: [] });
+
+    room.handle(host, { type: "setOptions", options: opts({ savedGame: id }) });
+    expect(room.joinColors(room.gameCode)).toEqual({ taken: ["red"], saved: ["red", "blue"] });
+    joinRoom(room, "Bo", "blue");
+    expect(room.joinColors(room.gameCode)!.taken.sort()).toEqual(["blue", "red"]);
+
+    room.handle(host, { type: "startGame" });
+    expect(room.joinColors(room.gameCode)).toBeNull();
+  });
+});
+
 describe("statistik", () => {
   function finishGame(room: Room, by: (id: string) => FakeConn): number {
     let guard = 0;

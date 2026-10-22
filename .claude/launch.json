@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "erovringen",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["bun", "src/server/main.ts"],
+      "port": 8765
+    }
+  ]
+}

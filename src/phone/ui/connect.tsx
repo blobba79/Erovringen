@@ -16,7 +16,8 @@ export function JoinView({ takenColors, savedColors }: { takenColors: ReadonlySe
   const [name, setName] = useState(() => loadName(storage));
   const palette = savedColors && savedColors.length > 0 ? savedColors : PALETTE;
   const [color, setColor] = useState(() => palette.find((p) => !takenColors.has(p)) ?? palette[0]!);
-  const chosen = takenColors.has(color) ? (palette.find((p) => !takenColors.has(p)) ?? color) : color;
+  // Färgerna kan komma efter första visningen: byt då bort en vald färg som är upptagen eller inte finns.
+  const chosen = takenColors.has(color) || !palette.includes(color) ? (palette.find((p) => !takenColors.has(p)) ?? color) : color;
   const waiting = s.conn !== "open";
   return (
     <main class="view join">

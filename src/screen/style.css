@@ -77,8 +77,9 @@ h1, h2, h3 { margin: 0 0 0.4em; }
 .reaction { font-size: 1.6em; line-height: 1; margin-right: 0.4em; animation: pop 0.35s ease-out; }
 @keyframes pop { from { transform: scale(0.2); } 70% { transform: scale(1.35); } to { transform: scale(1); } }
 .gain { font-weight: 800; color: var(--c-accent, #e64); background: var(--c-text, #fff); border-radius: 1em; padding: 0 0.5em; margin-right: 0.5em; animation: pop 0.3s ease-out; }
-.shown { top: 14vh; left: 50%; transform: translateX(-50%); border-width: 0.5vmax; text-align: center; font-size: 1.6vmax; z-index: 2; }
-.shown canvas { width: 20vmax; height: 20vmax; display: block; margin: 0 auto; border-radius: 0.6vmax; }
+/* Nere till vänster, så att kartan och platsernas siffror syns medan brickan läggs. */
+.shown { bottom: 1.2vmax; left: 1.2vmax; border-width: 0.4vmax; text-align: center; font-size: 1.3vmax; z-index: 2; }
+.shown canvas { width: 14vmax; height: 14vmax; display: block; margin: 0 auto; border-radius: 0.6vmax; }
 .final-wrap.with-stats { gap: 2vmax; align-items: stretch; padding: 3vmax; background: rgba(0, 0, 0, 0.4); }
 .final-wrap.with-stats .final { min-width: 24vmax; align-self: center; }
 .stats { display: flex; flex-direction: column; gap: 1.2vmax; width: 44vmax; font-size: 1.1vmax; overflow: hidden; }

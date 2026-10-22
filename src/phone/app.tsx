@@ -7,6 +7,7 @@ import { ClientCtx, TCtx, useClientState } from "./ui/common";
 import { JoinView, LobbyView, ScanView } from "./ui/connect";
 import { GameView } from "./ui/game";
 import { savedColors } from "./logic/options";
+import type { JoinColors } from "../shared/messages";
 
 export function App({ client }: { client: Client }) {
   const s = useClientState(client);
@@ -36,10 +37,16 @@ export function App({ client }: { client: Client }) {
     return () => clearTimeout(id);
   }, [s.error?.n]);
 
+  const colors = useJoinColors(!s.joined && s.plan.kind === "join" ? s.plan.gameCode : null);
+
   let body;
   if (s.state && s.joined) body = <GameView s={s} />;
   else if (s.joined) body = <LobbyView />;
-  else if (s.plan.kind === "join") body = <JoinView takenColors={new Set(s.lobby?.seats.map((x) => x.color) ?? [])} savedColors={savedColors(s.lobby?.options, s.lobby?.saves)} />;
+  else if (s.plan.kind === "join") {
+    const taken = colors?.taken ?? s.lobby?.seats.map((x) => x.color) ?? [];
+    const saved = colors?.saved ?? savedColors(s.lobby?.options, s.lobby?.saves);
+    body = <JoinView takenColors={new Set(taken)} savedColors={saved} />;
+  }
   else if (s.plan.kind === "rejoin" || s.seatToken) body = <p class="view hint">{t("reconnect.connecting")}</p>;
   else body = <ScanView />;
 
@@ -57,4 +64,28 @@ export function App({ client }: { client: Client }) {
       </TCtx.Provider>
     </ClientCtx.Provider>
   );
+}
+
+/** Upptagna och sparade färger innan telefonen gått med; hämtas om medan andra ansluter. */
+function useJoinColors(gameCode: string | null): JoinColors | null {
+  const [colors, setColors] = useState<JoinColors | null>(null);
+  useEffect(() => {
+    if (!gameCode) return;
+    let alive = true;
+    const load = async () => {
+      try {
+        const res = await fetch(`/join-colors?g=${encodeURIComponent(gameCode)}`, { cache: "no-store" });
+        if (alive && res.ok) setColors((await res.json()) as JoinColors);
+      } catch {
+        // Utan svar visas alla färger; servern säger till om en är upptagen.
+      }
+    };
+    void load();
+    const id = setInterval(load, 2000);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, [gameCode]);
+  return colors;
 }

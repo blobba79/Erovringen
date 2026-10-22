@@ -3,7 +3,7 @@
 // utan nätverk.
 
 import type {
-  ClientMessage, GameStats, HostAction, LobbySeat, MapControl, Preview, SavedGameInfo, ServerMessage, StartOptions, Warning,
+  ClientMessage, GameStats, HostAction, JoinColors, LobbySeat, MapControl, Preview, SavedGameInfo, ServerMessage, StartOptions, Warning,
 } from "../shared/messages";
 import type { GameEvent, GameState, PlayerId, Pos, Step } from "../shared/state";
 import type { ExpansionModule } from "../shared/expansion";
@@ -758,6 +758,15 @@ export class Room {
     return this.seats.map((s) => ({
       player: s.player, name: s.name, color: s.color, connected: s.conn !== null, isHost: s.isHost,
     }));
+  }
+
+  /** Färgerna för en telefon som ännu inte gått med; null om spelkoden är fel eller spelet har startat. */
+  joinColors(gameCode: string): JoinColors | null {
+    if (gameCode !== this.gameCode || this.phase !== "lobby") return null;
+    return {
+      taken: this.seats.filter((s) => !s.reserved).map((s) => s.color),
+      saved: this.pendingSave ? this.seats.map((s) => s.color) : [],
+    };
   }
 
   private lobbyMsg(): ServerMessage {

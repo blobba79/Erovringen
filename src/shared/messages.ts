@@ -109,6 +109,17 @@ export interface GameStats {
   durationSeconds: number;
 }
 
+/**
+ * Svar på `GET /join-colors?g=<spelkod>`, som telefonen hämtar innan den går med.
+ * Svaret är 404 om spelkoden är fel eller spelet har startat.
+ */
+export interface JoinColors {
+  /** Färger som anslutna spelare redan har. */
+  taken: string[];
+  /** Fortsätts ett sparat spel: dess färger, och bara de går att välja. Annars tom. */
+  saved: string[];
+}
+
 export type ClientMessage =
   /** Storskärmen. Servern godtar bara storskärmar från den egna datorn (localhost). */
   | { type: "helloScreen" }

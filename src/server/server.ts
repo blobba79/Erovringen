@@ -73,6 +73,11 @@ export function createServer(opts: ServerOptions = {}): RunningServer {
           headers: { "content-type": "image/svg+xml", "cache-control": "no-store" },
         });
       }
+      if (url.pathname === "/join-colors") {
+        const colors = room.joinColors(url.searchParams.get("g") ?? "");
+        if (!colors) return new Response("Hittades inte", { status: 404 });
+        return Response.json(colors, { headers: { "cache-control": "no-store" } });
+      }
       return new Response("Hittades inte", { status: 404 });
     },
     websocket: {
