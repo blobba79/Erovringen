@@ -59,3 +59,27 @@ describe("slumpspelare", () => {
     }
   }, 600_000);
 });
+
+describe("flodfasen", () => {
+  test("deadEnds=forbid, handstorlek 3: ingen flodbricka kastas och inga vanliga brickor läggs före sjön", () => {
+    for (let i = 0; i < 120; i++) {
+      const s = setupOf(["base", "river"], {
+        n: 2 + (i % 5), seed: 5000 + i, handSize: 3,
+        variants: { "river.deadEnds": "forbid", "river.startTile": i % 3 === 0 ? "afterRiver" : "shuffle" },
+      });
+      try {
+        const r = playGame(eng, s, { strategy: i % 2 ? "eager" : "random", checkUndo: false });
+        const discarded = (r.state.ext.base as { discarded: string[] }).discarded;
+        expect(discarded.filter((t) => t.startsWith("river/"))).toEqual([]);
+        expect((r.state.ext.river as { done: boolean }).done).toBe(true);
+      } catch (e) {
+        throw new Error(`parti ${i} (frö ${5000 + i}): ${(e as Error).message}`);
+      }
+    }
+  }, 600_000);
+
+  test("deadEnds=allow, handstorlek 3: partierna går att spela färdigt", () => {
+    for (let i = 0; i < 40; i++)
+      playGame(eng, setupOf(["base", "river"], { n: 3, seed: 7000 + i, handSize: 3 }), { checkUndo: false });
+  }, 600_000);
+});

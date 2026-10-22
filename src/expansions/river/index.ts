@@ -69,16 +69,51 @@ export function makeRiverModule(
   };
 
   /**
-   * Variant "forbid" (som JCloisterZones isContinuationFree): rutorna på båda sidor om fortsättningsrutan
-   * framför en öppen flodände, rutan två steg fram och dess båda grannar måste vara tomma.
+   * Variant "forbid". Rutorna som JCloisterZones isContinuationFree håller tomma framför en öppen
+   * flodände: båda sidorna om fortsättningsrutan, rutan två steg fram och dess båda grannar.
    */
-  function continuationFree(s: GameState, pos: Pos, side: Edge): boolean {
+  const reserved = (pos: Pos, side: Edge): Pos[] => {
     const adj = neighbour(pos, side);
     const adj2 = neighbour(adj, side);
     const i = edgeIndex(side);
-    const flanks = (p: Pos) => [neighbour(p, EDGES[(i + 1) % 4]!), neighbour(p, EDGES[(i + 3) % 4]!)];
-    return [...flanks(adj), adj2, ...flanks(adj2)].every((p) => !s.board[posKey(p)]);
+    const flanks = (q: Pos) => [neighbour(q, EDGES[(i + 1) % 4]!), neighbour(q, EDGES[(i + 3) % 4]!)];
+    return [...flanks(adj), adj2, ...flanks(adj2)];
+  };
+  const forbidDeadEnds = (s: GameState) => (s.setup.variants["river.deadEnds"] ?? "allow") === "forbid";
+
+  /**
+   * Variant "forbid": kan floden alltid fortsätta, vilka av de återstående flodbrickorna (rakt eller
+   * kurva) som än dras härnäst? Förenklad modell av kartan: bara vilka rutor som är upptagna, flodens
+   * ände (ruta + riktning) och åt vilket håll den senaste brickan svängde (0 rakt, 1 höger, 3 vänster).
+   * Varje steg följer samma regler som den riktiga placeringen: fri ruta, ingen omedelbar U-sväng
+   * och fria skyddsrutor framför den nya änden. Efter sista flodbrickan måste sjöns ruta vara fri.
+   */
+  function safe(occ: Set<string>, end: Pos, dir: Edge, last: number, straight: number, curves: number): boolean {
+    const q = neighbour(end, dir);
+    if (occ.has(posKey(q))) return false;
+    if (straight + curves === 0) return true;
+    const tryTurn = (turn: number): boolean => {
+      if (turn !== 0 && turn === last) return false;
+      const exit = EDGES[(edgeIndex(dir) + turn) % 4]!;
+      if (reserved(q, exit).some((r) => occ.has(posKey(r)))) return false;
+      const next = new Set(occ).add(posKey(q));
+      return safe(next, q, exit, turn, straight - (turn === 0 ? 1 : 0), curves - (turn === 0 ? 0 : 1));
+    };
+    return (straight === 0 || tryTurn(0)) && (curves === 0 || tryTurn(1) || tryTurn(3));
   }
+
+  const isStraight = (e: Edge[]) => e.length === 2 && opposite(e[0]!) === e[1];
+  /** Antal rakta och kurviga flodbrickor kvar (utom sjön), ev. utan en bricka som just läggs. */
+  function remaining(s: GameState, types: EngineHookContext["types"], placing?: string): [number, number] {
+    const left = riverTiles(s).filter((t) => t !== lake);
+    if (placing !== undefined) left.splice(left.indexOf(placing), 1);
+    let straight = 0;
+    for (const t of left) if (isStraight(riverEdgesOf(rotateTile(types.get(t)!, 0)))) straight++;
+    return [straight, left.length - straight];
+  }
+  const occupied = (s: GameState, extra: Pos): Set<string> => new Set([...Object.keys(s.board), posKey(extra)]);
+  const endTurn = (end: { pos: Pos; edge: Edge }, p: Edge[]): number =>
+    p.length === 2 && !isStraight(p) ? turnOf(p.find((e) => e !== end.edge)!, end.edge) : 0;
 
   const engineHooks: Partial<EngineHooks> = {
     // Första spelaren drar en flodbricka; ingen annan får något än.
@@ -143,8 +178,18 @@ export function makeRiverModule(
       canPlaceTile(c, pos, step) {
         const ctx = c as EngineHookContext;
         const tile = ctx.tile;
-        if (tile === undefined || !ids.has(tile)) return true;
+        if (tile === undefined) return true;
         const s = ctx.state;
+        if (!ids.has(tile)) {
+          // "forbid": en vanlig bricka (den inblandade startbrickan) får inte spärra flodens väg.
+          if (!forbidDeadEnds(s) || ext(s).done) return true;
+          const open = openRiverEnd(ctx);
+          if (!open) return true;
+          const [st, cu] = remaining(s, ctx.types);
+          const last = endTurn(open, riverEdgesOf(rotatedAt(s.board, ctx.types, open.pos)!));
+          if (reserved(open.pos, open.edge).some((q) => samePos(q, pos))) return false;
+          return safe(occupied(s, pos), open.pos, open.edge, last, st, cu);
+        }
         const end = openRiverEnd(ctx);
         if (!end || !samePos(pos, neighbour(end.pos, end.edge))) return false;
         if (tile === lake && riverTiles(s).some((t) => t !== lake)) return false;
@@ -157,8 +202,13 @@ export function makeRiverModule(
           const turn2 = turnOf(opposite(end.edge), n.find((e) => e !== opposite(end.edge))!);
           if (turn1 === turn2) return false;
         }
-        if ((s.setup.variants["river.deadEnds"] ?? "allow") === "forbid")
-          for (const e of n) if (e !== opposite(end.edge) && !continuationFree(s, pos, e)) return false;
+        if (forbidDeadEnds(s) && tile !== lake) {
+          const exit = n.find((e) => e !== opposite(end.edge))!;
+          if (reserved(pos, exit).some((r) => s.board[posKey(r)])) return false;
+          const [st, cu] = remaining(s, ctx.types, tile);
+          const last = n.length === 2 && !isStraight(n) ? turnOf(opposite(end.edge), exit) : 0;
+          if (!safe(occupied(s, pos), pos, exit, last, st, cu)) return false;
+        }
         return true;
       },
       afterTilePlaced(ctx, pos) {

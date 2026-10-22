@@ -47,6 +47,17 @@ export function checkInvariants(eng: EngineApi, s: GameState, initial: { tiles: 
     Object.keys(s.board).length + s.drawPile.length + s.players.reduce((n, p) => n + p.hand.length, 0) + discarded +
     (river?.waitingStart ? 1 : 0);
   if (tiles !== initial.tiles) throw new Error(`brickor ${tiles} != ${initial.tiles}`);
+  // Flodfasen: ingen håller mer än en bricka, och inga vanliga brickor läggs före sjön
+  // (utom den inblandade startbrickan).
+  const rv = s.ext.river as { done: boolean; dealt?: boolean } | undefined;
+  if (rv && rv.dealt === false) {
+    if (s.players.reduce((n, p) => n + p.hand.length, 0) > 1) throw new Error("flodfasen: fler än en bricka på hand");
+    // (Kastas en flodbricka kan floden aldrig bli klar och vanliga brickor dras ändå.)
+    if (!rv.done && !(s.ext.base as { discarded: string[] }).discarded.some((t) => t.startsWith("river/"))) {
+      const normal = Object.values(s.board).filter((t) => !t.type.startsWith("river/"));
+      if (normal.length > 1 || normal.some((t) => t.type !== "base/RCr")) throw new Error("vanlig bricka lagd före sjön");
+    }
+  }
   // Pjäser: lika många av varje sort och ägare, unika id, rimliga platser.
   const seen = new Set<string>();
   const counts = new Map<string, number>();

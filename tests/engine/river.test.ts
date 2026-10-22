@@ -125,4 +125,20 @@ describe("floden", () => {
     expect(feats).not.toContain("river0");
     expect(feats.some((f) => f.startsWith("city") || f.startsWith("road") || f.startsWith("field"))).toBe(true);
   });
-});
+
+  test("river.deadEnds: allow tillåter en bricka som kan köra fast floden, forbid (som JCZ) förbjuder den", () => {
+    // Källan, och en vanlig bricka två steg fram i sidled mot flodens fortsättning (3,1).
+    const board: [string, number, number, 0][] = [...spring, ["base/L", 3, 1, 0]];
+    const mk = (v: string) => scenario(eng, { board, expansions: [...RIVER], hands: [["river/IFI"], []], pile: ["river/IFI"], variants: { "river.deadEnds": v } });
+    expect(placements(mk("allow"))).toContain("1,0@0");
+    expect(placements(mk("forbid"))).toEqual([]);
+    // Fritt framför: forbid tillåter.
+    const free = scenario(eng, { board: spring, expansions: [...RIVER], hands: [["river/IFI"], []], pile: ["river/IFI"], variants: { "river.deadEnds": "forbid" } });
+    expect(placements(free).length).toBeGreaterThan(0);
+  });
+
+  test("river.deadEnds=forbid: den inblandade startbrickan får inte spärra flodens väg", () => {
+    const mk = (v: string) => scenario(eng, { board: spring, expansions: [...RIVER], hands: [["base/RCr"], []], pile: ["river/IFI"], variants: { "river.deadEnds": v } });
+    const blocked = (s: ReturnType<typeof scenario>) => placements(s).some((x) => x.startsWith("2,1@") || x.startsWith("2,-1@"));
+    expect(blocked(mk("forbid"))).toBe(false);
+  });});
