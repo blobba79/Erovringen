@@ -70,6 +70,16 @@ Fas 3, parallellt: regelmotorn (varningar), server, storskärm och telefon. Hand
 - Statistik: servern räknar `GameStats` ur partiets händelser och skickar `stats` när spelet är slut. Rekordens nycklar är `stats.<id>`.
 - Startvalen som går att välja kommer från servern (`lobby.available`), inte från listor i klienterna.
 
+Fas 4, parallellt: servern (webbläsarstart) och paketeringen (bygge och GitHub Actions). Se `SPEC.md`, "Paketering och start".
+
+**Konventioner för fas 4:**
+- Startpunkten är fortfarande `src/server/main.ts`, både för `npm run dev` och programfilen.
+- `npm run build` kör `scripts/build/build.ts`, som bygger `dist/erovringen-windows-x64.exe` och `dist/erovringen-linux-x64` med `bun build --compile`. `npm run build -- --target windows` (eller `linux`) bygger bara en.
+- Versionen kommer från `package.json` och byggs in som konstanten `EROVRINGEN_VERSION` (`--define`). Under `npm run dev` är den `"dev"`. Servern skriver versionen i loggen vid start.
+- Webbläsaren öppnas bara när programmet körs som programfil, aldrig under `npm run dev` eller i tester. `--no-browser` stänger av det även i programfilen. Webbläsarstarten ligger i `src/server/browser.ts`.
+- Sparade spel och loggen hamnar i `sparade/` och `logg/` bredvid programfilen (`baseDir()` i `src/server/options.ts`).
+- GitHub Actions: `.github/workflows/release.yml` körs när en release publiceras. Den kör typkontroll och tester, bygger båda filerna på `ubuntu-latest` och laddar upp dem till releasen.
+
 **Förslag på expansionsordning** (enklast först, de som påverkar mest sist):
 1. Inns & Cathedrals, 2. Traders & Builders, 3. The Gold Mines, 4. Mage & Witch, 5. The Ferries, 6. The Flying Machines, 7. Crop Circles II, 8. The Princess & the Dragon.
 
