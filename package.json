@@ -6,11 +6,16 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "dev": "bun --hot src/server/main.ts"
   },
   "devDependencies": {
     "@types/bun": "1.2.17",
     "bun": "1.2.17",
     "typescript": "5.8.3"
+  },
+  "dependencies": {
+    "preact": "11.0.1",
+    "qrcode-generator": "2.0.4"
   }
 }

@@ -53,6 +53,15 @@ Enligt `SPEC.md` (Arbetssätt): 1) grundspelet på en skärm, 2) telefoner, kart
 
 Fas 1, parallellt efter att grunden är godkänd: brickdata + konvertering, regelmotor för grundspelet (med river och abbot), cellshadad grafikstil, språkfiler. Server och telefon kommer i fas 2.
 
+Fas 2, parallellt: server, storskärm och telefon, så att grundspelet går att spela (steg 1 och 2 i `SPEC.md`). Hand med flera brickor, repris, emojis, statistik, varningar och spara/fortsätt väntar till fas 3, men meddelandena finns redan.
+
+**Konventioner för fas 2:**
+- `npm run dev` startar `src/server/main.ts`. Servern serverar klienterna med Buns HTML-import (`import screen from "../screen/index.html"`), så att de byggs in i programfilen i fas 4.
+- Adresser: `/` storskärmen, `/p?g=<spelkod>` ny spelare, `/p?s=<platskod>` återanslutning, `/ws` WebSocket, `/qr.svg?text=…` QR-kod som SVG.
+- Klienterna importerar motorn (`src/engine`), brickdatan, brickgeometrin, stilen och språkstödet direkt; servern skickar bara tillstånd, inte grafik.
+- Kameran (läge, zoom, rotation) ägs av servern: den aktiva telefonen skickar `map`, servern skickar `camera` till storskärmen. Siktet är kamerans mittpunkt, så servern räknar själv ut området under siktet vid `inspect`.
+- Nya texter: en del som behöver nya nycklar skriver dem (med engelsk text) i sin rapport. Samordnaren lägger in dem i `locales/en.json` och översättaren gör svenskan.
+
 **Förslag på expansionsordning** (enklast först, de som påverkar mest sist):
 1. Inns & Cathedrals, 2. Traders & Builders, 3. The Gold Mines, 4. Mage & Witch, 5. The Ferries, 6. The Flying Machines, 7. Crop Circles II, 8. The Princess & the Dragon.
 
