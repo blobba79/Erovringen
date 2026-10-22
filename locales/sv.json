@@ -26,6 +26,7 @@
     "variant.river.startTile.shuffle"
   ],
   "game.title": "Erövringen",
+  "style.cellshaded": "Cellshadad",
   "expansion.base": "Grundspelet",
   "expansion.river": "The River",
   "expansion.abbot": "The Abbot",

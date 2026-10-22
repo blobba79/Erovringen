@@ -1,6 +1,7 @@
 {
   "_name": "English",
   "game.title": "Erövringen",
+  "style.cellshaded": "Cel-shaded",
   "expansion.base": "Base game",
   "expansion.river": "The River",
   "expansion.abbot": "The Abbot",
