@@ -19,6 +19,23 @@ export interface EngineHookContext extends HookContext {
   tile?: string;
 }
 
+/**
+ * Extra krokar som motorn (men inte det delade gränssnittet) känner till. En modul får sätta dem
+ * i `hooks` (de läses via en typkonvertering). Floden använder dem för att dra en bricka per tur.
+ */
+export interface EngineHooks {
+  /** Vid spelstart, efter `setup`: dela ut första handen själv. Returnera true om den är utdelad. */
+  dealAtStart(ctx: EngineHookContext, first: PlayerId): boolean;
+  /**
+   * När en tur avslutats: dela ut brickor och välj nästa spelare. `undefined` = modulen lägger
+   * sig inte i (motorn fyller handen som vanligt), `null` = spelet är slut.
+   */
+  dealAfterTurn(ctx: EngineHookContext): PlayerId | null | undefined;
+}
+
+export const engineHook = <K extends keyof EngineHooks>(m: ExpansionModule, k: K): EngineHooks[K] | undefined =>
+  (m.hooks as Partial<EngineHooks>)[k];
+
 /** Motorns egna data i `state.ext.base`. */
 export interface BaseExt {
   /** Brickor som kastats (ingen passade). */

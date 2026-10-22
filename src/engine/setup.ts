@@ -1,7 +1,7 @@
 // Nytt spel: hög, startbricka, pjäser, startspelare, expansionernas uppsättning och första handen.
 
 import type { Figure, GameSetup, GameState } from "../shared/state";
-import { activeModules, makeCtx, type Env } from "./context";
+import { activeModules, engineHook, makeCtx, type Env } from "./context";
 import { randomInt, shuffle } from "./rng";
 import { beginTurn } from "./turn";
 
@@ -62,11 +62,13 @@ export function newGame(env: Env, setup: GameSetup): GameState {
   for (const m of mods) m.hooks.setup?.(ctx);
 
   // Dela ut händerna, startspelaren först, så att brickorna spelas i högens ordning.
-  for (let round = 0; round < state.setup.handSize; round++)
-    for (let k = 0; k < state.players.length; k++) {
-      const p = state.players[(startIdx + k) % state.players.length]!;
-      if (state.drawPile.length) p.hand.push(state.drawPile.shift() as string);
-    }
+  // En modul (floden) kan i stället dela ut själv.
+  if (!mods.some((m) => engineHook(m, "dealAtStart")?.(ctx, first)))
+    for (let round = 0; round < state.setup.handSize; round++)
+      for (let k = 0; k < state.players.length; k++) {
+        const p = state.players[(startIdx + k) % state.players.length]!;
+        if (state.drawPile.length) p.hand.push(state.drawPile.shift() as string);
+      }
   beginTurn(state, first, []);
   return state;
 }

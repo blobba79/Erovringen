@@ -106,10 +106,10 @@ describe("nytt spel", () => {
     expect(s.board["0,0"]?.type).toBe("river/s");
     const all = [...s.players.flatMap((p) => p.hand), ...s.drawPile];
     expect(all).toHaveLength(72 + 11);
-    // 10 flodbrickor + vanliga startbrickan, sjön på plats 12 (index 11); två är utdelade
-    expect(s.drawPile.indexOf("river/I.e")).toBe(11 - 2);
-    expect(s.drawPile.slice(0, 9).filter((t) => t.startsWith("river/") || t === "base/RCr").length).toBe(9);
-    expect(s.drawPile.slice(10).some((t) => t.startsWith("river/") && t !== "river/I.e")).toBe(false);
+    // 10 flodbrickor + vanliga startbrickan, sjön på plats 12 (index 11); en är utdelad (första spelaren)
+    expect(s.drawPile.indexOf("river/I.e")).toBe(11 - 1);
+    expect(s.drawPile.slice(0, 10).filter((t) => t.startsWith("river/") || t === "base/RCr").length).toBe(10);
+    expect(s.drawPile.slice(11).some((t) => t.startsWith("river/") && t !== "river/I.e")).toBe(false);
     expect(all.filter((t) => t === "base/RCr")).toHaveLength(4);
   });
 
