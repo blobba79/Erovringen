@@ -71,3 +71,24 @@ h1, h2, h3 { margin: 0 0 0.4em; }
 .waiting figure { margin: 0; }
 .waiting figcaption { margin-top: 0.5vmax; font-weight: 700; }
 .toast { position: fixed; bottom: 1.2vmax; left: 50%; transform: translateX(-50%); background: var(--c-accent, #e64); color: var(--c-text, #fff); border-radius: 2vmax; padding: 0.4vmax 1.6vmax; font-weight: 700; }
+
+.badge.wait { background: var(--c-backgroundDark, #000); }
+.saved { margin-top: 1vmax; padding-top: 0.8vmax; border-top: 0.15vmax solid var(--c-outline, #000); font-size: 0.85em; }
+.reaction { font-size: 1.6em; line-height: 1; margin-right: 0.4em; animation: pop 0.35s ease-out; }
+@keyframes pop { from { transform: scale(0.2); } 70% { transform: scale(1.35); } to { transform: scale(1); } }
+.gain { font-weight: 800; color: var(--c-accent, #e64); background: var(--c-text, #fff); border-radius: 1em; padding: 0 0.5em; margin-right: 0.5em; animation: pop 0.3s ease-out; }
+.shown { top: 14vh; left: 50%; transform: translateX(-50%); border-width: 0.5vmax; text-align: center; font-size: 1.6vmax; z-index: 2; }
+.shown canvas { width: 20vmax; height: 20vmax; display: block; margin: 0 auto; border-radius: 0.6vmax; }
+.final-wrap.with-stats { gap: 2vmax; align-items: stretch; padding: 3vmax; background: rgba(0, 0, 0, 0.4); }
+.final-wrap.with-stats .final { min-width: 24vmax; align-self: center; }
+.stats { display: flex; flex-direction: column; gap: 1.2vmax; width: 44vmax; font-size: 1.1vmax; overflow: hidden; }
+.stats .card { text-align: left; }
+.stats h2 { font-size: 1.4em; }
+.chart { width: 100%; height: auto; display: block; font-size: 16px; fill: var(--c-text, #fff); }
+.chart .grid { stroke: var(--c-text, #fff); stroke-opacity: 0.2; }
+.stats table { width: 100%; border-collapse: collapse; }
+.stats th, .stats td { padding: 0.15em 0.5em; text-align: right; font-variant-numeric: tabular-nums; }
+.stats td:first-child { text-align: left; }
+.records { list-style: none; margin: 0; padding: 0; }
+.records li { display: flex; gap: 1em; padding: 0.15em 0; }
+.records .what { flex: 1; }
