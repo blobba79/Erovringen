@@ -6,6 +6,7 @@ export { newGame, STATE_VERSION } from "./setup";
 export { legalSteps, figureSteps } from "./legal";
 export { legalPlacements, isLegalPlacement, hasAnyPlacement } from "./placement";
 export { analyze, type Area, type Analysis } from "./features";
+export { describeArea, describeFeature, type AreaDescription } from "./describe";
 export { areaValue, majorityOwners, completedCitiesAround, strength } from "./scoring";
 export { rotateTile, distinctRotations, type RotatedTile } from "./tileinfo";
 export { frontier, geometricPlacements, toTileTypes, type Board, type TileTypes } from "./board";

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { areaValue, majorityOwners } from "../../src/engine/index";
+import { areaValue, describeFeature, majorityOwners } from "../../src/engine/index";
 import { realEngine } from "./helpers";
 import { scenario } from "./scenario";
 
@@ -75,5 +75,16 @@ describe("områden över brickor", () => {
     const fields = eng.analyze(s).areas.filter((a) => a.kind === "field");
     expect(fields).toHaveLength(2);
     expect(fields.every((f) => f.tiles.length === 2)).toBe(true);
+  });
+
+  test("describeFeature: utbredning, majoritet, värde och det som återstår", () => {
+    const s = scenario(eng, {
+      board: [["base/L", 0, 0, 0], ["base/L", 1, 0, 0]],
+      figures: [{ id: "p2:meeple:0", x: 0, y: 0, feature: "cloister" }],
+    });
+    const d = describeFeature(s, eng.types, { x: 0, y: 0 }, "cloister")!;
+    expect(d).toMatchObject({ kind: "cloister", complete: false, owners: ["p2"], value: 2, filledSquares: 1 });
+    expect(d.openSquares).toHaveLength(7);
+    expect(describeFeature(s, eng.types, { x: 0, y: 0 }, "nej")).toBeUndefined();
   });
 });
