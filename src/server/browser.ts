@@ -93,7 +93,8 @@ export interface LaunchPlan {
 export function planLaunch(url: string, deps: FindDeps = defaultFindDeps(), profileRoot = tmpdir()): LaunchPlan {
   const b = findBrowser(deps);
   if (b?.kind === "chromium") {
-    const profile = (deps.platform === "win32" ? win32 : posix).join(profileRoot, `erovringen-profil-${process.pid}`);
+    // Samma profil varje gång, så att det inte blir en ny mapp i temp vid varje start.
+    const profile = (deps.platform === "win32" ? win32 : posix).join(profileRoot, "erovringen-profil");
     return { description: b.name, command: b.path, args: ["--kiosk", `--user-data-dir=${profile}`, "--no-first-run", url] };
   }
   if (b?.kind === "firefox") return { description: b.name, command: b.path, args: ["--kiosk", url] };
