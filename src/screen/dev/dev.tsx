@@ -23,7 +23,7 @@ function Dev() {
   const sync = () => send({ type: "state", state: toPublic(game.current) });
 
   useEffect(() => {
-    send({ type: "lobby", seats: [], options: { expansions: ["base", "river", "abbot"], variants: {}, screenLang: "en", handSize: 1, showClosingTiles: true }, gameCode: "dev" });
+    send({ type: "lobby", seats: [], options: { expansions: ["base", "river", "abbot"], variants: {}, screenLang: "en", handSize: 1, showClosingTiles: true }, gameCode: "dev", available: { expansions: ["base", "river", "abbot"], variants: {}, languages: ["en", "sv"], maxHandSize: 8 }, saves: [] });
     sync();
     const sendCam = () => send({ type: "camera", ...cam.current });
     sendCam();
@@ -41,7 +41,7 @@ function Dev() {
       } else if (e.key === "p") send({ type: "preview", player: game.current.turn.player, preview: previewSpots(eng, game.current) });
       else if (e.key === "i") {
         const t = Object.values(game.current.board)[0]!;
-        send({ type: "inspect", result: { tiles: [t.pos], figures: [], majority: [], points: 3, complete: false, openSpots: [{ x: t.pos.x + 1, y: t.pos.y }], blockedSpots: [{ x: t.pos.x - 1, y: t.pos.y }], closingTiles: { [`${t.pos.x + 1},${t.pos.y}`]: 4 } } });
+        send({ type: "inspect", result: { kind: "city", tiles: [t.pos], figures: [], majority: [], points: 3, complete: false, openSpots: [{ x: t.pos.x + 1, y: t.pos.y }], blockedSpots: [{ x: t.pos.x - 1, y: t.pos.y }], closingTiles: { [`${t.pos.x + 1},${t.pos.y}`]: 4 } } });
       } else if (e.key === "ArrowLeft") c.x -= 1;
       else if (e.key === "ArrowRight") c.x += 1;
       else if (e.key === "ArrowUp") c.y -= 1;

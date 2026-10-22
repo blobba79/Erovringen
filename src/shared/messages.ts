@@ -1,7 +1,8 @@
 // Meddelanden över WebSocket mellan server, storskärm och telefoner.
 // All text skickas som nycklar i språkfilen, aldrig som färdig text.
 
-import type { ExpansionId } from "./tiles";
+import type { Feature, ExpansionId } from "./tiles";
+import type { RuleVariantDefinition } from "./expansion";
 import type { FigureId, GameEvent, GameSetup, GameState, PlayerId, Pos, RuleVariants, Step } from "./state";
 
 export type Lang = string;
@@ -61,6 +62,53 @@ export interface Preview {
   feature?: { pos: Pos; feature: string };
 }
 
+/** Det som går att välja bland startvalen; servern vet vilka moduler som finns. */
+export interface AvailableOptions {
+  /** Valbara expansioner (grundspelet, river och abbot räknas med; "base" är alltid på). */
+  expansions: ExpansionId[];
+  /** Regelvarianter per expansion. */
+  variants: Partial<Record<ExpansionId, RuleVariantDefinition[]>>;
+  /** Språk som storskärmen kan visas på. */
+  languages: Lang[];
+  maxHandSize: number;
+}
+
+/** Ett sparat spel som går att fortsätta. */
+export interface SavedGameInfo {
+  /** Filnamnet utan ändelse; skickas i `StartOptions.savedGame`. */
+  id: string;
+  savedAt: string;
+  players: { name: string; color: string; score: number }[];
+  expansions: ExpansionId[];
+  /** Antal lagda brickor. */
+  tilesPlaced: number;
+  /** false om filen inte går att läsa (t.ex. från en för ny version); visas men kan inte väljas. */
+  readable: boolean;
+}
+
+/** En varning för nybörjare om ett väntande delsteg. Texten är en nyckel i språkfilen. */
+export interface Warning {
+  key: string;
+  params?: Record<string, string | number>;
+  /** Var på kartan varningen gäller (markeras på storskärmen om spelaren visar den). */
+  pos?: Pos;
+}
+
+/** Statistik efter spelet, räknad av servern ur partiets händelser. */
+export interface GameStats {
+  /** Poäng för varje spelare efter varje tur (index 0 = före första turen). */
+  scoreTimeline: Record<PlayerId, number>[];
+  /** Poäng per spelare och orsak (samma `reason` som i händelsen "scored"). */
+  pointsByReason: Record<PlayerId, Record<string, number>>;
+  /**
+   * Rekord, t.ex. största staden eller mest poäng från fält. `key` är en nyckel i språkfilen
+   * (`stats.<id>`), `value` talet, `player` vem (null om ingen).
+   */
+  records: { key: string; player: PlayerId | null; value: number; pos?: Pos }[];
+  turns: number;
+  durationSeconds: number;
+}
+
 export type ClientMessage =
   /** Storskärmen. Servern godtar bara storskärmar från den egna datorn (localhost). */
   | { type: "helloScreen" }
@@ -77,6 +125,8 @@ export type ClientMessage =
   /** Markera området under siktet. */
   | { type: "inspect" }
   | { type: "react"; emoji: string }
+  /** Slå på eller av varningar för nybörjare (sparas på telefonen och skickas vid anslutning). */
+  | { type: "setWarnings"; on: boolean }
   | { type: "hostAction"; player: PlayerId; action: HostAction };
 
 /** Det som visas för alla. Händer och dolda val är borttagna. */
@@ -88,6 +138,8 @@ export type PublicState = Omit<GameState, "players" | "rng" | "drawPile"> & {
 };
 
 export interface InspectResult {
+  /** Områdets sort (stad, väg, fält, kloster …), för rubriken. */
+  kind: Feature["kind"];
   tiles: Pos[];
   figures: FigureId[];
   majority: PlayerId[];
@@ -105,7 +157,15 @@ export interface InspectResult {
 
 export type ServerMessage =
   | { type: "welcome"; player: PlayerId; seatToken: string; isHost: boolean }
-  | { type: "lobby"; seats: LobbySeat[]; options: StartOptions; gameCode: string }
+  | {
+      type: "lobby";
+      seats: LobbySeat[];
+      options: StartOptions;
+      gameCode: string;
+      available: AvailableOptions;
+      /** Sparade spel, nyast först. */
+      saves: SavedGameInfo[];
+    }
   /**
    * Bara till storskärmen: adresserna i QR-koderna. `joinUrl` för nya spelare,
    * `seatUrls` per plats för återanslutning. Bilden hämtas från `/qr.svg?text=<adress>`.
@@ -130,6 +190,10 @@ export type ServerMessage =
   | { type: "shownTile"; player: PlayerId; tile: string }
   /** Spelare som saknas; storskärmen visar deras QR-koder. */
   | { type: "waitingFor"; seats: LobbySeat[] }
+  /** Bara till den aktiva spelaren, om varningar är påslagna: gäller de väntande delstegen. */
+  | { type: "warnings"; warnings: Warning[] }
+  /** Till alla när spelet är slut. */
+  | { type: "stats"; stats: GameStats }
   | { type: "error"; key: string; params?: Record<string, string | number> };
 
 export interface SavedGame {

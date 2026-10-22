@@ -84,7 +84,7 @@ describe("siffror på platserna", () => {
 describe("markeringar ur InspectResult", () => {
   test("öppna rutor som också är blockerade visas bara som blockerade", () => {
     const m = inspectMarks({
-      tiles: [{ x: 0, y: 0 }], figures: [], majority: [], points: 2, complete: false,
+      kind: "city", tiles: [{ x: 0, y: 0 }], figures: [], majority: [], points: 2, complete: false,
       openSpots: [{ x: 1, y: 0 }, { x: -1, y: 0 }], blockedSpots: [{ x: -1, y: 0 }],
       closingTiles: { "1,0": 3, "bad": 1 }, completedCities: [{ x: 4, y: 4 }],
     });
@@ -96,7 +96,7 @@ describe("markeringar ur InspectResult", () => {
   });
 
   test("utan valfria fält blir listorna tomma", () => {
-    const m = inspectMarks({ tiles: [], figures: [], majority: [], points: 0, complete: true, openSpots: [], blockedSpots: [] });
+    const m = inspectMarks({ kind: "city", tiles: [], figures: [], majority: [], points: 0, complete: true, openSpots: [], blockedSpots: [] });
     expect(m.closing).toEqual([]);
     expect(m.cities).toEqual([]);
   });
@@ -156,7 +156,7 @@ describe("modell och meddelanden", () => {
 
   test("nytt tillstånd nollställer förhandsvisning och markering", () => {
     let m = reduce(initialModel, { type: "preview", player: "p1", preview: { spots: [{ x: 1, y: 1 }] } });
-    m = reduce(m, { type: "inspect", result: { tiles: [], figures: [], majority: [], points: 0, complete: false, openSpots: [], blockedSpots: [] } });
+    m = reduce(m, { type: "inspect", result: { kind: "city", tiles: [], figures: [], majority: [], points: 0, complete: false, openSpots: [], blockedSpots: [] } });
     expect(m.preview).toBeDefined(); expect(m.inspect).toBeDefined();
     m = reduce(m, { type: "state", state });
     expect(m.preview).toBeUndefined(); expect(m.inspect).toBeUndefined();
@@ -166,7 +166,7 @@ describe("modell och meddelanden", () => {
   test("kameran och språket tas från servern", () => {
     let m = reduce(initialModel, { type: "camera", x: 1, y: 2, zoom: 9, rotation: 45 });
     expect(m.camera).toEqual({ x: 1, y: 2, zoom: 9, rotation: 45 });
-    m = reduce(m, { type: "lobby", seats: [], gameCode: "x", options: { expansions: [], variants: {}, screenLang: "sv", handSize: 1, showClosingTiles: false } });
+    m = reduce(m, { type: "lobby", seats: [], gameCode: "x", options: { expansions: [], variants: {}, screenLang: "sv", handSize: 1, showClosingTiles: false }, available: { expansions: ["base", "river", "abbot"], variants: {}, languages: ["en", "sv"], maxHandSize: 8 }, saves: [] });
     expect(m.lang).toBe("sv");
   });
 

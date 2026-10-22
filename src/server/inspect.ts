@@ -33,7 +33,7 @@ export function featureAt(engine: EngineApi, state: GameState, x: number, y: num
 }
 
 const EMPTY: InspectResult = {
-  tiles: [], figures: [], majority: [], points: 0, complete: false, openSpots: [], blockedSpots: [],
+  kind: "field", tiles: [], figures: [], majority: [], points: 0, complete: false, openSpots: [], blockedSpots: [],
 };
 
 function fitsSomewhere(engine: EngineApi, state: GameState, tile: string, pos: Pos): boolean {
@@ -69,6 +69,7 @@ export function inspectAt(
   const blockedSpots = openSpots.filter((s) => ![...unplaced].some((t) => fitsSomewhere(engine, state, t, s)));
 
   const result: InspectResult = {
+    kind: d.kind as InspectResult["kind"],
     tiles: d.tiles.map((p) => ({ x: p.x, y: p.y })),
     figures: d.figures.map((f) => f.id),
     majority: d.owners,

@@ -15,7 +15,7 @@ import { currentTile } from "../engine/turnstate";
 import { applyControl, fitAll, initialCamera, type Camera } from "./camera";
 import { inspectAt } from "./inspect";
 import { nullLogger, type Logger } from "./log";
-import { MODULES, createGameEngine } from "./modules";
+import { MODULES, availableOptions, createGameEngine } from "./modules";
 import { loadOptions, sanitizeOptions, saveOptions } from "./options";
 import { toPublicState } from "./publicState";
 
@@ -506,7 +506,10 @@ export class Room {
   }
 
   private lobbyMsg(): ServerMessage {
-    return { type: "lobby", seats: this.lobbySeats(), options: this.options, gameCode: this.gameCode };
+    return {
+      type: "lobby", seats: this.lobbySeats(), options: this.options, gameCode: this.gameCode,
+      available: availableOptions(this.modules), saves: [],
+    };
   }
 
   private broadcastLobby(): void {

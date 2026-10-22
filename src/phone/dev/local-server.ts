@@ -50,7 +50,7 @@ export function localServer(opts: LocalServerOptions = {}): TransportFactory {
       if (!closed) h.message(m);
     };
 
-    const lobby = () => to({ type: "lobby", seats, options, gameCode: "DEV" });
+    const lobby = () => to({ type: "lobby", seats, options, gameCode: "DEV", available: { expansions: ["base", "river", "abbot"], variants: {}, languages: ["en", "sv"], maxHandSize: 8 }, saves: [] });
     const pushState = () => {
       if (!game) return;
       to({ type: "state", state: toPublic(game) });

@@ -12,4 +12,5 @@ export { rotateTile, distinctRotations, type RotatedTile } from "./tileinfo";
 export { frontier, geometricPlacements, toTileTypes, type Board, type TileTypes } from "./board";
 export { nextRandom, randomInt, shuffle } from "./rng";
 export * from "./geometry";
+export { stepWarnings } from "./warnings";
 export { baseExt, activeModules, type Env, type EngineHookContext, type BaseExt } from "./context";
