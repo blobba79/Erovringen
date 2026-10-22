@@ -65,10 +65,10 @@ Fas 2, parallellt: server, storskärm och telefon, så att grundspelet går att 
 Fas 3, parallellt: regelmotorn (varningar), server, storskärm och telefon. Hand med flera brickor, "Visa för alla", repris, varningar för nybörjare, "Vad kan jag göra?", statistik, emojis och spara/fortsätt.
 
 **Konventioner för fas 3:**
-- Sparade spel:  i formatet , skrivs efter varje bekräftat drag. Ett spel byggs upp igen från  +  med motorn (då får servern även alla händelser till statistiken); går det inte används . En fil som inte går att läsa visas med  och får aldrig krascha servern.
-- Varningar:  i  (ägs av regelmotorn). Servern anropar den efter varje delsteg för spelare som slagit på varningar och skickar .
-- Statistik: servern räknar  ur partiets händelser och skickar  när spelet är slut. Rekordens nycklar är .
-- Startvalen som går att välja kommer från servern (), inte från listor i klienterna.
+- Sparade spel: `sparade/<id>.json` i formatet `SavedGame`, skrivs efter varje bekräftat drag. Ett spel byggs upp igen från `setup` + `steps` med motorn (då får servern även alla händelser till statistiken); går det inte används `snapshot`. En fil som inte går att läsa visas med `readable: false` och får aldrig krascha servern.
+- Varningar: `stepWarnings(state, player)` i `src/engine/warnings.ts` (ägs av regelmotorn). Servern anropar den efter varje delsteg för spelare som slagit på varningar och skickar `warnings`.
+- Statistik: servern räknar `GameStats` ur partiets händelser och skickar `stats` när spelet är slut. Rekordens nycklar är `stats.<id>`.
+- Startvalen som går att välja kommer från servern (`lobby.available`), inte från listor i klienterna.
 
 **Förslag på expansionsordning** (enklast först, de som påverkar mest sist):
 1. Inns & Cathedrals, 2. Traders & Builders, 3. The Gold Mines, 4. Mage & Witch, 5. The Ferries, 6. The Flying Machines, 7. Crop Circles II, 8. The Princess & the Dragon.
