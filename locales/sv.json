@@ -146,6 +146,8 @@
   "screen.firewall.title": "Om datorn frågar om nätverksåtkomst:",
   "screen.firewall.text": "Välj Tillåt (i Windows: kryssa i Privata nätverk). Annars kan telefonerna inte ansluta.",
   "screen.f11": "Tryck F11 för helskärm",
+  "screen.hotspot.title": "Spela utan internet:",
+  "screen.hotspot.text": "Slå på wifi-hotspot på den här enheten, anslut telefonerna till den och skanna QR-koden.",
   "screen.reconnect.title": "Väntar på att spelare ansluter igen",
   "screen.reconnect.restart": "Spelet har startats om. Alla skannar sin egen kod, en i taget.",
   "screen.reconnect.scan": "{player}: skanna för att fortsätta",

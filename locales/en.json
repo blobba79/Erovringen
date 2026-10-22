@@ -210,5 +210,7 @@
   "help.phase.other": "Follow the choices shown on your phone. Undo takes back the last step, and nothing is final until you confirm the move.",
   "help.expansion.river": "The River: the river tiles are laid first, and each new river tile must continue the river without turning back on itself. Players have no tiles in hand until the lake is placed.",
   "help.expansion.abbot": "The Abbot: instead of a normal figure you may place your abbot on a garden or a monastery, or take your abbot back from the board to score its points.",
-  "screen.f11": "Press F11 for fullscreen"
+  "screen.f11": "Press F11 for fullscreen",
+  "screen.hotspot.title": "To play without internet:",
+  "screen.hotspot.text": "Turn on Wi-Fi hotspot on this device, then connect the phones to it and scan the QR code."
 }
