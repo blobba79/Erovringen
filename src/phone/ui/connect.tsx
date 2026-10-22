@@ -1,29 +1,22 @@
 // Anslut, väntrum och värdens startval.
 
 import { useState } from "preact/hooks";
-import type { LobbySeat, StartOptions } from "../../shared/messages";
+import type { AvailableOptions, LobbySeat, SavedGameInfo, StartOptions } from "../../shared/messages";
 import type { ExpansionId } from "../../shared/tiles";
-import type { RuleVariantDefinition } from "../../shared/expansion";
-import { riverModule } from "../../expansions/river/index";
-import { abbotModule } from "../../expansions/abbot/index";
 import { availableLanguages } from "../../i18n/index";
+import { changeHandSize, chooseSave, setVariant, startChoices, toggleExpansion } from "../logic/options";
 import { loadName, saveName } from "../logic/session";
 import { LangSelect, PALETTE, useClient, useClientState, useT } from "./common";
 
-/** Expansionerna som går att välja i den här fasen (grundspelet är alltid med). */
-const SELECTABLE: { id: ExpansionId; variants: RuleVariantDefinition[] }[] = [
-  { id: "river", variants: riverModule.variants },
-  { id: "abbot", variants: abbotModule.variants },
-];
-
-export function JoinView({ takenColors }: { takenColors: ReadonlySet<string> }) {
+export function JoinView({ takenColors, savedColors }: { takenColors: ReadonlySet<string>; savedColors?: readonly string[] }) {
   const c = useClient();
   const t = useT();
   const s = useClientState(c);
   const storage = safeStorage();
   const [name, setName] = useState(() => loadName(storage));
-  const [color, setColor] = useState(() => PALETTE.find((p) => !takenColors.has(p)) ?? PALETTE[0]!);
-  const chosen = takenColors.has(color) ? (PALETTE.find((p) => !takenColors.has(p)) ?? color) : color;
+  const palette = savedColors && savedColors.length > 0 ? savedColors : PALETTE;
+  const [color, setColor] = useState(() => palette.find((p) => !takenColors.has(p)) ?? palette[0]!);
+  const chosen = takenColors.has(color) ? (palette.find((p) => !takenColors.has(p)) ?? color) : color;
   const waiting = s.conn !== "open";
   return (
     <main class="view join">
@@ -39,7 +32,7 @@ export function JoinView({ takenColors }: { takenColors: ReadonlySet<string> }) 
         />
       </label>
       <div class="swatches">
-        {PALETTE.map((p) => (
+        {palette.map((p) => (
           <button
             type="button"
             class={`swatch${p === chosen ? " on" : ""}`}
@@ -136,67 +129,85 @@ export function LobbyView() {
         ))}
       </ul>
       <SeatActions seats={lobby.seats} host={s.isHost} />
-      {s.isHost ? <HostOptions options={lobby.options} /> : <p class="hint">{t("lobby.waitingForHost")}</p>}
+      {s.isHost ? <HostOptions options={lobby.options} available={lobby.available} saves={lobby.saves} /> : <p class="hint">{t("lobby.waitingForHost")}</p>}
       <LangSelect />
     </main>
   );
 }
 
-function HostOptions({ options }: { options: StartOptions }) {
+function HostOptions({ options, available, saves }: { options: StartOptions; available: AvailableOptions; saves: SavedGameInfo[] }) {
   const c = useClient();
   const t = useT();
-  const set = (patch: Partial<StartOptions>) => c.setOptions({ ...options, ...patch });
-  const has = (id: ExpansionId) => options.expansions.includes(id);
-  const toggle = (id: ExpansionId) =>
-    set({ expansions: has(id) ? options.expansions.filter((e) => e !== id) : [...options.expansions, id] });
-  const variants = SELECTABLE.filter((x) => has(x.id)).flatMap((x) => x.variants.map((v) => ({ exp: x.id, v })));
+  const choices = startChoices(available, options);
+  const loading = options.savedGame !== undefined;
+  const names = new Map(availableLanguages().map((l) => [l.code, l.name]));
   return (
     <section class="options">
       <h2>{t("start.title")}</h2>
-      <h3>{t("start.expansions")}</h3>
-      <label class="check locked">
-        <input type="checkbox" checked disabled /> <span>{t("expansion.base")}</span>
-      </label>
-      {SELECTABLE.map((x) => (
-        <label class="check">
-          <input type="checkbox" checked={has(x.id)} onChange={() => toggle(x.id)} /> <span>{t(`expansion.${x.id}`)}</span>
-        </label>
-      ))}
-      {variants.length > 0 && <h3>{t("start.variants")}</h3>}
-      {variants.map(({ exp, v }) => {
-        const k = `${exp}.${v.id}`;
-        return (
-          <label class="field">
-            <span>{t(`variant.${k}`)}</span>
-            <select
-              value={options.variants[k] ?? v.default}
-              onChange={(e) => set({ variants: { ...options.variants, [k]: (e.currentTarget as HTMLSelectElement).value } })}
-            >
-              {v.options.map((o) => (
-                <option value={o}>{t(`variant.${k}.${o}`)}</option>
-              ))}
-            </select>
+      <div class="saves">
+        <button type="button" class={`save${loading ? "" : " on"}`} onClick={() => c.setOptions(chooseSave(options, saves, null))}>
+          {t("start.newGame")}
+        </button>
+        {saves.length > 0 && <h3>{t("start.continueGame")}</h3>}
+        {saves.map((sv) => (
+          <button
+            type="button"
+            class={`save${options.savedGame === sv.id ? " on" : ""}`}
+            disabled={!sv.readable}
+            onClick={() => c.setOptions(chooseSave(options, saves, sv.id))}
+          >
+            <b>{new Date(sv.savedAt).toLocaleString()}</b>
+            <span>{sv.players.map((p) => `${p.name} ${p.score}`).join(", ")}</span>
+            <span>{sv.readable ? t("start.savedTiles", { count: sv.tilesPlaced }) : t("start.unreadable")}</span>
+          </button>
+        ))}
+      </div>
+      {!loading && (
+        <>
+          <h3>{t("start.expansions")}</h3>
+          <label class="check locked">
+            <input type="checkbox" checked disabled /> <span>{t("expansion.base")}</span>
           </label>
-        );
-      })}
+          {choices.expansions.map((x) => (
+            <label class="check">
+              <input type="checkbox" checked={x.on} onChange={() => c.setOptions(toggleExpansion(options, x.id))} />{" "}
+              <span>{t(`expansion.${x.id}`)}</span>
+            </label>
+          ))}
+          {choices.variants.length > 0 && <h3>{t("start.variants")}</h3>}
+          {choices.variants.map((v) => (
+            <label class="field">
+              <span>{t(`variant.${v.key}`)}</span>
+              <select
+                value={v.value}
+                onChange={(e) => c.setOptions(setVariant(options, v.key, (e.currentTarget as HTMLSelectElement).value))}
+              >
+                {v.options.map((o) => (
+                  <option value={o}>{t(`variant.${v.key}.${o}`)}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+          <div class="field">
+            <span>{t("start.handSize")}</span>
+            <div class="stepper">
+              <button type="button" disabled={options.handSize <= 1} onClick={() => c.setOptions(changeHandSize(options, -1, choices.maxHandSize))}>−</button>
+              <output>{options.handSize}</output>
+              <button type="button" disabled={options.handSize >= choices.maxHandSize} onClick={() => c.setOptions(changeHandSize(options, 1, choices.maxHandSize))}>+</button>
+            </div>
+          </div>
+        </>
+      )}
       <label class="field">
         <span>{t("start.screenLanguage")}</span>
-        <select value={options.screenLang} onChange={(e) => set({ screenLang: (e.currentTarget as HTMLSelectElement).value })}>
-          {availableLanguages().map((l) => (
-            <option value={l.code}>{l.name}</option>
+        <select value={options.screenLang} onChange={(e) => c.setOptions({ ...options, screenLang: (e.currentTarget as HTMLSelectElement).value })}>
+          {choices.languages.map((l) => (
+            <option value={l}>{names.get(l) ?? l}</option>
           ))}
         </select>
       </label>
-      <div class="field">
-        <span>{t("start.handSize")}</span>
-        <div class="stepper">
-          <button type="button" disabled={options.handSize <= 1} onClick={() => set({ handSize: options.handSize - 1 })}>−</button>
-          <output>{options.handSize}</output>
-          <button type="button" disabled={options.handSize >= 5} onClick={() => set({ handSize: options.handSize + 1 })}>+</button>
-        </div>
-      </div>
       <label class="check">
-        <input type="checkbox" checked={options.showClosingTiles} onChange={() => set({ showClosingTiles: !options.showClosingTiles })} />{" "}
+        <input type="checkbox" checked={options.showClosingTiles} onChange={() => c.setOptions({ ...options, showClosingTiles: !options.showClosingTiles })} />{" "}
         <span>{t("start.showClosingTiles")}</span>
       </label>
       <button type="button" class="big primary" onClick={() => c.startGame()}>{t("start.begin")}</button>

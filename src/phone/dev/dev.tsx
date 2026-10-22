@@ -9,7 +9,12 @@ import texts from "../texts.en.json";
 import { localServer } from "./local-server";
 
 // De nya texterna ligger inte i locales/ än; här läggs de på engelskan.
-LOCALES.en = { ...LOCALES.en!, ...texts };
+LOCALES.en = {
+  ...LOCALES.en!,
+  ...texts,
+  "warning.cityBlocked": "(dev example) This placement makes your city impossible to finish.",
+  "stats.biggestCity": "Biggest city",
+};
 
 const search = location.search.includes("g=") ? location.search : "?g=DEV";
 const client = new Client(localServer({ botDelayMs: 600 }), {
@@ -31,7 +36,7 @@ if (new URLSearchParams(location.search).has("auto")) {
       const lobby = client.getState().lobby;
       if (!lobby) return;
       clearInterval(go);
-      client.setOptions({ ...lobby.options, expansions: ["base", "river", "abbot"] });
+      client.setOptions({ ...lobby.options, expansions: ["base", "river", "abbot"], handSize: Number(new URLSearchParams(location.search).get("hand") ?? 1) });
       client.startGame();
     }, 50);
   }, 50);

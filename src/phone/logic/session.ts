@@ -59,6 +59,16 @@ export function saveLang(st: StorageLike | null, lang: string): void {
   safe(() => st?.setItem(LANG_KEY, lang), undefined);
 }
 
+const WARN_KEY = "erovringen.warnings";
+
+export function loadWarnings(st: StorageLike | null): boolean {
+  return safe(() => st?.getItem(WARN_KEY) === "1", false);
+}
+
+export function saveWarnings(st: StorageLike | null, on: boolean): void {
+  safe(() => st?.setItem(WARN_KEY, on ? "1" : "0"), undefined);
+}
+
 export function loadName(st: StorageLike | null): string {
   return safe(() => st?.getItem(NAME_KEY) ?? "", "");
 }

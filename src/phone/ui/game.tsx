@@ -10,6 +10,8 @@ import { featureAtPoint } from "../logic/hit";
 import { rotationsAt, spotsFor } from "../logic/spots";
 import { deriveTurn, figureSupply, type TurnView } from "../logic/turnview";
 import { SeatActions } from "./connect";
+import { AfterView, Tools, Warnings } from "./extras";
+import { HandStrip } from "./hand";
 import { FigureIcon, LangSelect, TileCanvas, tileType, useClient, useT, useTileSize, type Highlight } from "./common";
 
 type FigureStep = Extract<Step, { type: "placeFigure" }>;
@@ -29,6 +31,8 @@ export function GameView({ s }: { s: PhoneState }) {
       <Banner state={state} view={view} name={current?.name ?? ""} />
       <ScoreBar state={state} me={me} />
       {s.waiting.length > 0 && <SeatActions seats={s.waiting} host={s.isHost} />}
+      {state.finished && <AfterView s={s} />}
+      {view.mine && <Warnings s={s} />}
       {view.mine && <Stage s={s} view={view} />}
       {view.mine && (has("undo") || view.phase === "confirm") && (
         <div class="actions">
@@ -42,6 +46,7 @@ export function GameView({ s }: { s: PhoneState }) {
       )}
       {view.mine && <PadBlock s={s} view={view} />}
       <HandStrip s={s} view={view} />
+      {!state.finished && <Tools s={s} phase={view.phase} mine={view.mine} />}
       {me && <Supply state={state} me={me} color={myColor} />}
       <LangSelect />
     </main>
@@ -92,39 +97,6 @@ function Supply({ state, me, color }: { state: PublicState; me: PlayerId; color:
         </li>
       ))}
     </ul>
-  );
-}
-
-/** Brickorna på hand. I valsteget är de knapparna. */
-function HandStrip({ s, view }: { s: PhoneState; view: TurnView }) {
-  const t = useT();
-  const c = useClient();
-  if (s.hand.length === 0) return null;
-  const chooses = new Set(s.legal.filter((x) => x.type === "chooseTile").map((x) => (x as { handIndex: number }).handIndex));
-  const swaps = new Set(s.legal.filter((x) => x.type === "exchangeTile").map((x) => (x as { handIndex: number }).handIndex));
-  return (
-    <section class="hand">
-      <h2>{t("phone.hand")}</h2>
-      {swaps.size > 0 && <p class="hint">{t("phone.exchangeHint")}</p>}
-      <div class="tiles">
-        {s.hand.map((id, i) => {
-          const pick = chooses.has(i);
-          const swap = swaps.has(i);
-          const chosen = view.mine && view.chosenIndex === i && view.phase !== "chooseTile";
-          return (
-            <button
-              type="button"
-              class={`tile-btn${pick || swap ? " enabled" : ""}${chosen ? " chosen" : ""}`}
-              disabled={!(pick || swap)}
-              onClick={() => c.step(pick ? { type: "chooseTile", handIndex: i } : { type: "exchangeTile", handIndex: i })}
-            >
-              <TileCanvas tileId={id} size={72} />
-              {swap && <span class="label">{t("turn.swapTile")}</span>}
-            </button>
-          );
-        })}
-      </div>
-    </section>
   );
 }
 
@@ -257,16 +229,12 @@ function TilePreview({ s, view }: { s: PhoneState; view: TurnView }) {
 function PadBlock({ s, view }: { s: PhoneState; view: TurnView }) {
   const t = useT();
   const c = useClient();
-  const showIndex = view.chosenIndex !== null && s.hand[view.chosenIndex] !== undefined && view.phase !== "placeFigure" && view.phase !== "confirm" ? view.chosenIndex : null;
   return (
     <section class="padblock">
       <Pad onMap={(m) => c.map(m)} onTap={() => c.inspect()} />
       <p class="hint small">{t("phone.padHint")}</p>
       <div class="row">
         <button type="button" onClick={() => c.map({ type: "fitAll" })}>{t("turn.showAll")}</button>
-        <button type="button" disabled={showIndex === null} onClick={() => showIndex !== null && c.showToAll(showIndex)}>
-          {t("turn.showToEveryone")}
-        </button>
       </div>
     </section>
   );

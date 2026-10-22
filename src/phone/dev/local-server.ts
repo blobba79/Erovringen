@@ -1,7 +1,7 @@
 // Lokal "server" för att prova telefonvyn utan riktig server: kör motorn i webbläsaren
 // (eller i ett test), har en spelare (värden) och en dator som spelar slumpmässigt.
 
-import type { ClientMessage, LobbySeat, PublicState, ServerMessage, StartOptions } from "../../shared/messages";
+import type { AvailableOptions, ClientMessage, LobbySeat, PublicState, SavedGameInfo, ServerMessage, StartOptions, Warning } from "../../shared/messages";
 import type { GameState, Step } from "../../shared/state";
 import { allTileTypes } from "../../tiles/index";
 import { baseModule, createEngine, type EngineApi } from "../../engine/index";
@@ -19,6 +19,20 @@ export interface LocalServerOptions {
   seed?: number;
   options?: Partial<StartOptions>;
 }
+
+const AVAILABLE: AvailableOptions = {
+  expansions: ["base", "river", "abbot"],
+  variants: { river: riverModule.variants, abbot: abbotModule.variants },
+  languages: ["en", "sv"],
+  maxHandSize: 5,
+};
+const SAVES: SavedGameInfo[] = [
+  {
+    id: "dev-1", savedAt: "2026-10-01T18:30:00Z", expansions: ["base"], tilesPlaced: 31, readable: true,
+    players: [{ name: "Ada", color: "#2a6fdb", score: 42 }, { name: "Bot", color: "#d62828", score: 37 }],
+  },
+  { id: "dev-2", savedAt: "2026-09-01T10:00:00Z", expansions: ["base"], tilesPlaced: 5, readable: false, players: [] },
+];
 
 export function toPublic(state: GameState): PublicState {
   const { rng: _rng, drawPile, players, ...rest } = state;
@@ -50,12 +64,31 @@ export function localServer(opts: LocalServerOptions = {}): TransportFactory {
       if (!closed) h.message(m);
     };
 
-    const lobby = () => to({ type: "lobby", seats, options, gameCode: "DEV", available: { expansions: ["base", "river", "abbot"], variants: {}, languages: ["en", "sv"], maxHandSize: 8 }, saves: [] });
+    const lobby = () => to({ type: "lobby", seats, options, gameCode: "DEV", available: AVAILABLE, saves: SAVES });
     const pushState = () => {
       if (!game) return;
       to({ type: "state", state: toPublic(game) });
       to({ type: "hand", tiles: game.players.find((p) => p.id === ME)?.hand ?? [] });
       if (game.turn.player === ME && !game.finished) to({ type: "legalSteps", steps: engine.legalSteps(game) });
+      sendWarnings();
+      if (game.finished) {
+        to({
+          type: "stats",
+          stats: {
+            scoreTimeline: [], pointsByReason: {}, turns: 0, durationSeconds: 0,
+            records: [{ key: "stats.biggestCity", player: ME, value: 6 }],
+          },
+        });
+      }
+    };
+    // Provvarning för dev-sidan: varje gång det är min tur i placeringssteget.
+    let warningsOn = false;
+    const sendWarnings = () => {
+      const list: Warning[] =
+        warningsOn && game && !game.finished && game.turn.player === ME && game.turn.phase === "placeTile"
+          ? [{ key: "warning.cityBlocked" }]
+          : [];
+      to({ type: "warnings", warnings: list });
     };
 
     const botPlay = () => {
@@ -123,6 +156,10 @@ export function localServer(opts: LocalServerOptions = {}): TransportFactory {
         }
         case "step":
           apply(m.step);
+          break;
+        case "setWarnings":
+          warningsOn = m.on;
+          sendWarnings();
           break;
         default:
           break; // preview, map, inspect, showToAll, hostAction: ingen storskärm här

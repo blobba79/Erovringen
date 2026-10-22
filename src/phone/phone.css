@@ -100,3 +100,24 @@ button.on { border-color: var(--accent); }
 .toast.error { background: var(--bad); color: #fff; border: 0; }
 .flash { position: fixed; inset: 0; z-index: 20; pointer-events: none; background: #fff; animation: flash 0.4s ease-in-out 3; }
 @keyframes flash { 0%, 100% { opacity: 0; } 50% { opacity: 0.9; } }
+
+.tile-btn.selected { border-color: var(--accent); background: #f2c23033; }
+.tools { display: flex; flex-direction: column; gap: 8px; }
+.emojis { flex-wrap: wrap; }
+.emoji { font-size: 1.8rem; min-height: 60px; }
+.card.help p { margin: 0 0 8px; }
+.card.help p.exp { border-top: 1px solid #ffffff22; padding-top: 8px; }
+.warnings { background: #5a4310; border: 2px solid var(--accent); border-radius: 12px; padding: 8px 14px; }
+.warnings p { margin: 4px 0; font-weight: 600; }
+.after .result { font-size: 1.3rem; font-weight: 700; margin: 0 0 8px; }
+.standings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.standings li { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 10px; }
+.standings li.me { outline: 2px solid var(--accent); }
+.standings li b { flex: 1; }
+.records { margin: 10px 0 0; padding-left: 20px; }
+.saves { display: flex; flex-direction: column; gap: 8px; }
+.save { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; }
+.save span { font-size: 0.85rem; color: var(--muted); }
+.stepper { display: flex; align-items: center; gap: 16px; }
+.stepper button { width: 60px; font-size: 1.4rem; }
+.stepper output { font-size: 1.4rem; min-width: 2ch; text-align: center; }
