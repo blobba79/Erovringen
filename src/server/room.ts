@@ -133,7 +133,8 @@ export class Room {
 
   private warningsFor(state: GameState, player: PlayerId): Warning[] {
     try {
-      return (this.opts.stepWarnings ?? engineStepWarnings)(state, player);
+      if (this.opts.stepWarnings) return this.opts.stepWarnings(state, player);
+      return engineStepWarnings(state, player, undefined, this.modules);
     } catch (e) {
       this.log.warn(`varningar misslyckades: ${e instanceof Error ? e.message : String(e)}`);
       return [];
