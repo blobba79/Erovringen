@@ -5,7 +5,7 @@ import { baseModule, createEngine, type EngineApi } from "../../engine/index";
 import { riverModule } from "../../expansions/river/index";
 import { abbotModule } from "../../expansions/abbot/index";
 import type { GameSetup, GameState, PlayerId, Pos, Step } from "../../shared/state";
-import type { Preview, PublicState } from "../../shared/messages";
+import type { GameStats, Preview, PublicState } from "../../shared/messages";
 
 export function devEngine(): EngineApi {
   return createEngine([baseModule, riverModule, abbotModule], allTileTypes().values());
@@ -62,4 +62,30 @@ export function previewSpots(eng: EngineApi, s: GameState): Preview {
   }
   spots.sort((a, b) => a.y - b.y || a.x - b.x);
   return { edge: "all", spots };
+}
+
+/** Påhittad statistik för dev-sidan: poängen växer slumpmässigt över ett antal turer. */
+export function fakeStats(s: GameState, rnd: () => number, turns = 24): GameStats {
+  const ids = s.players.map((p) => p.id);
+  const cur: Record<PlayerId, number> = Object.fromEntries(ids.map((id) => [id, 0]));
+  const scoreTimeline: Record<PlayerId, number>[] = [{ ...cur }];
+  for (let t = 0; t < turns; t++) {
+    const id = ids[t % ids.length]!;
+    cur[id] = cur[id]! + Math.floor(rnd() * 9);
+    scoreTimeline.push({ ...cur });
+  }
+  const pointsByReason: Record<PlayerId, Record<string, number>> = {};
+  for (const id of ids) {
+    const total = cur[id]!;
+    const city = Math.floor(total * 0.5), road = Math.floor(total * 0.3);
+    pointsByReason[id] = { city, road, "final.farm": total - city - road };
+  }
+  const first = Object.values(s.board)[0]?.pos;
+  return {
+    scoreTimeline, pointsByReason, turns, durationSeconds: 1800,
+    records: [
+      { key: "stats.largestCity", player: ids[0] ?? null, value: 12, pos: first },
+      { key: "stats.mostFarmPoints", player: ids[1] ?? null, value: 9 },
+    ],
+  };
 }

@@ -8,6 +8,8 @@ import { drawMap, type DrawModel } from "./render";
 import { style, tileTypes } from "./data";
 import type { InspectResult } from "../shared/messages";
 import type { Shape } from "../shared/style";
+import type { Pos } from "../shared/state";
+import type { ReplayPlayer } from "./replay";
 
 /** Markerade områden: valt område i förhandsvisningen och ett väntande placeFigure. */
 function areaShapesOf(m: Model): Shape[] {
@@ -26,9 +28,9 @@ function areaShapesOf(m: Model): Shape[] {
   return shapes;
 }
 
-export function MapCanvas({ model, inspect }: { model: Model; inspect?: InspectResult }) {
+export function MapCanvas({ model, inspect, replay, marks }: { model: Model; inspect?: InspectResult; replay?: ReplayPlayer; marks?: Pos[] }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const live = useRef<{ draw: DrawModel; target: Camera | undefined }>({ draw: { areaShapes: [], previewSpots: [] }, target: undefined });
+  const live = useRef<{ draw: DrawModel; target: Camera | undefined; replay?: ReplayPlayer }>({ draw: { areaShapes: [], previewSpots: [] }, target: undefined });
 
   const draw = useMemo<DrawModel>(() => {
     const state = model.state;
@@ -39,11 +41,14 @@ export function MapCanvas({ model, inspect }: { model: Model; inspect?: InspectR
       previewSpots: model.preview?.preview.spots ?? [],
       pendingTile: pending && pending.type === "placeTile" ? pending.pos : undefined,
       inspect: inspect ? inspectMarks(inspect) : undefined,
+      prevFigures: model.prevFigures,
+      marks,
     };
     // eslint-disable-next-line
-  }, [model.state, model.preview, inspect]);
+  }, [model.state, model.preview, inspect, model.prevFigures, marks]);
   live.current.draw = draw;
   live.current.target = model.camera;
+  live.current.replay = replay;
 
   useEffect(() => {
     const canvas = ref.current;
@@ -72,7 +77,7 @@ export function MapCanvas({ model, inspect }: { model: Model; inspect?: InspectR
       const { draw: dm, target } = live.current;
       const goal = target ?? (dm.state ? fitCamera(dm.state.board, view) : { x: 0, y: 0, zoom: 8, rotation: 0 });
       cur = cur ? (sameCamera(cur, goal) ? cur : stepCamera(cur, goal, dt)) : goal;
-      drawMap(ctx, view, dpr, cur, style, tileTypes, dm);
+      drawMap(ctx, view, dpr, cur, style, tileTypes, { ...dm, replay: live.current.replay?.view(now) });
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);

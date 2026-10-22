@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
-import type { InspectResult, LobbySeat, PublicState } from "../shared/messages";
+import type { GameStats, InspectResult, LobbySeat, PublicState, SavedGameInfo } from "../shared/messages";
 import type { Translate } from "../shared/i18n";
 import { LOCALES, availableLanguages, createTranslator } from "../i18n/index";
 import { MapCanvas } from "./MapCanvas";
 import { type Model, seatsToShow } from "./store";
 import { phaseKey, standings } from "./logic";
+import { ReplayPlayer, type ReplayView, shownScore } from "./replay";
+import { ReactionBoard } from "./reactions";
+import { axisTicks, reasonRows, recordMarks, scoreChart } from "./stats";
 import { style, tileTypes } from "./data";
 import { tileImage } from "./render";
 
@@ -25,6 +28,7 @@ function Lobby({ model, tr }: { model: Model; tr: Translate }) {
   const seats = model.lobby?.seats ?? [];
   const o = model.lobby?.options;
   const yesNo = (b: boolean) => tr(b ? "screen.yes" : "screen.no");
+  const save = o?.savedGame ? model.lobby?.saves.find((x) => x.id === o.savedGame) : undefined;
   const langName = availableLanguages().find((l) => l.code === o?.screenLang)?.name ?? o?.screenLang;
   return (
     <div class="lobby">
@@ -43,10 +47,18 @@ function Lobby({ model, tr }: { model: Model; tr: Translate }) {
                 <Dot color={s.color} />
                 <span class="name">{s.name}</span>
                 {s.isHost && <span class="badge">{tr("lobby.host")}</span>}
+                {save && !s.connected && <span class="badge wait">{tr("screen.lobby.seatWaiting")}</span>}
               </li>
             ))}
           </ul>
           {seats.length > 0 && <p class="muted">{tr("lobby.waitingForHost")}</p>}
+          {save && (
+            <div class="saved">
+              <strong>{tr("screen.lobby.continuing")}</strong>
+              <div>{savedSummary(save, tr)}</div>
+              <div class="muted">{tr("screen.lobby.takeBackSeats")}</div>
+            </div>
+          )}
         </section>
         {o && (
           <section class="card options">
@@ -77,6 +89,12 @@ function Lobby({ model, tr }: { model: Model; tr: Translate }) {
   );
 }
 
+/** Rad om ett sparat spel: tid, spelare med poäng och antal lagda brickor. */
+export function savedSummary(save: SavedGameInfo, tr: Translate): string {
+  const players = save.players.map((p) => `${p.name} ${p.score}`).join(", ");
+  return `${new Date(save.savedAt).toLocaleString()} \u00b7 ${players} \u00b7 ${tr("screen.lobby.tilesPlaced", { count: save.tilesPlaced })}`;
+}
+
 function TileThumb({ type, count }: { type: string; count: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -95,7 +113,7 @@ function TileThumb({ type, count }: { type: string; count: number }) {
   );
 }
 
-function Scoreboard({ state, tr }: { state: PublicState; tr: Translate }) {
+function Scoreboard({ state, tr, view, reactions }: { state: PublicState; tr: Translate; view?: ReplayView; reactions: Record<string, string> }) {
   const rank = new Map(standings(state.players).map((s) => [s.id, s.rank]));
   return (
     <section class="panel scores">
@@ -106,7 +124,9 @@ function Scoreboard({ state, tr }: { state: PublicState; tr: Translate }) {
             <span class="rank">{rank.get(p.id)}</span>
             <Dot color={p.color} />
             <span class="name">{p.name}</span>
-            <span class="score">{p.score}</span>
+            {reactions[p.id] && <span class="reaction" key={reactions[p.id]}>{reactions[p.id]}</span>}
+            {view?.gaining[p.id] ? <span class="gain">+{view.gaining[p.id]}</span> : null}
+            <span class="score">{shownScore(p.score, view, p.id)}</span>
           </li>
         ))}
       </ul>
@@ -164,12 +184,90 @@ function InspectPanel({ result, state, tr }: { result: InspectResult; state: Pub
   );
 }
 
-function FinalBoard({ state, tr }: { state: PublicState; tr: Translate }) {
+function ShownTile({ model, tr }: { model: Model; tr: Translate }) {
+  const shown = model.shownTile;
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx || !shown) return;
+    const img = tileImage(style, tileTypes, { type: shown.tile, rotation: 0 }, 256);
+    ctx.clearRect(0, 0, 256, 256);
+    if (img) ctx.drawImage(img, 0, 0);
+  }, [shown?.tile]);
+  if (!shown || !model.state) return null;
+  const p = model.state.players.find((x) => x.id === shown.player);
+  return (
+    <section class="panel shown" style={{ borderColor: p?.color }}>
+      <h3>{tr("screen.shownTile", { player: p?.name ?? "" })}</h3>
+      <canvas ref={ref} width={256} height={256} />
+    </section>
+  );
+}
+
+export function StatsView({ stats, state, tr }: { stats: GameStats; state: PublicState; tr: Translate }) {
+  const ids = state.players.map((p) => p.id);
+  const W = 640, H = 240;
+  const chart = scoreChart(stats, ids, W, H);
+  const rows = reasonRows(stats, ids);
+  const nameOf = (id: string | null) => state.players.find((p) => p.id === id)?.name;
+  const label = (key: string, fallback: string) => { const t = tr(key); return t === key ? fallback : t; };
+  return (
+    <div class="stats">
+      <section class="card">
+        <h2>{tr("screen.stats.curve")}</h2>
+        <svg viewBox={`-40 -10 ${W + 60} ${H + 40}`} class="chart">
+          {axisTicks(chart.maxScore).map((v) => {
+            const y = H - (v / chart.maxScore) * H;
+            return <g key={v}><line x1={0} x2={W} y1={y} y2={y} class="grid" /><text x={-8} y={y + 5} text-anchor="end">{v}</text></g>;
+          })}
+          {chart.lines.map((l) => (
+            <path key={l.player} d={l.path} fill="none" stroke={state.players.find((p) => p.id === l.player)?.color} stroke-width={5} stroke-linejoin="round" stroke-linecap="round" />
+          ))}
+          <text x={0} y={H + 28}>{tr("screen.stats.turn", { count: 0 })}</text>
+          <text x={W} y={H + 28} text-anchor="end">{tr("screen.stats.turn", { count: chart.turns })}</text>
+        </svg>
+      </section>
+      <section class="card">
+        <h2>{tr("screen.stats.byReason")}</h2>
+        <table>
+          <thead>
+            <tr><th />{state.players.map((p) => <th key={p.id}><Dot color={p.color} /></th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.reason}>
+                <td>{label(`stats.reason.${r.reason}`, r.reason)}</td>
+                {r.values.map((v, i) => <td key={i}>{v || ""}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      {stats.records.length > 0 && (
+        <section class="card">
+          <h2>{tr("screen.stats.records")}</h2>
+          <ul class="records">
+            {stats.records.map((r, i) => (
+              <li key={i}>
+                <span class="what">{label(r.key, r.key.replace(/^stats\./, ""))}</span>
+                {nameOf(r.player) && <span><Dot color={state.players.find((p) => p.id === r.player)?.color ?? "#888"} />{nameOf(r.player)}</span>}
+                <b>{r.value}</b>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function FinalBoard({ state, tr, stats }: { state: PublicState; tr: Translate; stats?: GameStats }) {
   const rows = standings(state.players);
   const byId = new Map(state.players.map((p) => [p.id, p]));
   const winners = rows.filter((r) => r.rank === 1).map((r) => byId.get(r.id)!.name);
   return (
-    <div class="overlay">
+    <div class={`overlay final-wrap${stats ? " with-stats" : ""}`}>
       <section class="card final">
         <h1>{tr("screen.gameOver")}</h1>
         <h2>{tr("screen.winner", { player: winners.join(", "), count: winners.length })}</h2>
@@ -186,9 +284,8 @@ function FinalBoard({ state, tr }: { state: PublicState; tr: Translate }) {
             );
           })}
         </ol>
-        {/* Plats för repris och statistik (fas 3). */}
-        <div id="after-game-slot" />
       </section>
+      {stats && <StatsView stats={stats} state={state} tr={tr} />}
     </div>
   );
 }
@@ -224,14 +321,44 @@ function Game({ model, tr }: { model: Model; tr: Translate }) {
     const t = setTimeout(() => setShown(undefined), 20000);
     return () => clearTimeout(t);
   }, [model.inspect]);
+  // Repris och reaktioner: klockan går bara medan något pågår.
+  const replay = useRef(new ReplayPlayer());
+  const board = useRef(new ReactionBoard());
+  const [, setTick] = useState(0);
+  const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const kick = () => {
+    if (timer.current) return;
+    timer.current = setInterval(() => {
+      setTick((n) => n + 1);
+      const t = performance.now();
+      replay.current.view(t);
+      if (!replay.current.active && Object.keys(board.current.active(t)).length === 0) {
+        clearInterval(timer.current);
+        timer.current = undefined;
+      }
+    }, 80);
+  };
+  useEffect(() => () => clearInterval(timer.current), []);
+  useEffect(() => {
+    if (model.events && replay.current.push(model.events.events, performance.now())) kick();
+  }, [model.events?.seq]);
+  useEffect(() => {
+    if (!model.reaction) return;
+    board.current.push(model.reaction.player, model.reaction.emoji, performance.now());
+    kick();
+  }, [model.reaction?.seq]);
+  const now = performance.now();
+  const view = replay.current.view(now);
+  const marks = useMemo(() => (state.finished && model.stats ? recordMarks(model.stats) : undefined), [state.finished, model.stats]);
   return (
     <div class="game">
-      <MapCanvas model={model} inspect={shown} />
+      <MapCanvas model={model} inspect={shown} replay={replay.current} marks={marks} />
       <TurnBanner state={state} tr={tr} />
-      <Scoreboard state={state} tr={tr} />
+      <Scoreboard state={state} tr={tr} view={view} reactions={board.current.active(now)} />
+      <ShownTile model={model} tr={tr} />
       <Remaining state={state} tr={tr} />
       {shown && <InspectPanel result={shown} state={state} tr={tr} />}
-      {state.finished && <FinalBoard state={state} tr={tr} />}
+      {state.finished && <FinalBoard state={state} tr={tr} stats={model.stats} />}
     </div>
   );
 }

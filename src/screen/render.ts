@@ -1,7 +1,7 @@
 // Ritar kartan på canvas. Brickor ritas en gång per (typ, rotation, storlek) till en bild och cachas.
 
 import type { GraphicStyle, Shape } from "../shared/style";
-import type { PlacedTile, Pos } from "../shared/state";
+import type { Figure, PlacedTile, Pos } from "../shared/state";
 import type { PublicState } from "../shared/messages";
 import type { TileType } from "../shared/tiles";
 import { computeGeometry } from "../geometry/index";
@@ -9,6 +9,7 @@ import {
   type Camera, type InspectMarks, type View, type XY,
   cacheSize, figureSpots, pxPerTile, spotLabels, squareShape, tileCacheKey, worldToScreen,
 } from "./logic";
+import { type ReplayView, landingLook } from "./replay";
 
 export type TileTypeMap = Map<string, TileType>;
 
@@ -39,6 +40,12 @@ export interface DrawModel {
   previewSpots: Pos[];
   pendingTile?: Pos;
   inspect?: InspectMarks;
+  /** Pågående repris av senaste draget (landande bricka, pjäser, poäng). */
+  replay?: ReplayView;
+  /** Pjäserna före senaste draget, för pjäser som tas tillbaka. */
+  prevFigures?: Figure[];
+  /** Platser att markera (rekord efter spelet). */
+  marks?: Pos[];
 }
 
 const toScreen = (cam: Camera, view: View, shapes: readonly Shape[]): Shape[] =>
@@ -89,6 +96,24 @@ export function drawMap(
     }
   }
 
+  // repris: brickan landar
+  const rp = model.replay;
+  if (state && rp?.landing) {
+    const { tile, progress } = rp.landing;
+    const look = landingLook(progress);
+    const c = worldToScreen(cam, view, tile.pos);
+    const img = tileImage(style, types, tile, cacheSize(px * dpr * look.scale));
+    if (img) {
+      ctx.save();
+      ctx.globalAlpha = look.alpha;
+      ctx.translate(c.x, c.y);
+      ctx.rotate((cam.rotation * Math.PI) / 180);
+      const s = px * look.scale;
+      ctx.drawImage(img, -s / 2, -s / 2, s, s);
+      ctx.restore();
+    }
+  }
+
   // markeringar (i skärmens pixlar)
   const hl = (shapes: Shape[], kind: "area" | "open" | "blocked" | "preview") => {
     if (shapes.length) style.drawHighlight({ ctx, shapes: toScreen(cam, view, shapes), kind });
@@ -104,6 +129,8 @@ export function drawMap(
     hl(squares(ins.blocked), "blocked");
   }
   hl(model.areaShapes, "area");
+  if (model.marks?.length) hl(squares(model.marks), "area");
+  if (rp?.landing) hl([squareShape(rp.landing.tile.pos)], "preview");
 
   // pjäser, upprätta
   if (state) {
@@ -111,6 +138,33 @@ export function drawMap(
     for (const f of figureSpots(state.figures, types, state.board)) {
       const c = worldToScreen(cam, view, f);
       style.drawFigure({ ctx, kind: f.kind, color: f.owner ? players.get(f.owner) ?? null : null, x: c.x, y: c.y - px * 0.1, size: px * 0.5 });
+    }
+  }
+
+  // repris: pjäser som ställs ut (ring) och tas tillbaka (tonar bort och stiger)
+  if (state && rp && rp.figures.length) {
+    const now = figureSpots(state.figures, types, state.board);
+    const before = figureSpots(model.prevFigures ?? [], types, state.board);
+    for (const f of rp.figures) {
+      const spot = (f.mode === "placed" ? now : before).find((x) => x.id === f.figure);
+      if (!spot) continue;
+      const c = worldToScreen(cam, view, spot);
+      if (f.mode === "placed") {
+        ctx.save();
+        ctx.lineWidth = Math.max(3, px * 0.05);
+        ctx.strokeStyle = colors.text ?? "#fff";
+        ctx.globalAlpha = 1 - f.progress * 0.6;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y - px * 0.1, px * (0.3 + 0.35 * f.progress), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.globalAlpha = 1 - f.progress;
+        const owner = state.players.find((p) => p.id === spot.owner)?.color ?? null;
+        style.drawFigure({ ctx, kind: spot.kind, color: owner, x: c.x, y: c.y - px * (0.1 + 0.5 * f.progress), size: px * 0.5 });
+        ctx.restore();
+      }
     }
   }
 
@@ -124,6 +178,18 @@ export function drawMap(
     for (const c of ins.closing) {
       const p = worldToScreen(cam, view, c.pos);
       drawText(ctx, String(c.count), p, Math.max(16, px * 0.4), text, outline);
+    }
+  }
+
+  // repris: poäng som stiger från området
+  if (rp) {
+    for (const pop of rp.pops) {
+      if (!pop.pos) continue;
+      const c = worldToScreen(cam, view, pop.pos);
+      ctx.save();
+      ctx.globalAlpha = 1 - Math.max(0, pop.progress - 0.6) / 0.4;
+      drawText(ctx, `+${pop.points}`, { x: c.x, y: c.y - px * (0.2 + 0.6 * pop.progress) }, Math.max(20, px * 0.5), text, outline);
+      ctx.restore();
     }
   }
 
