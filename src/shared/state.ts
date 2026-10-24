@@ -104,6 +104,12 @@ export interface TurnState {
   phase: string;
   /** Delsteg som gjorts men inte bekräftats; "undo" tar bort det sista. */
   pending: Step[];
+  /**
+   * Spelaren som ska välja just nu, om det inte är den som har tur (t.ex. när alla i tur och ordning
+   * väljer i Crop Circles II, eller flyttar draken). Delstegen tas då emot från och skickas till den
+   * spelaren; turen tillhör fortfarande `player`.
+   */
+  actor?: PlayerId;
 }
 
 export interface GameState {
