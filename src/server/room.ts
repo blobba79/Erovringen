@@ -556,7 +556,7 @@ export class Room {
       this.camera = fitAll(tiles(), this.currentSpots());
       return this.sendCamera();
     }
-    this.camera = applyControl(this.camera, control, tiles, () => []);
+    this.camera = applyControl(this.camera, control, tiles, () => this.currentSpots());
     this.scheduleCamera();
   }
 
@@ -817,6 +817,9 @@ export class Room {
     const seen = new Map<string, Pos>();
     for (const t of tiles)
       for (const p of this.engine.placementsFor(s, t)) seen.set(`${p.pos.x},${p.pos.y}`, { x: p.pos.x, y: p.pos.y });
+    // Målen för ett expansionsval (magikern, draken …) ska också synas.
+    if (this.preview?.player === s.turn.player)
+      for (const t of this.preview.preview.targets ?? []) seen.set(`${t.pos.x},${t.pos.y}`, { x: t.pos.x, y: t.pos.y });
     return [...seen.values()];
   }
 
