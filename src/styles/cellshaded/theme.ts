@@ -18,12 +18,8 @@ export const THEME = {
   river: { light: "#3FB3EC", dark: "#2290CF", glint: "#E9F8FF", width: 0.25, shade: 0.06, glintW: 0.012, dash: [0.05, 0.06] as const },
   city: { light: "#F6C766", dark: "#D99A3C", wallBand: 0.05 },
 
-  /** Vägslut i korsningar (se junction.ts). */
-  junction: {
-    plazaR: 0.135, plazaLight: "#E9D3A0", plazaDark: "#C49F5E",
-    wellStone: "#D5D9D8", wellStoneDark: "#9AA5A8", wellWater: "#3FB3EC", wellWaterDark: "#2290CF",
-    stub: 0.16, stallR: 0.1, stallA: "#EE6A4A", stallADark: "#B8432D", stallB: "#FFF4DC", stallBDark: "#DCC496",
-  },
+  /** Vägslut mitt på brickan (se junction.ts): avstånd från mitten där vägen slutar, och husstorlek. */
+  junction: { stub: 0.23, houseSize: 0.095 },
 
   house: { wallLight: "#FFF4DC", wallDark: "#DCC496", roofLight: "#EE6A4A", roofDark: "#B8432D", size: 0.13 },
   cloister: { size: 0.4, cross: "#FFF4DC", door: "#7A4B2A" },
