@@ -1,7 +1,7 @@
 // Spelets tillstånd, delsteg och händelser. Tillståndet är ren JSON så att det kan sparas,
 // skickas och spelas upp igen. Motorn ändrar det bara via `Engine.apply`.
 
-import type { ExpansionId, Rotation } from "./tiles";
+import type { Edge, ExpansionId, Rotation } from "./tiles";
 
 export type PlayerId = string;
 export type FigureId = string;
@@ -71,10 +71,32 @@ export type Step =
   | { type: "placeFigure"; kind: FigureKind; pos: Pos; feature: string }
   | { type: "noFigure" }
   | { type: "returnFigure"; figure: FigureId }
-  /** Expansionernas egna handlingar, t.ex. flytta draken eller lägga en guldtacka. */
+  /**
+   * Expansionernas egna handlingar, t.ex. flytta draken eller magikern. `data` följer helst
+   * `ExpansionStepData`, så att telefonen och storskärmen kan visa valet utan att känna till expansionen.
+   */
   | { type: "expansion"; expansion: ExpansionId; action: string; data: unknown }
   | { type: "undo" }
   | { type: "confirm" };
+
+/**
+ * Gemensam form för `data` i ett expansionssteg. Telefonen grupperar stegen efter `action`
+ * (text `step.<expansion>.<action>`). Steg med `pos` är mål på kartan: storskärmen numrerar dem
+ * och spelaren väljer en siffra. `choice` skiljer steg utan mål åt (text
+ * `step.<expansion>.<action>.<choice>`).
+ */
+export interface ExpansionStepData {
+  /** Rutan som valet gäller. */
+  pos?: Pos;
+  /** Området på rutan (område-id i brickdatan), om valet gäller ett område. */
+  feature?: string;
+  /** Pjäsen som valet gäller, t.ex. vilken färja eller vilken av magikern och häxan. */
+  figure?: FigureId;
+  /** Kant på rutan, t.ex. för en flygmaskins riktning. */
+  edge?: Edge;
+  /** Ett val utan mål på kartan. */
+  choice?: string;
+}
 
 export interface TurnState {
   player: PlayerId;

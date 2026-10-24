@@ -62,6 +62,11 @@ export interface Preview {
   spots?: Pos[];
   /** Området som spelaren håller på att välja i steget "Välj pjäs" (innan delsteget görs). */
   feature?: { pos: Pos; feature: string };
+  /**
+   * Målen för expansionssteget som spelaren håller på att välja, i nummerordning (mål 1 först).
+   * Storskärmen visar siffror där. Räknas ut av telefonen ur stegens `ExpansionStepData`.
+   */
+  targets?: { pos: Pos; feature?: string }[];
 }
 
 /** Det som går att välja bland startvalen; servern vet vilka moduler som finns. */
