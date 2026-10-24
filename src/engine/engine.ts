@@ -7,8 +7,8 @@ import type {
 } from "../shared/state";
 import { toTileTypes, type TileTypes } from "./board";
 import { baseModule } from "./base-module";
-import { baseExt, type Env } from "./context";
-import { analyze, type Analysis } from "./features";
+import { baseExt, engineHook, type Env } from "./context";
+import { analyze, registerEdgeLinks, type Analysis } from "./features";
 import { legalSteps } from "./legal";
 import { legalPlacements } from "./placement";
 import { newGame } from "./setup";
@@ -48,6 +48,7 @@ export function createEngine(
   const ordered = [...modules].sort((a, b) => (a.id === "base" ? -1 : b.id === "base" ? 1 : 0));
   if (!ordered.some((m) => m.id === "base")) ordered.unshift(baseModule);
   const env: Env = { modules: ordered, types: toTileTypes(tileTypes) };
+  for (const m of ordered) registerEdgeLinks(engineHook(m, "edgeLinks"));
 
   function apply(state: GameState, player: PlayerId, step: Step): ApplyResult {
     if (state.finished) return fail("error.gameFinished");

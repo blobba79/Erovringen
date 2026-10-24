@@ -31,6 +31,13 @@ export interface Analysis {
   areaAt(pos: Pos, feature: string): Area | undefined;
 }
 
+/** Förbindelser inne på brickor som moduler anmält (färjor). Ren funktion av pjäserna, så att det är ofarligt att alla finns med. */
+type EdgeLinks = (figures: readonly Figure[]) => { pos: Pos; a: Edge; b: Edge }[];
+const edgeLinkFns: EdgeLinks[] = [];
+export function registerEdgeLinks(fn: EdgeLinks | undefined): void {
+  if (fn && !edgeLinkFns.includes(fn)) edgeLinkFns.push(fn);
+}
+
 const nodeKey = (pos: Pos, id: string) => `${posKey(pos)}|${id}`;
 
 class UnionFind {
@@ -97,6 +104,20 @@ export function analyze(board: Board, figures: readonly Figure[], types: TileTyp
       }
     }
   }
+
+  // Förbindelser inne på brickor (färjor).
+  for (const fn of edgeLinkFns)
+    for (const { pos, a, b } of fn(figures)) {
+      const placed = tileAt(board, pos);
+      if (!placed) continue;
+      const rt = rotateTile(getType(types, placed.type), placed.rotation);
+      const fa = rt.edgeFeature[a];
+      const fb = rt.edgeFeature[b];
+      if (fa === undefined || fb === undefined || rt.edgeKind[a] !== rt.edgeKind[b]) continue;
+      const ia = idx(pos, fa);
+      const ib = idx(pos, fb);
+      if (ia !== undefined && ib !== undefined) uf.union(ia, ib);
+    }
 
   // Samla områden.
   const byRoot = new Map<number, Area>();

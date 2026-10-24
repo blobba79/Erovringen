@@ -3,7 +3,8 @@
 
 import type { GameEvent, GameState, Step } from "../shared/state";
 import { analyze } from "./features";
-import { activeModules, engineHook, makeCtx, playerOf, type Env } from "./context";
+import type { ExpansionModule } from "../shared/expansion";
+import { activeModules, engineHook, makeCtx, playerOf, type EngineHookContext, type Env } from "./context";
 import { exchangeAllowed, figureSteps } from "./legal";
 import { hasAnyPlacement, isLegalPlacement } from "./placement";
 import { addScore, adjustedPoints, areaValue, returnToSupply } from "./scoring";
@@ -73,13 +74,13 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
       fig.location = { at: "feature", pos: { ...step.pos }, feature: step.feature };
       events.push({ type: "figurePlaced", figure: fig.id, location: fig.location });
       turn.pending.push(step);
-      turn.phase = "confirm";
+      turn.phase = phaseAfterFigure(ctx, mods);
       return null;
     }
     case "noFigure":
       if (turn.phase !== "placeFigure") return "error.illegalStep";
       turn.pending.push(step);
-      turn.phase = "confirm";
+      turn.phase = phaseAfterFigure(ctx, mods);
       return null;
     case "returnFigure": {
       if (turn.phase !== "placeFigure") return "error.illegalStep";
@@ -93,7 +94,7 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
       if (area) addScore(ctx, player, adjustedPoints(ctx, area, areaValue(an, area), false), "return", area);
       returnToSupply(ctx, fig);
       turn.pending.push(step);
-      turn.phase = "confirm";
+      turn.phase = phaseAfterFigure(ctx, mods);
       return null;
     }
     case "expansion": {
@@ -107,6 +108,15 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
     default:
       return "error.illegalStep";
   }
+}
+
+/** Fasen efter pjässteget: en modul (färjorna) kan lägga en egen fas före "confirm". */
+function phaseAfterFigure(ctx: EngineHookContext, mods: ExpansionModule[]): string {
+  for (const m of mods) {
+    const phase = engineHook(m, "afterFigureStep")?.(ctx);
+    if (phase !== undefined) return phase;
+  }
+  return "confirm";
 }
 
 function explainFigureError(env: Env, state: GameState, step: Extract<Step, { type: "placeFigure" }>): string {

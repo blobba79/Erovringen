@@ -1,7 +1,8 @@
 // Gemensamma typer för motorns delar: miljön (moduler och brickor) och krokarnas utvidgade sammanhang.
 
 import type { ExpansionModule, HookContext } from "../shared/expansion";
-import type { GameEvent, GameSetup, GameState, PlayerId } from "../shared/state";
+import type { Edge } from "../shared/tiles";
+import type { Figure, GameEvent, GameSetup, GameState, PlayerId, Pos } from "../shared/state";
 import type { TileTypes } from "./board";
 
 /** Det som är fast för en motorinstans. */
@@ -42,6 +43,22 @@ export interface EngineHooks {
    * `{ tile }` (tile utelämnad = ingen ersättare, handen krymper) eller `undefined` för vanlig dragning.
    */
   exchangeDraw(ctx: EngineHookContext): { tile?: string } | undefined;
+  /**
+   * Förbindelser inne på brickor: områdena vid kanterna `a` och `b` på brickan i `pos` räknas som
+   * ett enda område (färjorna). Ska vara en ren funktion av pjäserna. Läses av `analyze` (via
+   * `registerEdgeLinks`, som `createEngine` anropar för sina moduler).
+   */
+  edgeLinks(figures: readonly Figure[]): { pos: Pos; a: Edge; b: Edge }[];
+  /**
+   * Efter att turens pjässteg gjorts (pjäs, ingen pjäs eller pjäs hem): modulen får lägga en egen fas
+   * före "confirm". Returnera fasens namn, eller `undefined` för att gå vidare som vanligt.
+   */
+  afterFigureStep(ctx: EngineHookContext): string | undefined;
+  /**
+   * Rutor utöver den lagda brickan där färdiga områden ska räknas i slutet av turen (t.ex. en bricka
+   * vars färja flyttats).
+   */
+  scoreAround(ctx: EngineHookContext): Pos[];
 }
 
 export const engineHook = <K extends keyof EngineHooks>(m: ExpansionModule, k: K): EngineHooks[K] | undefined =>

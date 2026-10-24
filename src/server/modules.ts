@@ -9,13 +9,14 @@ import { innsCathedralsModule } from "../expansions/inns-cathedrals/index";
 import { tradersBuildersModule } from "../expansions/traders-builders/index";
 import { goldMinesModule } from "../expansions/gold-mines/index";
 import { mageWitchModule } from "../expansions/mage-witch/index";
+import { ferriesModule } from "../expansions/ferries/index";
 import { allTileTypes } from "../tiles/index";
 import { availableLanguages } from "../i18n/index";
 import type { AvailableOptions } from "../shared/messages";
 import { MAX_HAND_SIZE } from "./options";
 
 // Mage & Witch efter I&C (poängordningen följer registreringsordningen).
-export const MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule, goldMinesModule, mageWitchModule];
+export const MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule, goldMinesModule, mageWitchModule, ferriesModule];
 
 export function availableExpansions(modules: ExpansionModule[] = MODULES): ExpansionId[] {
   return modules.map((m) => m.id);
