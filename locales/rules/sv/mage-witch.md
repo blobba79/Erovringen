@@ -8,6 +8,7 @@ Magikern och häxan är två neutrala figurer som du placerar på en väg eller 
 
 ## Så går turen till
 - Lägger du en bricka med magikersymbol måste du direkt efter att den lagts placera eller flytta exakt en av figurerna.
+- Samma sak gäller om din bricka binder ihop magikerns och häxans väg eller stad: då måste en av dem flyttas.
 - Ligger ingen på brädet tar du in en av dem. Ligger båda ute flyttar du en. Ligger en ute väljer du fritt: flytta den, eller ta in den andra.
 - Målet är en ofärdig väg eller stad var som helst på brädet. Magikern och häxan får inte stå på samma väg eller i samma stad, och en figur du flyttar måste hamna på en annan sak än förut.
 - Finns inget lagligt mål tas en figur som står ute bort från brädet.

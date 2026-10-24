@@ -53,6 +53,8 @@ export interface BaseExt {
   discarded: string[];
   /** Ögonblicksbild av tillståndet vid turens början, finns medan delsteg väntar. */
   snapshot?: GameState;
+  /** Expansionsfaser som väntar på sin tur den här turen (se `phases.ts`). */
+  phaseQueue?: string[];
 }
 
 export function baseExt(state: GameState): BaseExt {

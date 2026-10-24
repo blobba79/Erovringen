@@ -33,6 +33,7 @@ import { analyze } from "../../engine/features";
 import { neighbours8, posKey } from "../../engine/geometry";
 import { majorityOwners } from "../../engine/scoring";
 import { placedStep } from "../../engine/turnstate";
+import { enterPhase, leavePhase } from "../../engine/phases";
 import { TILE_DATA } from "../../tiles/index";
 
 export const GOLD_KIND = "gold-bar";
@@ -171,7 +172,7 @@ export const goldMinesModule: ExpansionModule = {
       const near = neighbourTiles(ctx, pos);
       if (free < 2 || near.length === 0) return;
       if (near.length === 1) putBar(ctx, near[0]!);
-      else ctx.state.turn.phase = GOLD_PHASE;
+      else enterPhase(ctx.state, GOLD_PHASE);
     },
 
     extraSteps(c, phase) {
@@ -187,7 +188,7 @@ export const goldMinesModule: ExpansionModule = {
       const pos = (step.data as { pos?: Pos } | null)?.pos;
       if (!pos || !candidates(ctx).some((p) => p.x === pos.x && p.y === pos.y)) return "error.illegalStep";
       putBar(ctx, pos);
-      ctx.state.turn.phase = "placeFigure";
+      leavePhase(ctx.state);
       return null;
     },
 

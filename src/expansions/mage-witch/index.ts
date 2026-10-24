@@ -21,6 +21,7 @@ import type { TileSet } from "../../shared/tiles";
 import type { EngineHookContext } from "../../engine/context";
 import { analyze, type Area } from "../../engine/features";
 import { returnToSupply } from "../../engine/scoring";
+import { enterPhase, leavePhase } from "../../engine/phases";
 import { TILE_DATA } from "../../tiles/index";
 
 export const MAGE_KIND = "mage";
@@ -87,7 +88,7 @@ export const mageWitchModule: ExpansionModule = {
       const together = !!a && !!b && a.id === b.id;
       if (!symbol && !together) return;
       if (options(ctx).length === 0) return;
-      s.turn.phase = MAGE_PHASE;
+      enterPhase(s, MAGE_PHASE);
     },
 
     extraSteps(c, phase): Step[] {
@@ -108,7 +109,7 @@ export const mageWitchModule: ExpansionModule = {
         f.location = { at: "feature", pos: { ...d.pos! }, feature: d.feature! };
         ctx.emit({ type: "figurePlaced", figure: f.id, location: f.location });
       } else returnToSupply(ctx, f);
-      ctx.state.turn.phase = "placeFigure";
+      leavePhase(ctx.state);
       return null;
     },
 
