@@ -13,8 +13,8 @@ The Gold Mines put gold bars on the tiles. Whoever wins a road, city or cloister
 - Gold belongs to the whole tile, not to one feature on it.
 
 ## Gold is awarded
-- When a road, city or cloister is completed, the player with the majority there takes all gold bars lying on the tiles that are part of it. A cloister counts its own tile and all eight neighbours.
-- With a tied majority, or when several features with gold are completed at once, gold is awarded **one bar at a time**. The player whose turn it is chooses first, then it goes clockwise until all is awarded.
+- When a road, city or cloister is completed, the player with the majority there takes all gold bars lying on the tiles that are part of it. A cloister (and the abbot's garden) counts its own tile and all eight neighbours.
+- With a tied majority, or when several features with gold are completed at once, gold is awarded **one bar at a time**. The player whose turn it is gets the first, then it goes clockwise until all is awarded. The game picks which bar each player gets.
 - When starting the game you can choose the other variant, where gold is awarded per completed feature instead.
 - Farmers get no gold.
 

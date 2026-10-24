@@ -13,8 +13,8 @@ Guldgruvorna lägger guldtackor på brickorna. Den som vinner en väg, stad elle
 - Guldet hör till hela brickan, inte till en särskild del av den.
 
 ## Guld delas ut
-- När en väg, stad eller ett kloster blir färdigt får den som har flest följare där alla guldtackor som ligger på de brickor som ingår. Ett kloster räknar sin egen bricka och alla åtta grannar.
-- Vid delad majoritet, eller om flera ställen med guld blir färdiga samtidigt, delas guldet ut **en tacka i taget**. Spelaren som är i tur väljer först, sedan går det medsols tills allt är utdelat.
+- När en väg, stad eller ett kloster blir färdigt får den som har flest följare där alla guldtackor som ligger på de brickor som ingår. Ett kloster (och abbotens trädgård) räknar sin egen bricka och alla åtta grannar.
+- Vid delad majoritet, eller om flera ställen med guld blir färdiga samtidigt, delas guldet ut **en tacka i taget**. Spelaren som är i tur får den första, sedan går det medsols tills allt är utdelat. Spelet väljer vilken tacka var och en får.
 - Vid start kan du välja den andra varianten, där guldet delas ut per färdig sak i stället.
 - Bönder får inget guld.
 
