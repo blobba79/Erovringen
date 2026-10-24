@@ -4,6 +4,7 @@ import { describe, expect, test } from "bun:test";
 import { realEngine, setupOf } from "../engine/helpers";
 import { chooseStep, makeRng } from "../players/random-player";
 import { chooseBotStep } from "../../src/server/bot";
+import { actorOf } from "../../src/engine/index";
 import type { GameState, Step } from "../../src/shared/state";
 
 const eng = realEngine();
@@ -19,7 +20,7 @@ function duel(seed: number, handSize: number, n: number) {
   let guard = 0;
   while (!s.finished) {
     if (++guard > 20000) throw new Error("spelet tar aldrig slut");
-    const me = s.turn.player;
+    const me = actorOf(s);
     let step: Step;
     if (isBot(me)) {
       const t0 = performance.now();

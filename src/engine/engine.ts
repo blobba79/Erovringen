@@ -7,9 +7,9 @@ import type {
 } from "../shared/state";
 import { toTileTypes, type TileTypes } from "./board";
 import { baseModule } from "./base-module";
-import { baseExt, engineHook, type Env } from "./context";
+import { actorOf, baseExt, engineHook, type Env } from "./context";
 import { analyze, registerEdgeLinks, type Analysis } from "./features";
-import { legalSteps } from "./legal";
+import { legalSteps, undoAllowed } from "./legal";
 import { legalPlacements } from "./placement";
 import { newGame } from "./setup";
 import { applyCore } from "./steps";
@@ -21,6 +21,8 @@ export interface EngineApi extends Engine {
   /** Områden på kartan (för markering, förhandsvisning och poäng just nu). */
   analyze(state: GameState): Analysis;
   /** Tillåtna (plats, rotation) för en brickstyp för spelaren vars tur det är. */
+  /** Får spelaren som har tur ångra just nu (även när en annan spelare väljer)? */
+  canUndo(state: GameState): boolean;
   placementsFor(state: GameState, tileId: string): { pos: Pos; rotation: 0 | 90 | 180 | 270 }[];
 }
 
@@ -52,10 +54,12 @@ export function createEngine(
 
   function apply(state: GameState, player: PlayerId, step: Step): ApplyResult {
     if (state.finished) return fail("error.gameFinished");
-    if (player !== state.turn.player) return fail("error.notYourTurn");
     const events: GameEvent[] = [];
     const pending = state.turn.pending;
+    // Delstegen görs av `actor` om den är satt; ångra hör alltid till spelaren som har tur.
+    if (step.type === "undo" ? player !== state.turn.player : player !== actorOf(state)) return fail("error.notYourTurn");
     if (step.type === "undo") {
+      if (!undoAllowed(env, state)) return fail("error.nothingToUndo");
       const snap = baseExt(state).snapshot;
       if (pending.length === 0 || !snap) return fail("error.nothingToUndo");
       return { ok: true, state: replay(env, snap, pending.slice(0, -1), events), events };
@@ -85,6 +89,7 @@ export function createEngine(
     newGame: (setup: GameSetup) => newGame(env, setup),
     legalSteps: (state) => legalSteps(env, state),
     apply,
+    canUndo: (state) => !state.finished && undoAllowed(env, state),
     analyze: (state) => analyze(state.board, state.figures, env.types),
     placementsFor: (state, tileId) => legalPlacements(env, state, state.turn.player, tileId),
   };

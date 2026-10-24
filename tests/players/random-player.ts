@@ -1,7 +1,7 @@
 // Testspelare: spelar slumpmässiga tillåtna drag och kontrollerar invarianter efter varje steg.
 
 import type { GameEvent, GameSetup, GameState, Step } from "../../src/shared/state";
-import type { EngineApi } from "../../src/engine/index";
+import { actorOf, type EngineApi } from "../../src/engine/index";
 
 /** Litet frö-baserat slumptal, skilt från spelets eget så att spelaren inte påverkar brickdragningen. */
 export function makeRng(seed: number): () => number {
@@ -108,9 +108,10 @@ export function playGame(
     const steps = eng.legalSteps(s);
     if (steps.length === 0) throw new Error(`inga tillåtna steg i fas ${s.turn.phase}`);
     const step = chooseStep(steps, rnd, opts.strategy ?? "random");
-    const r = eng.apply(s, s.turn.player, step);
+    const r = eng.apply(s, actorOf(s), step);
     if (!r.ok) throw new Error(`tillåtet steg nekades: ${json(step)} -> ${r.error}`);
-    if (opts.checkUndo !== false && step.type !== "confirm" && rnd() < 0.2) {
+    // (Efter att en annan spelare valt, t.ex. i Crop Circles II, går det inte längre att ångra.)
+    if (opts.checkUndo !== false && step.type !== "confirm" && eng.canUndo(r.state) && rnd() < 0.2) {
       // Ångra ska ge exakt det tidigare läget.
       const u = eng.apply(r.state, s.turn.player, { type: "undo" });
       if (!u.ok || json(u.state) !== json(s)) throw new Error(`ångra gav inte tillbaka läget efter ${json(step)}`);
