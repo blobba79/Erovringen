@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "preact/hooks";
 import { analyze } from "../engine/index";
 import type { Model } from "./store";
-import { type Camera, type View, featureShapes, fitCamera, inspectMarks, sameCamera, stepCamera } from "./logic";
+import { type Camera, type View, featureShapes, fitCamera, inspectMarks, sameCamera, squareShape, stepCamera } from "./logic";
 import { drawMap, type DrawModel } from "./render";
 import { style, tileTypes } from "./data";
 import type { InspectResult } from "../shared/messages";
@@ -28,6 +28,16 @@ function areaShapesOf(m: Model): Shape[] {
   return shapes;
 }
 
+/** Målens former: området om målet har ett, annars hela rutan. */
+function targetShapesOf(m: Model): Shape[] {
+  const state = m.state;
+  const targets = m.preview?.preview.targets;
+  if (!state || !targets?.length) return [];
+  return targets.flatMap((t) =>
+    t.feature !== undefined ? featureShapes(tileTypes, state.board, [{ pos: t.pos, feature: t.feature }]) : [squareShape(t.pos)],
+  );
+}
+
 export function MapCanvas({ model, inspect, replay, marks }: { model: Model; inspect?: InspectResult; replay?: ReplayPlayer; marks?: Pos[] }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const live = useRef<{ draw: DrawModel; target: Camera | undefined; replay?: ReplayPlayer }>({ draw: { areaShapes: [], previewSpots: [] }, target: undefined });
@@ -39,6 +49,8 @@ export function MapCanvas({ model, inspect, replay, marks }: { model: Model; ins
       state,
       areaShapes: areaShapesOf(model),
       previewSpots: model.preview?.preview.spots ?? [],
+      targets: model.preview?.preview.targets ?? [],
+      targetShapes: targetShapesOf(model),
       pendingTile: pending && pending.type === "placeTile" ? pending.pos : undefined,
       inspect: inspect ? inspectMarks(inspect) : undefined,
       prevFigures: model.prevFigures,

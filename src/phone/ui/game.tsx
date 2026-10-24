@@ -13,6 +13,7 @@ import { rotationsAt, spotsFor } from "../logic/spots";
 import { deriveTurn, figureSupply, type TurnView } from "../logic/turnview";
 import { SeatActions } from "./connect";
 import { AfterView, Tools, Warnings } from "./extras";
+import { ExpansionStage } from "./expansion";
 import { HandStrip } from "./hand";
 import { FigureIcon, LangSelect, TileCanvas, tileType, useClient, useT, useTileSize, type Highlight } from "./common";
 
@@ -39,12 +40,12 @@ export function GameView({ s }: { s: PhoneState }) {
       {state.finished && <AfterView s={s} />}
       {view.mine && <Warnings s={s} />}
       {view.mine && <Stage s={s} view={view} />}
-      {view.mine && (has("undo") || view.phase === "confirm") && (
+      {view.mine && (has("undo") || has("confirm")) && (
         <div class="actions">
           {has("undo") && (
             <button type="button" class="big" onClick={() => c.step({ type: "undo" })}>{t("turn.undo")}</button>
           )}
-          {view.phase === "confirm" && (
+          {has("confirm") && (
             <button type="button" class="big primary" onClick={() => c.step({ type: "confirm" })}>{t("turn.confirm")}</button>
           )}
         </div>
@@ -65,6 +66,7 @@ function Banner({ state, view, name }: { state: PublicState; view: TurnView; nam
     : view.phase === "placeTile" ? "turn.placeTile"
     : view.phase === "placeFigure" ? "turn.chooseFigure"
     : view.phase === "confirm" ? "turn.confirm"
+    : t(`phase.${view.phase}`) !== `phase.${view.phase}` ? `phase.${view.phase}`
     : "turn.extraPlacements";
   return (
     <h1 class={`banner${view.mine ? " mine" : ""}`}>
@@ -141,6 +143,15 @@ function Supply({ state, me, color }: { state: PublicState; me: PlayerId; color:
 // --- Delsteg ---
 
 function Stage({ s, view }: { s: PhoneState; view: TurnView }) {
+  return (
+    <>
+      <PhaseStage s={s} view={view} />
+      <ExpansionStage s={s} />
+    </>
+  );
+}
+
+function PhaseStage({ s, view }: { s: PhoneState; view: TurnView }) {
   const t = useT();
   switch (view.phase) {
     case "chooseTile":

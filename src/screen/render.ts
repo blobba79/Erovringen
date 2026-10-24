@@ -7,7 +7,7 @@ import type { TileType } from "../shared/tiles";
 import { computeGeometry } from "../geometry/index";
 import {
   type Camera, type InspectMarks, type View, type XY,
-  cacheSize, figureSpots, pxPerTile, spotLabels, squareShape, tileCacheKey, worldToScreen,
+  cacheSize, figureSpots, pxPerTile, spotLabels, squareShape, targetLabels, type TargetRef, tileCacheKey, worldToScreen,
 } from "./logic";
 import { type ReplayView, landingLook } from "./replay";
 
@@ -38,6 +38,10 @@ export interface DrawModel {
   /** Former som markeras (kartans rutor), färdigräknade av anroparen. */
   areaShapes: Shape[];
   previewSpots: Pos[];
+  /** Mål för en expansions val (siffror på områdets mittpunkt eller rutans mitt). */
+  targets?: TargetRef[];
+  /** Målens former (områden eller hela rutor) att markera. */
+  targetShapes?: Shape[];
   pendingTile?: Pos;
   inspect?: InspectMarks;
   /** Pågående repris av senaste draget (landande bricka, pjäser, poäng). */
@@ -120,6 +124,7 @@ export function drawMap(
   };
   const squares = (ps: readonly Pos[]) => ps.map(squareShape);
   hl(squares(model.previewSpots), "preview");
+  hl(model.targetShapes ?? [], "preview");
   if (model.pendingTile) hl([squareShape(model.pendingTile)], "preview");
   const ins = model.inspect;
   if (ins) {
@@ -173,6 +178,11 @@ export function drawMap(
   const outline = colors.outline ?? "#000";
   for (const l of spotLabels(model.previewSpots, cam, view)) {
     if (l.visible) drawText(ctx, String(l.n), l, l.size, text, outline);
+  }
+  if (state && model.targets?.length) {
+    for (const l of targetLabels(model.targets, types, state.board, cam, view)) {
+      if (l.visible) drawText(ctx, String(l.n), l, l.size, text, outline);
+    }
   }
   if (ins) {
     for (const c of ins.closing) {

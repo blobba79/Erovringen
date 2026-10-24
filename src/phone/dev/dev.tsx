@@ -6,6 +6,7 @@ import { availableLanguages, LOCALES } from "../../i18n/index";
 import { App } from "../app";
 import { Client } from "../client";
 import texts from "../texts.en.json";
+import { fakeExpansionServer } from "./fake-expansion";
 import { localServer } from "./local-server";
 
 // De nya texterna ligger inte i locales/ än; här läggs de på engelskan.
@@ -14,10 +15,16 @@ LOCALES.en = {
   ...texts,
   "warning.cityBlocked": "(dev example) This placement makes your city impossible to finish.",
   "stats.biggestCity": "Biggest city",
+  // ?fake: påhittad expansion med egen fas (texterna saknas medvetet för "skip.never", för att prova reservtexten).
+  "phase.moveMage": "Move the mage",
+  "step.mage-witch.move": "Move the mage or the witch",
+  "step.mage-witch.skip": "Or do nothing",
+  "step.mage-witch.skip.now": "Skip now",
 };
 
+const fake = location.search.includes("fake");
 const search = location.search.includes("g=") ? location.search : "?g=DEV";
-const client = new Client(localServer({ botDelayMs: 600 }), {
+const client = new Client(fake ? fakeExpansionServer().factory : localServer({ botDelayMs: 600 }), {
   storage: null,
   search,
   browserLang: navigator.language,
@@ -36,7 +43,7 @@ if (new URLSearchParams(location.search).has("auto")) {
       const lobby = client.getState().lobby;
       if (!lobby) return;
       clearInterval(go);
-      client.setOptions({ ...lobby.options, expansions: ["base", "river", "abbot"], handSize: Number(new URLSearchParams(location.search).get("hand") ?? 1) });
+      client.setOptions({ ...lobby.options, expansions: fake ? ["base"] : ["base", "river", "abbot"], handSize: Number(new URLSearchParams(location.search).get("hand") ?? 1) });
       client.startGame();
     }, 50);
   }, 50);

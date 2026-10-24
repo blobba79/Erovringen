@@ -164,6 +164,45 @@ export function featureShapes(
   return out;
 }
 
+/** Områdets mittpunkt (ankaret) på rutan i kartkoordinater; saknas området eller rutan används rutans mitt. */
+export function featureAnchor(
+  types: Map<string, TileType>, board: Record<string, PlacedTile>, pos: Pos, feature: string | undefined,
+): XY {
+  const placed = board[`${pos.x},${pos.y}`];
+  const type = placed && types.get(placed.type);
+  const g = placed && type && feature !== undefined ? computeGeometry(type).features.find((f) => f.feature === feature) : undefined;
+  if (!placed || !g) return { x: pos.x, y: pos.y };
+  const [ax, ay] = rotatePoint(g.anchor, placed.rotation);
+  return { x: pos.x - 0.5 + ax, y: pos.y - 0.5 + ay };
+}
+
+/** Mål för expansionens val (Preview.targets): rutan och ev. området. */
+export interface TargetRef {
+  pos: Pos;
+  feature?: string;
+}
+
+/**
+ * Siffrorna för expansionens mål, i given ordning (mål 1 först), på områdets mittpunkt eller
+ * rutans mitt. Samma form och synlighetsregel som platssiffrorna.
+ */
+export function targetLabels(
+  targets: readonly TargetRef[], types: Map<string, TileType>, board: Record<string, PlacedTile>, cam: Camera, view: View,
+): SpotLabel[] {
+  const s = pxPerTile(cam, view);
+  return targets.map((t, i) => {
+    const c = worldToScreen(cam, view, featureAnchor(types, board, t.pos, t.feature));
+    const half = s * 0.7;
+    return {
+      n: i + 1,
+      x: c.x,
+      y: c.y,
+      size: Math.max(18, s * 0.55),
+      visible: c.x > -half && c.x < view.width + half && c.y > -half && c.y < view.height + half,
+    };
+  });
+}
+
 export interface FigureSpot {
   id: string;
   kind: string;
@@ -177,14 +216,7 @@ export function figureSpots(
   figures: readonly Figure[], types: Map<string, TileType>, board: Record<string, PlacedTile>,
 ): FigureSpot[] {
   const base = new Map<string, XY>();
-  const anchorOf = (pos: Pos, feature: string): XY => {
-    const placed = board[`${pos.x},${pos.y}`];
-    const type = placed && types.get(placed.type);
-    const g = placed && type ? computeGeometry(type).features.find((f) => f.feature === feature) : undefined;
-    if (!placed || !g) return { x: pos.x, y: pos.y };
-    const [ax, ay] = rotatePoint(g.anchor, placed.rotation);
-    return { x: pos.x - 0.5 + ax, y: pos.y - 0.5 + ay };
-  };
+  const anchorOf = (pos: Pos, feature: string): XY => featureAnchor(types, board, pos, feature);
   for (const f of figures) {
     if (f.location.at === "feature") base.set(f.id, anchorOf(f.location.pos, f.location.feature));
     else if (f.location.at === "tile") base.set(f.id, { x: f.location.pos.x, y: f.location.pos.y });
