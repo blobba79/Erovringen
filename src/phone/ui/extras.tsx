@@ -5,7 +5,7 @@ import type { PhoneState } from "../client";
 import { LOCALES } from "../../i18n/index";
 import { helpKeys } from "../logic/help";
 import { standings, topRecords } from "../logic/after";
-import { useClient, useT } from "./common";
+import { LangSelect, useClient, useT } from "./common";
 
 export const EMOJIS = ["👍", "👏", "😂", "😮", "😢", "🔥"] as const;
 
@@ -59,10 +59,13 @@ export function Tools({ s, phase, mine }: { s: PhoneState; phase: string; mine: 
           ))}
         </div>
       )}
-      <label class="check">
-        <input type="checkbox" checked={s.warningsOn} onChange={() => c.setWarningsOn(!s.warningsOn)} />{" "}
-        <span>{t("phone.warningsOn")}</span>
-      </label>
+      <div class="settings">
+        <label class="check">
+          <input type="checkbox" checked={s.warningsOn} onChange={() => c.setWarningsOn(!s.warningsOn)} />{" "}
+          <span>{t("phone.warningsOn")}</span>
+        </label>
+        <LangSelect />
+      </div>
     </section>
   );
 }
