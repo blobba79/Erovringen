@@ -8,7 +8,7 @@ import { housesFor, symbolSpots, treesFor } from "./decor";
 import { drawBands, drawCityBody, drawGrass } from "./layers";
 import { drawSymbol } from "./symbols";
 import { pathPoly } from "./util";
-import { drawJunction, endsAtCenter, getJunctionMode, shortenLine } from "./junction";
+import { drawJunction, endsAtCenter, shortenLine } from "./junction";
 
 interface Icon { name: string; p: Point; s: number }
 
@@ -36,9 +36,8 @@ export function drawTile({ ctx, tile, geometry, rotation, size }: DrawTileArgs):
   ctx.clip();
   drawGrass(ctx, tile.id);
 
-  const jm = getJunctionMode();
   const hasCloister = feats.some((g) => g.kind === "cloister");
-  const ends = jm === "none" || hasCloister ? 0 : feats.filter((g) => g.kind === "road" && endsAtCenter(g.centerline)).length;
+  const ends = hasCloister ? 0 : feats.filter((g) => g.kind === "road" && endsAtCenter(g.centerline)).length;
   for (const kind of ["river", "road"] as const) {
     drawBands(ctx, kind, feats.filter((g) => g.kind === kind && g.centerline).map((g) => ({
       line: (ends && kind === "road" && endsAtCenter(g.centerline) ? shortenLine(g.centerline!) : g.centerline!).map(R),

@@ -2,36 +2,25 @@ import { expect, test } from "bun:test";
 import { allTileTypes } from "../../src/tiles";
 import { computeGeometry } from "../../src/geometry";
 import { cellshadedStyle } from "../../src/styles/cellshaded";
-import { JUNCTION_MODES, endsAtCenter, setJunctionMode, shortenLine } from "../../src/styles/cellshaded/junction";
+import { endsAtCenter, shortenLine } from "../../src/styles/cellshaded/junction";
 
-function count(t: Parameters<typeof computeGeometry>[0]): number {
-  let n = 0;
-  const ctx = new Proxy({}, { get: () => () => { n++; }, set: () => true }) as unknown as CanvasRenderingContext2D;
-  cellshadedStyle.drawTile({ ctx, tile: t, geometry: computeGeometry(t), rotation: 90, size: 100 });
-  return n;
-}
-
-test("alla korsningslägen ritar alla brickor utan fel; standard är oförändrat", () => {
-  const tiles = [...allTileTypes().values()];
-  setJunctionMode("none");
-  const base = tiles.map(count);
-  let changed = 0;
-  for (const m of JUNCTION_MODES) {
-    setJunctionMode(m);
-    tiles.forEach((t, i) => { if (count(t) !== base[i]) changed++; });
+test("brickor med vägslut ritas i alla vridningar och geometrin är oförändrad av ritningen", () => {
+  const ctx = new Proxy({}, { get: () => () => {}, set: () => true }) as unknown as CanvasRenderingContext2D;
+  let found = 0;
+  for (const t of allTileTypes().values()) {
+    const geometry = computeGeometry(t);
+    const before = JSON.stringify(geometry);
+    if (geometry.features.some((f) => endsAtCenter(f.centerline))) found++;
+    for (const rotation of [0, 90, 180, 270] as const) cellshadedStyle.drawTile({ ctx, tile: t, geometry, rotation, size: 100 });
+    expect(JSON.stringify(geometry), t.id).toBe(before);
+    expect(JSON.stringify(computeGeometry(t)), t.id).toBe(before);
   }
-  setJunctionMode("none");
-  expect(tiles.map(count)).toEqual(base);
-  expect(changed).toBeGreaterThan(0);
+  expect(found).toBeGreaterThan(5);
 });
 
-test("geometrin ändras inte av läget och förslag C kortar vägen", () => {
+test("vägen kortas så att den slutar före mitten", () => {
   const t = [...allTileTypes().values()].find((x) => computeGeometry(x).features.filter((f) => endsAtCenter(f.centerline)).length >= 3)!;
-  const a = JSON.stringify(computeGeometry(t));
-  setJunctionMode("C");
-  expect(JSON.stringify(computeGeometry(t))).toBe(a);
-  setJunctionMode("none");
   const line = computeGeometry(t).features.find((f) => endsAtCenter(f.centerline))!.centerline!;
-  const s = shortenLine(line, "C");
-  expect(Math.hypot(s[1]![0] - 0.5, s[1]![1] - 0.5)).toBeGreaterThan(0.1);
+  const s = shortenLine(line);
+  expect(Math.hypot(s[1]![0] - 0.5, s[1]![1] - 0.5)).toBeGreaterThan(0.15);
 });

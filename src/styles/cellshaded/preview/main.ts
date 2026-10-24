@@ -2,8 +2,7 @@
 import { TILE_DATA } from "../../../tiles";
 import { computeGeometry } from "../../../geometry";
 import { cellshadedStyle as style } from "../index";
-import type { Rotation, TileType } from "../../../shared/tiles";
-import { JUNCTION_MODES, type JunctionMode, endsAtCenter, setJunctionMode } from "../junction";
+import type { Rotation } from "../../../shared/tiles";
 
 const q = new URLSearchParams(location.search);
 const sel = document.getElementById("exp") as HTMLSelectElement;
@@ -15,50 +14,6 @@ for (const id of Object.keys(TILE_DATA)) sel.add(new Option(id, id));
 sel.value = q.get("exp") ?? "base";
 rotSel.value = q.get("rot") ?? "0";
 const SIZE = Number(q.get("size") ?? 150);
-const jq = q.get("junction");
-if (jq && (JUNCTION_MODES as readonly string[]).includes(jq)) setJunctionMode(jq as JunctionMode);
-
-const JUNCTION_TITLES: Record<JunctionMode, string> = {
-  none: "Nuvarande ritning (referens)",
-  A: "A: liten by med hus",
-  B: "B: torg med brunn",
-  C: "C: vägarna stannar före mitten, hus i mitten",
-  D: "D: marknadsstånd på rund yta",
-};
-
-/** ?compare=1: korsningsbrickor och vägslut, en rad per förslag. */
-function renderCompare(): void {
-  document.body.querySelectorAll("#grid, #figs, label").forEach((e) => ((e as HTMLElement).style.display = "none"));
-  const pool: TileType[] = Object.values(TILE_DATA).flatMap((d) => d?.tiles ?? []);
-  const info = (t: TileType) => {
-    const g = computeGeometry(t);
-    return { t, n: g.features.filter((f) => f.kind === "road" && endsAtCenter(f.centerline)).length, cloister: g.features.some((f) => f.kind === "cloister"), city: g.features.some((f) => f.kind === "city") };
-  };
-  const all = pool.map(info);
-  const pick = (f: (i: ReturnType<typeof info>) => boolean, n: number) => all.filter(f).slice(0, n).map((i) => i.t);
-  const tiles = [...pick((i) => i.n === 3 && !i.city, 2), ...pick((i) => i.n === 4, 2), ...pick((i) => i.n === 3 && i.city, 1),
-    ...pick((i) => i.n === 1 && i.city && !i.cloister, 2), ...pick((i) => i.n === 1 && !i.city && !i.cloister, 2), ...pick((i) => i.cloister && i.n === 1, 1)];
-  const root = document.createElement("div");
-  const dpr = window.devicePixelRatio || 1;
-  const size = Number(q.get("size") ?? 130);
-  for (const m of JUNCTION_MODES) {
-    setJunctionMode(m);
-    const h = document.createElement("h3");
-    h.textContent = JUNCTION_TITLES[m];
-    const row = document.createElement("div");
-    row.style.cssText = "display:flex;gap:6px;flex-wrap:wrap";
-    for (const tile of tiles) {
-      const cv = document.createElement("canvas");
-      cv.width = cv.height = Math.round(size * dpr);
-      cv.style.width = cv.style.height = size + "px";
-      style.drawTile({ ctx: cv.getContext("2d")!, tile, geometry: computeGeometry(tile), rotation: 0, size: size * dpr });
-      row.append(cv);
-    }
-    root.append(h, row);
-  }
-  setJunctionMode("none");
-  document.body.append(root);
-}
 
 function render(): void {
   const data = TILE_DATA[sel.value as keyof typeof TILE_DATA];
@@ -102,6 +57,5 @@ function drawFigures(): void {
 }
 
 sel.onchange = rotSel.onchange = render;
-if (q.get("compare")) renderCompare();
-else render();
+render();
 document.title = "ready";
