@@ -201,6 +201,9 @@
   "stats.reason.final.cloister": "Unfinished cloisters",
   "stats.reason.final.garden": "Unfinished gardens",
   "stats.reason.final.farm": "Fields",
+  "stats.reason.final.goods.wine": "Wine majority",
+  "stats.reason.final.goods.grain": "Grain majority",
+  "stats.reason.final.goods.cloth": "Cloth majority",
   "stats.biggestCity": "Biggest city (points)",
   "stats.longestRoad": "Longest road",
   "stats.mostFarmPoints": "Most points from fields",
@@ -228,6 +231,7 @@
   "help.expansion.river": "The River: the river tiles are laid first, and each new river tile must continue the river without turning back on itself. Until the lake is placed, players only hold river tiles.",
   "help.expansion.abbot": "The Abbot: instead of a normal figure you may place your abbot on a garden or a monastery, or take your abbot back from the board to score its points.",
   "help.expansion.inns-cathedrals": "Inns & Cathedrals: a completed road with an inn scores 2 points per tile, and a completed city with a cathedral 3 per tile and pennant, but both score nothing if unfinished at the end. The large follower counts as two followers when deciding who wins a feature, but does not double the points.",
+  "help.expansion.traders-builders": "Traders & Builders: whoever completes a city takes its trade goods. At the end, most of each good scores 10 points (ties all score 10). Your builder joins a road or city where you have a follower; extending it gives you an extra turn. Your pig joins a field where you have a farmer and makes it score 4 instead of 3 per completed city.",
   "screen.f11": "Press F11 for fullscreen",
   "screen.hotspot.title": "To play without internet:",
   "screen.hotspot.text": "Turn on Wi-Fi hotspot on this device, then connect the phones to it and scan the QR code."

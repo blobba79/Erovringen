@@ -219,6 +219,9 @@
   "stats.reason.final.cloister": "Ofärdiga kloster",
   "stats.reason.final.garden": "Ofärdiga trädgårdar",
   "stats.reason.final.farm": "Fält",
+  "stats.reason.final.goods.wine": "Mest vin",
+  "stats.reason.final.goods.grain": "Mest säd",
+  "stats.reason.final.goods.cloth": "Mest tyg",
   "stats.biggestCity": "Största stad (poäng)",
   "stats.longestRoad": "Längsta väg",
   "stats.mostFarmPoints": "Mest poäng från fält",
@@ -245,5 +248,6 @@
   "help.phase.other": "Följ valen som visas på telefonen. Ångra tar tillbaka det senaste steget, och inget är slutgiltigt förrän du bekräftar draget.",
   "help.expansion.river": "The River: flodbrickorna läggs först, och varje ny flodbricka måste fortsätta floden utan att vika tillbaka. Tills sjön är lagd har spelarna bara flodbrickor på hand.",
   "help.expansion.abbot": "The Abbot: i stället för en vanlig pjäs får du placera din abbot på en trädgård eller ett kloster, eller ta tillbaka abboten från kartan för att få dess poäng.",
-  "help.expansion.inns-cathedrals": "Inns & Cathedrals: en färdig väg med värdshus ger 2 poäng per bricka och en färdig stad med katedral 3 per bricka och vimpel, men båda ger inget om de är ofärdiga vid slutet. Den stora följaren räknas som två följare när man avgör vem som vinner ett område, men den dubblar inte poängen."
+  "help.expansion.inns-cathedrals": "Inns & Cathedrals: en färdig väg med värdshus ger 2 poäng per bricka och en färdig stad med katedral 3 per bricka och vimpel, men båda ger inget om de är ofärdiga vid slutet. Den stora följaren räknas som två följare när man avgör vem som vinner ett område, men den dubblar inte poängen.",
+  "help.expansion.traders-builders": "Traders & Builders: den som gör en stad färdig tar dess varor. Vid slutet ger flest av varje vara 10 poäng (delad ledning ger alla 10). Byggmästaren ställs på en väg eller stad där du har en följare; bygger du vidare där får du en extra tur. Grisen ställs på ett fält där du har en bonde och ger 4 i stället för 3 per färdig stad."
 }
