@@ -256,6 +256,7 @@ För varje extra pjäs som ska placeras visar storskärmen siffror på de bricko
 
 - Expansionerna läggs till **en i taget, först när grundspelet fungerar**.
 - **Grundspelet** innehåller floden och abboten (som i den nya utgåvan av grundspelet).
+- **Floden** spelas med två uppsättningar flodbrickor som standard (en källa och en sjö), och alla flodbrickor läggs före alla andra brickor. Den vanliga startbrickan kommer efter sjön. Spelarna har full hand (flodbrickor) redan under floden, och floden får inte kunna köra fast.
 - **Valda expansioner**, med all deras spelmekanik och alla pjäser:
   - Stora expansioner:
     1. Inns & Cathedrals

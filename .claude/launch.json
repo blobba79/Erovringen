@@ -4,8 +4,30 @@
     {
       "name": "erovringen",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["bun", "src/server/main.ts"],
+      "runtimeArgs": [
+        "bun",
+        "src/server/main.ts"
+      ],
       "port": 8765
+    },
+    {
+      "name": "telefon-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "bun",
+        "src/phone/dev/serve.ts"
+      ],
+      "port": 3100
+    },
+    {
+      "name": "stil-forhandsvisning",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "bun",
+        "src/styles/cellshaded/preview/serve.ts",
+        "5174"
+      ],
+      "port": 5174
     }
   ]
 }
