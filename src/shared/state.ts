@@ -58,7 +58,8 @@ export interface GameSetup {
   /** 1 = vanliga regler. */
   handSize: number;
   showClosingTiles: boolean;
-  players: { id: PlayerId; name: string; color: string }[];
+  /** `bot`: datorstyrd spelare, som servern spelar åt. */
+  players: { id: PlayerId; name: string; color: string; bot?: boolean }[];
   seed: number;
 }
 

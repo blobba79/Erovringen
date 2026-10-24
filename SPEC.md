@@ -158,6 +158,7 @@ Tecknad stil med svarta konturer och skarpa skuggor i två toner, som i tecknade
   - Vilka expansioner som är med (bocka i och ur).
   - Storskärmens språk (engelska eller svenska).
   - Antal brickor på hand (1 = vanliga regler).
+  - **Datorstyrda spelare:** värden kan lägga till och ta bort datorstyrda spelare. De spelar på servern med en enkel men rimlig strategi och tar en kort paus per drag så att man hinner se vad de gör på storskärmen. De följer med i sparade spel.
   - Om det ska visas hur många brickor i högen som kan stänga en öppning.
   - **Regelvarianter:** där regel-PDF:en beskriver olika versioner av en regel (t.ex. om draken flyttar före eller efter poängräkningen) går varianten att välja, med Hans im Glücks regel som standard. Se `PLAN.md`.
   - Starta nytt spel eller fortsätt ett sparat.

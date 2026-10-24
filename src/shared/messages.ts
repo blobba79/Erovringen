@@ -23,6 +23,8 @@ export interface LobbySeat {
   color: string;
   connected: boolean;
   isHost: boolean;
+  /** Datorstyrd spelare. */
+  bot?: boolean;
 }
 
 export type HostAction = "wait" | "skip" | "remove";
@@ -138,7 +140,10 @@ export type ClientMessage =
   | { type: "react"; emoji: string }
   /** Slå på eller av varningar för nybörjare (sparas på telefonen och skickas vid anslutning). */
   | { type: "setWarnings"; on: boolean }
-  | { type: "hostAction"; player: PlayerId; action: HostAction };
+  | { type: "hostAction"; player: PlayerId; action: HostAction }
+  /** Bara värden, i lobbyn: lägg till eller ta bort en datorstyrd spelare. */
+  | { type: "addBot" }
+  | { type: "removeBot"; player: PlayerId };
 
 /** Det som visas för alla. Händer och dolda val är borttagna. */
 export type PublicState = Omit<GameState, "players" | "rng" | "drawPile"> & {
