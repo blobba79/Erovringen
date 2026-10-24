@@ -40,7 +40,8 @@ export function GameView({ s }: { s: PhoneState }) {
       {state.finished && <AfterView s={s} />}
       {view.mine && <Warnings s={s} />}
       {view.mine && <Stage s={s} view={view} />}
-      {view.mine && (has("undo") || has("confirm")) && (
+      {/* Vid placeringen ligger Ångra bredvid Alla platser, så att vyn ryms utan scroll. */}
+      {view.mine && view.phase !== "placeTile" && (has("undo") || has("confirm")) && (
         <div class="actions">
           {has("undo") && (
             <button type="button" class="big" onClick={() => c.step({ type: "undo" })}>{t("turn.undo")}</button>
@@ -193,6 +194,9 @@ function PlaceStage({ s, view }: { s: PhoneState; view: TurnView }) {
         <button type="button" class={`big${edge === "all" ? " on" : ""}`} onClick={() => c.selectEdge("all")}>
           {t("turn.allPositions")}
         </button>
+        {s.legal.some((x) => x.type === "undo") && (
+          <button type="button" onClick={() => c.step({ type: "undo" })}>{t("turn.undo")}</button>
+        )}
         {edge !== null && (
           <div class="digits">
             {spots.map((p, i) => (
