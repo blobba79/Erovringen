@@ -115,6 +115,9 @@
   "variant.river.deadEnds": "Flodens återvändsgränder",
   "variant.river.deadEnds.allow": "Tillåtna (originalregeln: bara direkt U-sväng är förbjuden)",
   "variant.river.deadEnds.forbid": "Förbjudna (floden måste alltid kunna fortsätta)",
+  "variant.river.sets": "Flodens längd",
+  "variant.river.sets.2": "Två flodset (en källa, en sjö)",
+  "variant.river.sets.1": "Ett flodset",
   "error.badMessage": "Ogiltigt meddelande",
   "error.internal": "Något gick fel i servern",
   "error.notJoined": "Du är inte med i det här spelet",
@@ -228,6 +231,6 @@
   "help.phase.placeFigure": "Du får placera en pjäs på brickan du nyss lade, på en del där ingen annan har en pjäs. Tryck på delen och sedan på pjäsen. Du kan också hoppa över det.",
   "help.phase.confirm": "Kontrollera ditt drag. Tryck på Bekräfta drag för att avsluta turen, eller Ångra för att gå tillbaka ett steg.",
   "help.phase.other": "Följ valen som visas på telefonen. Ångra tar tillbaka det senaste steget, och inget är slutgiltigt förrän du bekräftar draget.",
-  "help.expansion.river": "The River: flodbrickorna läggs först, och varje ny flodbricka måste fortsätta floden utan att vika tillbaka. Spelarna har inga brickor på hand förrän sjön är lagd.",
+  "help.expansion.river": "The River: flodbrickorna läggs först, och varje ny flodbricka måste fortsätta floden utan att vika tillbaka. Tills sjön är lagd har spelarna bara flodbrickor på hand.",
   "help.expansion.abbot": "The Abbot: i stället för en vanlig pjäs får du placera din abbot på en trädgård eller ett kloster, eller ta tillbaka abboten från kartan för att få dess poäng."
 }
