@@ -13,7 +13,7 @@ function setupFor(i: number) {
   const n = 2 + (i % 5); // 2-6 spelare
   const variant = i % 7 === 3 ? "afterRiver" : "shuffle";
   // Varannan omgång med alla färdiga expansioner.
-  const expansions: ExpansionId[] = i % 2 ? ["base", "river", "abbot", "inns-cathedrals"] : ["base", "river", "abbot"];
+  const expansions: ExpansionId[] = i % 2 ? ["base", "river", "abbot", "inns-cathedrals", "traders-builders"] : ["base", "river", "abbot", "traders-builders"];
   return setupOf(expansions, {
     n, seed: 1000 + i, handSize: i % 11 === 5 ? 3 : 1, variants: { "river.startTile": variant },
   });
