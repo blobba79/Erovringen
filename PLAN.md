@@ -90,6 +90,12 @@ Fas 5, parallellt: spelrummet i webbläsaren (servern) och Android-appen. Se `SP
 - APK:n byggs av `.github/workflows/android.yml` (`ubuntu-latest`), som körs på samma sätt som `release.yml` (release och `workflow_dispatch`) och laddar upp `erovringen-android.apk`. `release.yml` rörs inte. APK:n signeras med en nyckel ur GitHub-hemligheter om de finns, annars med debug-nyckeln.
 - Med `?android=1` visar storskärmen hur man slår på wifi-hotspot i stället för texten om brandväggen.
 
+Fas 6: expansionerna, en i taget i ordningen nedan, och spelreglerna i spelet.
+
+**Konventioner för fas 6:**
+- En expansion är klar när modulen finns i `src/expansions/<id>/` med tester i `tests/expansions/<id>/`, är anmäld i `src/server/modules.ts`, har texter i `locales/` och har granskats av `regelgranskare`.
+- **Spelregler i spelet:** begripliga sammanfattningar för spelare (inte de tekniska sammanfattningarna i `regler/sammanfattning/`) ligger i `locales/rules/<språk>/<id>.md`, en fil per del (`base`, `river`, `abbot` och expansionernas id). De beskriver reglerna som de fungerar i Erövringen, med husregler och standardvarianter. Formatet är en enkel delmängd av Markdown: `#` och `##` rubriker, stycken, `-` listor och `**fetstil**`. Svenska och engelska. `locales/rules/index.ts` importerar filerna som text. Telefonen visar dem under knappen **Regler**, i lobbyn och under spelet, för de delar som är med i spelet.
+
 **Förslag på expansionsordning** (enklast först, de som påverkar mest sist):
 1. Inns & Cathedrals, 2. Traders & Builders, 3. The Gold Mines, 4. Mage & Witch, 5. The Ferries, 6. The Flying Machines, 7. Crop Circles II, 8. The Princess & the Dragon.
 
@@ -103,10 +109,11 @@ Se `regler/sammanfattning/README.md`. Brickornas utseende och de flesta kantfall
 |---|---|---|
 | Draken flyttar | före poängräkning (HiG/ZMG) | efter poängräkning (RGG) |
 | Guldtackor delas ut | en i taget i tur (HiG) | en per poängräknat område |
-| Floden | River I, källan är startbricka, sjön sist i flodhögen, vanliga startbrickan blandas in | vanliga startbrickan läggs när floden är klar |
-| Flodens återvändsgränder | bara direkt U-sväng är förbjuden (originalregeln) | förbjud också lägen där floden inte kan fortsätta (som JCloisterZone) |
+| Floden, startbricka | vanliga startbrickan kommer efter sjön (husregel: floden läggs alltid först) | vanliga startbrickan blandas in bland flodbrickorna |
+| Flodens längd | två flodset med en källa och en sjö (husregel) | ett flodset |
+| Flodens återvändsgränder | förbjud lägen där floden inte kan fortsätta (som JCloisterZone, ser 7 brickor framåt) | bara direkt U-sväng är förbjuden (originalregeln) |
 
-Under flodfasen har ingen brickor på hand, oavsett handstorlek: man drar en flodbricka i början av sin tur. Händerna delas ut när sjön är lagd.
+Under flodfasen har spelarna upp till handstorleken flodbrickor på hand, men aldrig vanliga brickor. Sjön delas ut sist, och den som saknar flodbricka hoppas över. Vanliga händer delas ut när sjön är lagd.
 
 Fler varianter läggs till på samma sätt när de dyker upp.
 

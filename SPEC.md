@@ -269,6 +269,7 @@ För varje extra pjäs som ska placeras visar storskärmen siffror på de bricko
     3. The Gold Mines
     4. Mage & Witch
     5. Crop Circles II (de sex brickorna som ingår i Big Box)
+- **Spelreglerna ska vara lätta att nå i spelet:** en knapp **Regler** på telefonen, i lobbyn och under spelet, visar en kort och begriplig sammanfattning av grundspelet och varje expansion som är med, på svenska eller engelska.
 - **Tills vidare utelämnas** The Messengers och The Robbers. Bygg så att de går att lägga till senare.
 - Expansioner som bygger på fysisk skicklighet tas inte med.
 - Alla expansioner är **inbyggda i programfilen**. I koden är varje expansion en egen, avgränsad modul som slås på eller av vid spelstart, så att den är lätt att testa och ändra.
