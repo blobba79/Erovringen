@@ -23,7 +23,7 @@ Den här expansionen ger värdshus och katedraler som höjer poängen för färd
 
 ## Bra att veta
 
-- Ett värdshus påverkar bara vägstycket intill det, inte alla vägar på brickan.
+- Ett värdshus gäller hela den väg det ligger vid, men inte andra vägar på samma bricka.
 - Du får lägga värdshus- och katedralbrickor på någon annans väg eller stad, till exempel sent i spelet för att ta ifrån en stor stad dess poäng.
 - Bara ett fåtal brickor har en katedral, så en stad med katedral är riskfylld att bygga ut.
 - Har du flera brickor på hand väljer du själv vilken du spelar. Kan ingen läggas får du byta bort en.

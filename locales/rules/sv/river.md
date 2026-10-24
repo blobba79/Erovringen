@@ -5,7 +5,7 @@ Floden är en liten extra uppsättning brickor som läggs först, innan det rikt
 ## Det här ingår
 
 - 12 flodbrickor. En är källan, en är sjön och tio är vanliga flodbrickor med vägar, städer, kloster eller fält.
-- Som standard används två flodset, alltså en källa och en sjö till (det är en regelvariant som kan ändras vid start).
+- Som standard används två flodset: 20 vanliga flodbrickor, men ändå bara en källa och en sjö (en regelvariant som kan ändras vid start).
 
 ## Så går turen till
 

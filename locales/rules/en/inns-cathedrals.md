@@ -23,7 +23,7 @@ This expansion adds inns and cathedrals that raise the score of completed roads 
 
 ## Good to know
 
-- An inn only affects the road segment next to it, not every road on the tile.
+- An inn counts for the whole road it lies beside, but not for other roads on the same tile.
 - You may place inn and cathedral tiles on someone else's road or city, for example late in the game to strip a big city of its points.
 - Only a few tiles have a cathedral, so building out a city with one is risky.
 - If you hold several tiles you pick which one to play. If none can be placed you may swap one away.

@@ -5,7 +5,7 @@ The River is a small extra set of tiles that is laid first, before the real land
 ## What is included
 
 - 12 river tiles. One is the spring, one is the lake and ten are ordinary river tiles with roads, cities, cloisters or fields.
-- By default two river sets are used, that is one more spring and one more lake (this is a rule variant that can be changed at the start).
+- By default two river sets are used: 20 ordinary river tiles, but still only one spring and one lake (a rule variant that can be changed at the start).
 
 ## How a turn works
 
