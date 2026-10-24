@@ -29,12 +29,13 @@ export function HandStrip({ s, view }: { s: PhoneState; view: TurnView }) {
             disabled={!tappable}
             onClick={() => c.selectTile(sel === h.index ? null : h.index)}
           >
-            <TileCanvas tileId={h.id} size={s.hand.length > 3 ? 64 : 80} />
+            <TileCanvas tileId={h.id} size={s.hand.length > 3 ? 52 : 64} />
           </button>
         ))}
       </div>
+      <div class="row wrap">
       {choosing && selected && (
-        <div class="row wrap">
+        <>
           {selected.canChoose && (
             <button type="button" class="big primary" onClick={() => c.step({ type: "chooseTile", handIndex: selected.index })}>
               {t("phone.playTile")}
@@ -45,13 +46,14 @@ export function HandStrip({ s, view }: { s: PhoneState; view: TurnView }) {
               {t("turn.swapTile")}
             </button>
           )}
-        </div>
+        </>
       )}
       {view.mine && (
         <button type="button" disabled={showIndex === null} onClick={() => showIndex !== null && c.showToAll(showIndex)}>
           {t("turn.showToEveryone")}
         </button>
       )}
+      </div>
     </section>
   );
 }

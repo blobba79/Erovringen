@@ -48,7 +48,7 @@ export function GameView({ s }: { s: PhoneState }) {
       <HandStrip s={s} view={view} />
       {!state.finished && <Tools s={s} phase={view.phase} mine={view.mine} />}
       {me && <Supply state={state} me={me} color={myColor} />}
-      <LangSelect />
+      {state.finished && <LangSelect />}
     </main>
   );
 }
@@ -121,7 +121,7 @@ function Stage({ s, view }: { s: PhoneState; view: TurnView }) {
 function PlaceStage({ s, view }: { s: PhoneState; view: TurnView }) {
   const t = useT();
   const c = useClient();
-  const size = useTileSize();
+  const size = useTileSize(0.3, 240);
   if (!view.tileId) return null;
   const board = s.state!.board;
   const edge = s.edge;
@@ -157,7 +157,7 @@ function PlaceStage({ s, view }: { s: PhoneState; view: TurnView }) {
 function FigureStage({ s, view }: { s: PhoneState; view: TurnView }) {
   const t = useT();
   const c = useClient();
-  const size = useTileSize();
+  const size = useTileSize(0.34, 280);
   const placed = view.placedTile;
   const type = placed ? tileType(placed.type) : undefined;
   const steps = s.legal.filter((x): x is FigureStep => x.type === "placeFigure");
@@ -213,7 +213,7 @@ function FigureStage({ s, view }: { s: PhoneState; view: TurnView }) {
 }
 
 function TilePreview({ s, view }: { s: PhoneState; view: TurnView }) {
-  const size = useTileSize(0.3, 260);
+  const size = useTileSize(0.26, 200);
   const p = view.placedTile!;
   const hl: Highlight[] = view.figure ? [{ feature: view.figure.feature, kind: "area" }] : [];
   void s;
