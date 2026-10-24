@@ -9,8 +9,9 @@ import { riverModule } from "../../src/expansions/river/index";
 import { abbotModule } from "../../src/expansions/abbot/index";
 import { innsCathedralsModule } from "../../src/expansions/inns-cathedrals/index";
 import { tradersBuildersModule } from "../../src/expansions/traders-builders/index";
+import { mageWitchModule } from "../../src/expansions/mage-witch/index";
 
-export const ALL_MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule];
+export const ALL_MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule, mageWitchModule];
 
 export function realEngine(): EngineApi {
   return createEngine(ALL_MODULES, allTileTypes().values());
