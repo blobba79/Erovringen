@@ -7,12 +7,13 @@ import { riverModule } from "../expansions/river/index";
 import { abbotModule } from "../expansions/abbot/index";
 import { innsCathedralsModule } from "../expansions/inns-cathedrals/index";
 import { tradersBuildersModule } from "../expansions/traders-builders/index";
+import { goldMinesModule } from "../expansions/gold-mines/index";
 import { allTileTypes } from "../tiles/index";
 import { availableLanguages } from "../i18n/index";
 import type { AvailableOptions } from "../shared/messages";
 import { MAX_HAND_SIZE } from "./options";
 
-export const MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule];
+export const MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule, goldMinesModule];
 
 export function availableExpansions(modules: ExpansionModule[] = MODULES): ExpansionId[] {
   return modules.map((m) => m.id);
