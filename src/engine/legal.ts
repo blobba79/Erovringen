@@ -34,7 +34,8 @@ export function figureSteps(env: Env, state: GameState): Step[] {
       for (const feature of rt.features) {
         if (!def.placeableOn.includes(feature.kind)) continue;
         const here = an.areaAt(placed.pos, feature.id)?.figures ?? [];
-        if (def.joinsOwn ? !here.some((f) => f.owner === player && strength(f) > 0) : here.length > 0) continue;
+        // Neutrala pjäser (magikern, häxan) hindrar inte följare.
+        if (def.joinsOwn ? !here.some((f) => f.owner === player && strength(f) > 0) : here.some((f) => f.owner !== null)) continue;
         out.push({ type: "placeFigure", kind: def.kind, pos: placed.pos, feature: feature.id });
       }
     }

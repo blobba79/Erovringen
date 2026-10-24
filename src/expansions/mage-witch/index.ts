@@ -12,7 +12,7 @@
 //   ligger ingen på kartan händer ingenting (fasen hoppas över).
 // - Poäng (i scoreFeature, efter I&C): magikern +1 per bricka, häxan halverar (uppåt). Vid
 //   slutpoäng gäller samma sak för ofärdiga områden (OKLART för häxan; JCloisterZone-beteende).
-// - Pjäserna går hem när området räknas (städas i extraTurn, som anropas efter poängräkningen).
+// - Pjäserna går hem när området räknas (motorn skickar hem alla pjäser på ett färdigt område).
 // - Modulen måste registreras efter Inns & Cathedrals (ordningen avgör poängordningen).
 
 import type { ExpansionModule, FeatureRef } from "../../shared/expansion";
@@ -124,16 +124,5 @@ export const mageWitchModule: ExpansionModule = {
     },
 
     // Anropas efter poängräkningen i slutet av turen: pjäser på färdiga områden går hem.
-    extraTurn(c) {
-      const ctx = c as EngineHookContext;
-      const s = ctx.state;
-      const an = analyze(s.board, s.figures, ctx.types);
-      for (const f of figs(ctx)) {
-        if (f.location.at !== "feature") continue;
-        const area = an.areaAt(f.location.pos, f.location.feature);
-        if (!area || area.complete) returnToSupply(ctx, f);
-      }
-      return false;
-    },
   },
 };

@@ -82,7 +82,8 @@ export function scoreCompleted(ctx: EngineHookContext, an: Analysis, areas: Area
       const pts = adjustedPoints(ctx, area, areaValue(an, area), false);
       for (const o of owners) addScore(ctx, o, pts, area.kind, area);
     }
-    for (const f of area.figures) if (f.owner !== null) returnToSupply(ctx, f);
+    // Alla pjäser på området går hem, även neutrala (magikern, häxan).
+    for (const f of area.figures) returnToSupply(ctx, f);
   }
 }
 

@@ -119,5 +119,5 @@ function explainFigureError(env: Env, state: GameState, step: Extract<Step, { ty
   const an = analyze(state.board, state.figures, env.types);
   const area = an.areaAt(step.pos, step.feature);
   if (!area || !def.placeableOn.includes(area.kind)) return "error.illegalFigure";
-  return area.figures.length > 0 ? "error.featureOccupied" : "error.illegalFigure";
+  return area.figures.some((f) => f.owner !== null) ? "error.featureOccupied" : "error.illegalFigure";
 }
