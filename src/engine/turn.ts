@@ -68,7 +68,9 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
   const placed = placedStep(state);
   if (placed) {
     const an = analyze(state.board, state.figures, env.types);
-    scoreCompleted(ctx, an, an.areas.filter((a) => a.complete && nearPlaced(a, placed.pos)));
+    // Moduler (färjorna) kan ange fler rutor där färdiga områden ska räknas.
+    const around = [placed.pos, ...activeModules(env, state.setup).flatMap((m) => engineHook(m, "scoreAround")?.(ctx) ?? [])];
+    scoreCompleted(ctx, an, an.areas.filter((a) => a.complete && around.some((p) => nearPlaced(a, p))));
   }
   delete baseExt(state).snapshot;
   state.turn.pending = [];
