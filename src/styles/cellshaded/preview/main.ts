@@ -49,10 +49,11 @@ function drawFigures(): void {
   ctx.fillStyle = "#7FD05B";
   ctx.fillRect(0, 0, figs.width, figs.height);
   const colors = ["#E53935", "#1E88E5", "#FDD835", "#43A047", "#212121", "#8E24AA", null];
-  const kinds = ["meeple", "large-meeple", "abbot", "builder"];
+  const kinds = ["meeple", "large-meeple", "abbot", "builder", "pig"];
   kinds.forEach((kind, r) => colors.forEach((color, c) => style.drawFigure({ ctx, kind, color, x: 50 + c * 80, y: 50 + r * 80, size: 60 })));
+  ["gold-bar", "mage", "witch", "dragon", "fairy"].forEach((kind, c) => style.drawFigure({ ctx, kind, color: null, x: 50 + c * 80, y: 50 + kinds.length * 80, size: 60 }));
   const t = style.drawHighlight;
-  const sq = (x: number) => [[[x, 330], [x + 70, 330], [x + 70, 390], [x, 390]]] as const;
+  const sq = (x: number) => [[[x, 500], [x + 70, 500], [x + 70, 560], [x, 560]]] as const;
   (["area", "open", "blocked", "preview"] as const).forEach((k, i) => t({ ctx, shapes: [sq(20 + i * 90)], kind: k }));
 }
 

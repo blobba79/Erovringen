@@ -41,7 +41,7 @@ test("räknarikoner ritas för kända id:n och okänt ger false", async () => {
 
 test("pjäser och markeringar ritas", () => {
   const { ctx, calls } = fakeCtx();
-  for (const kind of ["meeple", "large-meeple", "abbot", "builder", "okänd"]) {
+  for (const kind of ["meeple", "large-meeple", "abbot", "builder", "pig", "gold-bar", "mage", "witch", "dragon", "fairy", "okänd"]) {
     cellshadedStyle.drawFigure({ ctx, kind, color: "#E53935", x: 50, y: 50, size: 40 });
     cellshadedStyle.drawFigure({ ctx, kind, color: null, x: 50, y: 50, size: 40 });
   }
