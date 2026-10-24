@@ -7,7 +7,7 @@ import type { Translate } from "../shared/i18n";
 import { LOCALES, availableLanguages, createTranslator } from "../i18n/index";
 import { MapCanvas } from "./MapCanvas";
 import { type Model, seatsToShow } from "./store";
-import { isAndroidApp, isFullscreenNow, phaseKey, standings, wantsF11, withoutF11 } from "./logic";
+import { isAndroidApp, isFullscreenNow, phaseKey, standings, visibleCounters, wantsF11, withoutF11 } from "./logic";
 import { ReplayPlayer, type ReplayView, shownScore } from "./replay";
 import { ReactionBoard } from "./reactions";
 import { axisTicks, reasonRows, recordMarks, scoreChart } from "./stats";
@@ -125,6 +125,25 @@ function TileThumb({ type, count }: { type: string; count: number }) {
   );
 }
 
+function Counters({ counters, tr }: { counters: Record<string, number>; tr: Translate }) {
+  const list = visibleCounters(counters);
+  if (list.length === 0) return null;
+  return (
+    <span class="counters">
+      {list.map((c) => {
+        const key = `counter.${c.id}`;
+        const label = tr(key) !== key ? tr(key) : c.id;
+        return (
+          <span key={c.id} class="counter" title={label} data-counter={c.id}>
+            <span class="dot" style={{ background: c.color }} />
+            <span class="clabel">{label}</span> {c.count}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 function Scoreboard({ state, tr, view, reactions }: { state: PublicState; tr: Translate; view?: ReplayView; reactions: Record<string, string> }) {
   const rank = new Map(standings(state.players).map((s) => [s.id, s.rank]));
   return (
@@ -138,6 +157,7 @@ function Scoreboard({ state, tr, view, reactions }: { state: PublicState; tr: Tr
             <span class="name">{p.name}</span>
             {reactions[p.id] && <span class="reaction" key={reactions[p.id]}>{reactions[p.id]}</span>}
             {view?.gaining[p.id] ? <span class="gain">+{view.gaining[p.id]}</span> : null}
+            <Counters counters={p.counters} tr={tr} />
             <span class="score">{shownScore(p.score, view, p.id)}</span>
           </li>
         ))}
@@ -291,6 +311,7 @@ function FinalBoard({ state, tr, stats }: { state: PublicState; tr: Translate; s
                 <span class="rank">{r.rank}</span>
                 <Dot color={p.color} />
                 <span class="name">{p.name}</span>
+                <Counters counters={p.counters} tr={tr} />
                 <span class="score">{p.score}</span>
               </li>
             );

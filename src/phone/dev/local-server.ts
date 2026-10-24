@@ -40,7 +40,14 @@ export function toPublic(state: GameState): PublicState {
   for (const t of drawPile) remaining[t] = (remaining[t] ?? 0) + 1;
   return {
     ...rest,
-    players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })),
+    players: players.map(({ hand, ...p }) => ({
+      ...p,
+      // ?counters i adressen: provräknare för att mäta var de får plats.
+      counters: typeof location !== "undefined" && location.search.includes("counters")
+        ? { "goods.wine": 2, "goods.grain": 1, "goods.cloth": 3, gold: 4 }
+        : p.counters,
+      handCount: hand.length,
+    })),
     drawPileCount: drawPile.length,
     remaining,
   };

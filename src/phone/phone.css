@@ -156,3 +156,6 @@ button.on { border-color: var(--accent); }
 .rules-body p { margin: 0 0 10px; }
 .rules-body ul:not(.rules-list) { margin: 0 0 10px; padding-left: 20px; }
 .rules-body li { margin-bottom: 4px; }
+.scores .counters { display: inline-flex; gap: 4px; }
+.scores .counter { white-space: nowrap; font-size: 0.75rem; }
+.scores .counter .dot { width: 9px; height: 9px; margin-right: 2px; }

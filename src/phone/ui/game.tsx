@@ -7,6 +7,7 @@ import type { Client, PhoneState } from "../client";
 import { computeGeometry } from "../../geometry/index";
 import { GestureTracker } from "../logic/gestures";
 import { featureAtPoint } from "../logic/hit";
+import { visibleCounters } from "../logic/counters";
 import { rotationsAt, spotsFor } from "../logic/spots";
 import { deriveTurn, figureSupply, type TurnView } from "../logic/turnview";
 import { SeatActions } from "./connect";
@@ -82,6 +83,20 @@ function ScoreBar({ state, me }: { state: PublicState; me: PlayerId | null }) {
           <span class="dot" style={{ background: p.color }} />
           <b>{p.name}</b>
           <span>{t("score.points", { count: p.score })}</span>
+          {visibleCounters(p.counters).length > 0 && (
+            <span class="counters">
+              {visibleCounters(p.counters).map((c) => {
+                const key = `counter.${c.id}`;
+                const label = t(key) !== key ? t(key) : c.id;
+                return (
+                  <span class="counter" title={label} data-counter={c.id}>
+                    <span class="dot" style={{ background: c.color }} />
+                    {c.color === "#999999" ? `${label} ` : ""}{c.count}
+                  </span>
+                );
+              })}
+            </span>
+          )}
         </li>
       ))}
     </ul>
