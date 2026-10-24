@@ -13,9 +13,7 @@
     "expansion.traders-builders",
     "figure.ferry",
     "figure.flying-machine",
-    "figure.gold-bar",
-    "figure.mage",
-    "figure.witch"
+    "figure.gold-bar"
   ],
   "game.title": "Erövringen",
   "style.cellshaded": "Cellshadad",
@@ -99,8 +97,8 @@
   "figure.pig": "Gris",
   "figure.dragon": "Drake",
   "figure.fairy": "Fe",
-  "figure.mage": "Mage",
-  "figure.witch": "Witch",
+  "figure.mage": "Magiker",
+  "figure.witch": "Häxa",
   "figure.princess": "Prinsessa",
   "figure.wagon": "Vagn",
   "figure.barn": "Lada",
@@ -242,5 +240,6 @@
   "help.phase.confirm": "Kontrollera ditt drag. Tryck på Bekräfta drag för att avsluta turen, eller Ångra för att gå tillbaka ett steg.",
   "help.phase.other": "Följ valen som visas på telefonen. Ångra tar tillbaka det senaste steget, och inget är slutgiltigt förrän du bekräftar draget.",
   "help.expansion.river": "The River: flodbrickorna läggs först, och varje ny flodbricka måste fortsätta floden utan att vika tillbaka. Tills sjön är lagd har spelarna bara flodbrickor på hand.",
-  "help.expansion.abbot": "The Abbot: i stället för en vanlig pjäs får du placera din abbot på en trädgård eller ett kloster, eller ta tillbaka abboten från kartan för att få dess poäng."
+  "help.expansion.abbot": "The Abbot: i stället för en vanlig pjäs får du placera din abbot på en trädgård eller ett kloster, eller ta tillbaka abboten från kartan för att få dess poäng.",
+  "help.expansion.inns-cathedrals": "Inns & Cathedrals: en färdig väg med värdshus ger 2 poäng per bricka och en färdig stad med katedral 3 per bricka och vimpel, men båda ger inget om de är ofärdiga vid slutet. Den stora följaren räknas som två följare när man avgör vem som vinner ett område, men den dubblar inte poängen."
 }

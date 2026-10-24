@@ -41,8 +41,12 @@ export const innsCathedralsModule: ExpansionModule = {
         return (f?.props as Record<string, unknown> | undefined)?.[prop] === true;
       });
       if (!marked) return points;
-      if (!area.complete) return final ? 0 : points;
-      return area.kind === "road" ? area.tiles.length * 2 : (area.tiles.length + area.pennants) * 3;
+      // Påslag på det som redan räknats, så att andra modulers ändringar (t.ex. magikern) står kvar.
+      const road = area.kind === "road";
+      const units = road ? area.tiles.length : area.tiles.length + area.pennants;
+      const base = road || !area.complete ? units : units * 2;
+      const value = !area.complete ? (final ? 0 : base) : units * (road ? 2 : 3);
+      return points + value - base;
     },
   },
 };

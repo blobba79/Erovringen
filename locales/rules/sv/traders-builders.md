@@ -1,22 +1,22 @@
 # Traders & Builders
 
-Expansionen ger dig byggaren som ger dubbla drag, grisen som höjer poängen på fält, och varor som ger bonuspoäng i slutet.
+Expansionen ger dig byggmästaren som ger dubbla drag, grisen som höjer poängen på fält, och varor som ger bonuspoäng i slutet.
 
 ## Det här ingår
 
 - 24 nya brickor. Några städer visar varor: vin, spannmål eller tyg.
-- En byggare och en gris per spelare. De är inga följare.
+- En byggmästare och en gris per spelare. De är inga följare.
 - Varumarkörer: vin, spannmål och tyg.
 
 ## Så går turen till
 
-I stället för en följare får du sätta ut din byggare eller din gris på brickan du just lade.
+I stället för en följare får du sätta ut din byggmästare eller din gris på brickan du just lade.
 
-- **Byggaren** får bara stå på en väg eller i en stad där du redan har en egen följare (tjuv eller riddare). Hur långt bort följaren står spelar ingen roll, och andras följare hindrar inte. Byggaren räknas inte vid majoritet.
-- **Dubbelt drag:** när du senare lägger en bricka som bygger ut vägen eller staden där din byggare står, får du ta ett extra drag. Du väljer själv om du vill. Först gör du hela den första delen (lägg bricka, sätt ut pjäs, poängräkna), sedan får du en ny bricka och en ny runda. Det blir aldrig ett tredje drag.
+- **Byggmästaren** får bara stå på en väg eller i en stad där du redan har en egen följare (tjuv eller riddare). Hur långt bort följaren står spelar ingen roll, och andras följare hindrar inte. Byggmästaren räknas inte vid majoritet.
+- **Dubbelt drag:** när du senare lägger en bricka som bygger ut vägen eller staden där din byggmästare står, får du ta ett extra drag. Du väljer själv om du vill. Först gör du hela den första delen (lägg bricka, sätt ut pjäs, poängräkna), sedan får du en ny bricka och en ny runda. Det blir aldrig ett tredje drag.
 - **Grisen** får bara stå på ett fält där du redan har en egen bonde.
 
-Byggaren och grisen går tillbaka till dig om din sista tjuv, riddare eller bonde lämnar platsen. Byggaren går också tillbaka när vägen eller staden poängräknas.
+Byggmästaren och grisen går tillbaka till dig om din sista tjuv, riddare eller bonde lämnar platsen. Byggmästaren går också tillbaka när vägen eller staden poängräknas.
 
 ## Poäng
 
@@ -26,6 +26,6 @@ Byggaren och grisen går tillbaka till dig om din sista tjuv, riddare eller bond
 
 ## Bra att veta
 
-- Byggaren och grisen räknas inte med när man avgör vem som har flest.
+- Byggmästaren och grisen räknas inte med när man avgör vem som har flest.
 - Bryggbrickan har två vägar som korsar varandra utan att mötas. Spelet vet hur de hänger ihop.
 - Har du flera brickor på hand väljer du bland dem, och i ett dubbelt drag fyller du på mellan delarna. Kan ingen bricka läggas får du byta bort en.
