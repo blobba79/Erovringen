@@ -7,7 +7,8 @@ import { activeModules, playerOf } from "./context";
 import type { Analysis, Area } from "./features";
 
 /** Pjäsernas vikt vid majoritet. Standard 1; stora pjäser räknas som två. */
-const STRENGTH: Record<string, number> = { "large-meeple": 2 };
+// Byggmästaren och grisen (pjäser med `joinsOwn`) är inga följare och räknas inte vid majoritet.
+const STRENGTH: Record<string, number> = { "large-meeple": 2, builder: 0, pig: 0 };
 
 export function strength(f: Figure): number {
   if (f.owner === null) return 0;

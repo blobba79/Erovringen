@@ -5,6 +5,7 @@ import { analyze } from "./features";
 import { rotatedAt } from "./board";
 import { activeModules, makeCtx, playerOf, type Env } from "./context";
 import { hasAnyPlacement, legalPlacements } from "./placement";
+import { strength } from "./scoring";
 import { currentTile, placedStep } from "./turnstate";
 
 export function exchangeAllowed(env: Env, state: GameState): boolean {
@@ -32,7 +33,8 @@ export function figureSteps(env: Env, state: GameState): Step[] {
       if (!state.figures.some((f) => f.kind === def.kind && f.owner === player && f.location.at === "supply")) continue;
       for (const feature of rt.features) {
         if (!def.placeableOn.includes(feature.kind)) continue;
-        if ((an.areaAt(placed.pos, feature.id)?.figures.length ?? 0) > 0) continue;
+        const here = an.areaAt(placed.pos, feature.id)?.figures ?? [];
+        if (def.joinsOwn ? !here.some((f) => f.owner === player && strength(f) > 0) : here.length > 0) continue;
         out.push({ type: "placeFigure", kind: def.kind, pos: placed.pos, feature: feature.id });
       }
     }

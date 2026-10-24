@@ -12,6 +12,11 @@ export interface FigureDefinition {
   neutral?: boolean;
   /** Vilka områdestyper pjäsen får stå på, t.ex. ["city", "road", "field", "cloister"]. */
   placeableOn: string[];
+  /**
+   * Pjäsen ställs bara på ett område där ägaren redan har en egen följare, och området behöver
+   * inte vara ledigt (byggmästaren, grisen). Den räknas inte vid majoritet.
+   */
+  joinsOwn?: boolean;
 }
 
 export interface RuleVariantDefinition {
