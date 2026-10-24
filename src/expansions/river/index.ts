@@ -21,7 +21,7 @@
 
 import type { ExpansionModule, RuleVariantDefinition } from "../../shared/expansion";
 import type { Edge, TileSet, TileType } from "../../shared/tiles";
-import type { GameState, Pos } from "../../shared/state";
+import type { GameState, PlayerId, Pos } from "../../shared/state";
 import type { EngineHookContext, EngineHooks } from "../../engine/context";
 import { EDGES, edgeIndex, neighbour, opposite, parseKey, posKey, samePos } from "../../engine/geometry";
 import { rotatedAt } from "../../engine/board";
@@ -168,13 +168,19 @@ export function makeRiverModule(
           if (stackLen(s) > 0) s.players[(at + k) % s.players.length]!.hand.push(s.drawPile.shift()!);
       return true;
     },
-    dealAfterTurn(c) {
+    dealAfterTurn(c, again) {
       const s = c.state;
       const r = ext(s);
       if (r.dealt) return undefined;
       const cur = s.players.find((p) => p.id === c.player)!;
       const start = nextSeat(s, c.player);
       const over = r.done || riverTiles(s).length === 0;
+      // Extra tur: den som just spelat får turen igen om hen har en bricka.
+      const pick = (from: number): PlayerId | undefined => {
+        if (again && cur.hand.length > 0) return cur.id;
+        const i = seatWithTiles(s, from);
+        return i === undefined ? undefined : s.players[i]!.id;
+      };
       if (over) {
         // Sjön är lagd: startbrickan (afterRiver) överst, sedan vanliga händer i turordning från nästa spelare.
         r.dealt = true;
@@ -192,22 +198,43 @@ export function makeRiverModule(
             }
           }
         }
-        const i = seatWithTiles(s, start);
-        return i === undefined ? null : s.players[i]!.id;
+        return pick(start) ?? null;
       }
-      // Mitt i floden: den som lagt fyller på med flodbrickor, den som är näst i tur och har en bricka spelar.
-      while (cur.hand.length < s.setup.handSize && stackLen(s) > 0) {
-        cur.hand.push(s.drawPile.shift()!);
-        c.emit({ type: "tileDrawn", player: cur.id });
+      // Mitt i floden: alla händer fylls på med flodbrickor upp till handstorleken, i turordning från
+      // nästa spelare (den som lagt sist kommer sist). Det läker också gamla sparade spel med tomma händer.
+      for (let more = true; more; ) {
+        more = false;
+        for (let k = 0; k < s.players.length; k++) {
+          const p = s.players[(start + k) % s.players.length]!;
+          if (p.hand.length < s.setup.handSize && stackLen(s) > 0) {
+            p.hand.push(s.drawPile.shift()!);
+            c.emit({ type: "tileDrawn", player: p.id });
+            more = true;
+          }
+        }
       }
-      const i = seatWithTiles(s, start);
-      if (i !== undefined) return s.players[i]!.id;
-      // Alla andra flodbrickor är lagda: sjön går till nästa spelare.
+      const next = pick(start);
+      if (next !== undefined) return next;
+      // Alla andra flodbrickor är lagda: sjön går till nästa spelare (vid extra tur till samma spelare).
       if (lake !== undefined && s.drawPile[0] === lake) {
-        s.players[start]!.hand.push(s.drawPile.shift()!);
-        return s.players[start]!.id;
+        const to = again ? cur : s.players[start]!;
+        to.hand.push(s.drawPile.shift()!);
+        return to.id;
       }
       return null;
+    },
+    // Brickor från en borttagen eller överhoppad spelare under flodfasen: de går tillbaka i
+    // flodstapeln (före sjön), som blandas där. Sjön ligger kvar direkt efter stapeln.
+    returnTiles(c, tiles) {
+      const s = c.state;
+      if (ext(s).dealt) return false;
+      const n = stackLen(s);
+      const stack = s.drawPile.slice(0, n);
+      const rest = s.drawPile.slice(n);
+      stack.push(...tiles.filter((t) => t !== lake));
+      shuffle(s, stack);
+      s.drawPile = [...stack, ...(lake !== undefined && tiles.includes(lake) ? [lake] : []), ...rest];
+      return true;
     },
     // Byte under flodfasen ger en flodbricka (eller ingen), aldrig en vanlig bricka eller sjön i förtid.
     exchangeDraw(c) {

@@ -3,6 +3,7 @@
 import type { GameEvent, GameState, PlayerId } from "../shared/state";
 import { analyze, type Area } from "./features";
 import { activeModules, baseExt, engineHook, makeCtx, playerOf, type Env } from "./context";
+import { shuffle } from "./rng";
 import { scoreCompleted, scoreFinal } from "./scoring";
 import { phaseForHand, placedStep } from "./turnstate";
 
@@ -45,6 +46,21 @@ export function endGame(env: Env, state: GameState, events: GameEvent[]): void {
   events.push({ type: "gameEnded" });
 }
 
+/**
+ * Lägg tillbaka brickor i högen (en borttagen eller överhoppad spelares hand). En modul som styr
+ * utdelningen (floden) får lägga tillbaka dem själv. Annars läggs de sist och högen blandas, men
+ * bara om `always` är sant. Returnerar true om brickorna lades tillbaka.
+ */
+export function returnTiles(env: Env, state: GameState, tiles: string[], always = true): boolean {
+  if (tiles.length === 0) return true;
+  const ctx = makeCtx(env, state, state.turn.player, []);
+  if (activeModules(env, state.setup).some((m) => engineHook(m, "returnTiles")?.(ctx, tiles))) return true;
+  if (!always) return false;
+  state.drawPile.push(...tiles);
+  shuffle(state, state.drawPile);
+  return true;
+}
+
 /** "Bekräfta drag": räkna poäng för det som brickan avslutade, fyll på handen och gå vidare. */
 export function finishTurn(env: Env, state: GameState, events: GameEvent[]): void {
   const player = state.turn.player;
@@ -58,7 +74,7 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
   state.turn.pending = [];
   const again = activeModules(env, state.setup).some((m) => m.hooks.extraTurn?.(ctx));
   for (const m of activeModules(env, state.setup)) {
-    const handled = engineHook(m, "dealAfterTurn")?.(ctx);
+    const handled = engineHook(m, "dealAfterTurn")?.(ctx, again);
     if (handled === undefined) continue;
     if (handled === null) endGame(env, state, events);
     else beginTurn(state, handled, events);

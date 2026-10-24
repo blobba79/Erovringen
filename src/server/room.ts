@@ -7,10 +7,10 @@ import type {
 } from "../shared/messages";
 import type { GameEvent, GameState, PlayerId, Pos, Step } from "../shared/state";
 import type { ExpansionModule } from "../shared/expansion";
-import { STATE_VERSION, shuffle, stepWarnings as engineStepWarnings } from "../engine/index";
+import { STATE_VERSION, stepWarnings as engineStepWarnings } from "../engine/index";
 import type { EngineApi } from "../engine/index";
 import { baseExt } from "../engine/context";
-import { finishTurn } from "../engine/turn";
+import { finishTurn, returnTiles } from "../engine/turn";
 import { currentTile } from "../engine/turnstate";
 import { applyControl, fitAll, initialCamera, type Camera } from "./camera";
 import { inspectAt } from "./inspect";
@@ -605,21 +605,28 @@ export class Room {
     const advance = remove === null || remove === skipped;
     const snap = advance ? baseExt(state).snapshot : undefined;
     const s: GameState = structuredClone(snap ?? state);
-    if (advance && remove === null && (s.ext.river as { done?: boolean } | undefined)?.done === false) {
-      // Flodfasen: ingen ska hålla en flodbricka mellan turerna, den går tillbaka överst i högen.
-      const p = s.players.find((x) => x.id === skipped)!;
-      s.drawPile.unshift(...p.hand.splice(0));
-    }
     const events: GameEvent[] = [];
-    if (advance && !s.finished) finishTurn(this.engine.env, s, events);
+    const env = this.engine.env;
+    if (advance && remove === null) {
+      // Flodfasen: en frånvarande spelare får inte hålla flodbrickor (sjön kan annars aldrig läggas),
+      // de går tillbaka i flodstapeln. Utanför flodfasen behåller hen sin hand.
+      const p = s.players.find((x) => x.id === skipped)!;
+      if (returnTiles(env, s, [...p.hand], false)) p.hand = [];
+    }
     if (remove) {
-      const p = s.players.find((x) => x.id === remove);
+      const idx = s.players.findIndex((x) => x.id === remove);
+      const p = s.players[idx];
       if (p) {
-        s.drawPile.push(...p.hand.splice(0));
-        shuffle(s, s.drawPile);
+        returnTiles(env, s, p.hand.splice(0));
+        s.players.splice(idx, 1);
+        // Den borttagna får aldrig få turen: räkna turen som avslutad av föregående spelare.
+        if (advance && s.players.length > 0)
+          s.turn = { ...s.turn, player: s.players[(idx - 1 + s.players.length) % s.players.length]!.id, pending: [] };
       }
+    }
+    if (advance && !s.finished) finishTurn(env, s, events);
+    if (remove) {
       s.figures = s.figures.filter((f) => f.owner !== remove);
-      s.players = s.players.filter((x) => x.id !== remove);
       s.setup.players = s.setup.players.filter((x) => x.id !== remove);
       const seat = this.seats.find((x) => x.player === remove);
       if (seat) this.removeSeat(seat);
