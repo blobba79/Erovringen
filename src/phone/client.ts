@@ -327,6 +327,14 @@ export class Client {
     this.send({ type: "startGame" });
   }
 
+  addBot(): void {
+    this.send({ type: "addBot" });
+  }
+
+  removeBot(player: PlayerId): void {
+    this.send({ type: "removeBot", player });
+  }
+
   hostAction(player: PlayerId, action: HostAction): void {
     this.send({ type: "hostAction", player, action });
   }
