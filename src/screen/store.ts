@@ -66,7 +66,8 @@ export function reduce(m: Model, msg: ServerMessage): Model {
       return { ...m, inspect: msg.result };
     case "waitingFor": {
       if (msg.seats.length === 0) return { ...m, waiting: [], restart: false };
-      const total = m.state?.players.length ?? m.lobby?.seats.length ?? 0;
+      // Datorspelare har ingen telefon och räknas inte med.
+      const total = m.state?.setup.players.filter((p) => !p.bot).length ?? m.lobby?.seats.filter((x) => !x.bot).length ?? 0;
       const restart = m.restart || (total > 0 && msg.seats.length >= total && msg.seats.every((s) => !s.connected));
       return { ...m, waiting: msg.seats, restart };
     }

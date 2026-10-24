@@ -50,6 +50,7 @@ function Lobby({ model, tr }: { model: Model; tr: Translate }) {
                 <Dot color={s.color} />
                 <span class="name">{s.name}</span>
                 {s.isHost && <span class="badge">{tr("lobby.host")}</span>}
+                {s.bot && <span class="badge">{tr("lobby.bot")}</span>}
                 {save && !s.connected && <span class="badge wait">{tr("screen.lobby.seatWaiting")}</span>}
               </li>
             ))}

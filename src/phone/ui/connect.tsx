@@ -126,9 +126,16 @@ export function LobbyView() {
             <span class="dot" style={{ background: seat.color }} /> {seat.name}
             {seat.player === s.player ? ` ${t("phone.you")}` : ""}
             {seat.isHost ? ` (${t("lobby.host")})` : ""}
+            {seat.bot ? ` (${t("lobby.bot")})` : ""}
+            {seat.bot && s.isHost && !lobby.options.savedGame && (
+              <button type="button" class="danger" onClick={() => c.removeBot(seat.player)}>{t("lobby.removeBot")}</button>
+            )}
           </li>
         ))}
       </ul>
+      {s.isHost && !lobby.options.savedGame && (
+        <button type="button" onClick={() => c.addBot()}>{t("lobby.addBot")}</button>
+      )}
       <SeatActions seats={lobby.seats} host={s.isHost} />
       {s.isHost ? <HostOptions options={lobby.options} available={lobby.available} saves={lobby.saves} /> : <p class="hint">{t("lobby.waitingForHost")}</p>}
       <LangSelect />

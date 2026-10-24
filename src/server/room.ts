@@ -12,6 +12,8 @@ import type { EngineApi } from "../engine/index";
 import { baseExt } from "../engine/context";
 import { finishTurn, returnTiles } from "../engine/turn";
 import { currentTile } from "../engine/turnstate";
+import { chooseBotStep } from "./bot";
+import { createTranslator } from "../i18n/index";
 import { applyControl, fitAll, initialCamera, type Camera } from "./camera";
 import { inspectAt } from "./inspect";
 import { nullLogger, type Logger } from "./log";
@@ -42,6 +44,8 @@ export interface RoomOptions {
   logger?: Logger;
   /** Var sparade spel och startval ligger; utelämnad = ingen sparning. */
   store?: FileStore;
+  /** Paus före varje delsteg som en datorstyrd spelare gör, i ms (standard 800; 0 i tester). */
+  botPauseMs?: number;
   /** Förenkling för datorn: mappen `sparade/`. Används om `store` saknas. */
   savedDir?: string;
   /** Slumpfrö för ett nytt spel. */
@@ -72,7 +76,16 @@ interface Seat {
   /** Har spelaren slagit på varningar för nybörjare? */
   warnings?: boolean;
   reactionTimes?: number[];
+  /** Datorstyrd spelare: spelar på servern, har ingen anslutning och räknas aldrig som värd. */
+  bot?: boolean;
+  /** Datorstyrd plats från ett valt sparat spel. */
+  fromSave?: boolean;
 }
+
+/** Färger som datorspelare tar i tur och ordning (samma som telefonens palett). */
+const BOT_COLORS = ["#d62828", "#2a6fdb", "#2e9e47", "#f2c230", "#222222", "#9b59b6", "#ee7f2d", "#8a8f98"];
+/** Hur många gånger i rad ett botdrag får misslyckas innan turen hoppas över. */
+const BOT_MAX_FAILURES = 3;
 
 type SavedPlayer = SaveFile["setup"]["players"][number];
 
@@ -115,6 +128,15 @@ export class Room {
   private endedAt: number | null = null;
   private statsMsg: GameStats | null = null;
   private shown: { player: PlayerId; tile: string } | null = null;
+  private botTimer: ReturnType<typeof setTimeout> | null = null;
+  private botFailures = 0;
+  private disposed = false;
+  private readonly botConn: Conn = {
+    local: false,
+    send: (m) => {
+      if (m.type === "error") this.log.warn(`botdrag nekades: ${m.key}`);
+    },
+  };
 
   constructor(opts: RoomOptions = {}) {
     this.opts = opts;
@@ -152,6 +174,9 @@ export class Room {
   dispose(): void {
     if (this.cameraTimer) clearTimeout(this.cameraTimer);
     this.cameraTimer = null;
+    this.disposed = true;
+    if (this.botTimer) clearTimeout(this.botTimer);
+    this.botTimer = null;
   }
 
   // ---------------------------------------------------------------- inkommande
@@ -203,6 +228,10 @@ export class Room {
         return this.setWarnings(seat, msg.on);
       case "hostAction":
         return this.hostAction(conn, seat, msg.player, msg.action);
+      case "addBot":
+        return this.addBot(conn, seat);
+      case "removeBot":
+        return this.removeBot(conn, seat, msg.player);
       default:
         return this.error(conn, "error.badMessage");
     }
@@ -241,7 +270,7 @@ export class Room {
     if (!color) return this.error(conn, "error.invalidColor");
     const lower = color.toLowerCase();
     // En plats från det valda sparade spelet tas av den som har platsens färg.
-    const reserved = this.seats.find((s) => s.reserved && s.color.toLowerCase() === lower);
+    const reserved = this.seats.find((s) => s.reserved && !s.bot && s.color.toLowerCase() === lower);
     if (reserved) {
       reserved.reserved = false;
       reserved.conn = conn;
@@ -274,7 +303,7 @@ export class Room {
   }
 
   private rejoin(conn: Conn, token: unknown): void {
-    const seat = typeof token === "string" ? this.seats.find((s) => s.token === token) : undefined;
+    const seat = typeof token === "string" ? this.seats.find((s) => !s.bot && s.token === token) : undefined;
     if (!seat) return this.error(conn, "error.badSeatToken");
     if (this.bindings.get(conn)?.kind === "screen") return this.error(conn, "error.alreadyJoined");
     const old = seat.conn;
@@ -325,7 +354,7 @@ export class Room {
   }
 
   private clearPendingSave(): void {
-    for (const s of [...this.seats]) if (s.reserved) this.removeSeat(s);
+    for (const s of [...this.seats]) if (s.reserved || s.fromSave) this.removeSeat(s);
     this.pendingSave = null;
   }
 
@@ -351,7 +380,8 @@ export class Room {
     const bound = new Map<Seat, SavedPlayer>();
     for (const s of [...this.seats]) {
       const pl = byColor(s.color);
-      if (pl) bound.set(s, pl);
+      if (s.bot) this.removeSeat(s); // datorspelare i det sparade spelet kommer från filen
+      else if (pl) bound.set(s, pl);
       else this.removeSeat(s); // färgen finns inte i det sparade spelet
     }
     for (const [s, pl] of bound) {
@@ -361,6 +391,10 @@ export class Room {
     const taken = new Set([...bound.values()]);
     for (const pl of players) {
       if (taken.has(pl)) continue;
+      if (pl.bot) {
+        this.seats.push({ player: pl.id, name: pl.name, color: pl.color, lang: "en", token: hex(12), conn: null, isHost: false, bot: true, fromSave: true });
+        continue;
+      }
       this.seats.push({ player: pl.id, name: pl.name, color: pl.color, lang: "en", token: hex(12), conn: null, isHost: false, reserved: true });
     }
     this.seats.sort((a, b) => players.findIndex((p) => p.id === a.player) - players.findIndex((p) => p.id === b.player));
@@ -393,7 +427,10 @@ export class Room {
   private startSaved(): void {
     const { id, file } = this.pendingSave!;
     const { state, tracker, replayed } = this.rebuild(file);
-    for (const s of this.seats) s.reserved = false;
+    for (const s of this.seats) {
+      s.reserved = false;
+      s.fromSave = false;
+    }
     this.pendingSave = null;
     this.state = state;
     this.tracker = tracker;
@@ -423,7 +460,7 @@ export class Room {
       variants: { ...o.variants },
       handSize: o.handSize,
       showClosingTiles: o.showClosingTiles,
-      players: this.seats.map((s) => ({ id: s.player, name: s.name, color: s.color })),
+      players: this.seats.map((s) => ({ id: s.player, name: s.name, color: s.color, ...(s.bot ? { bot: true } : {}) })),
       seed,
     });
     this.phase = "playing";
@@ -561,6 +598,71 @@ export class Room {
     const state = this.state;
     if (!seat?.conn || !seat.warnings || !state || state.finished || state.turn.player !== seat.player) return;
     this.send(seat.conn, { type: "warnings", warnings: this.warningsFor(state, seat.player) });
+  }
+
+  // ---------------------------------------------------------------- datorspelare
+
+  private addBot(conn: Conn, host: Seat): void {
+    if (!host.isHost) return this.error(conn, "error.hostOnly");
+    if (this.phase !== "lobby") return this.error(conn, "error.gameStarted");
+    if (this.pendingSave) return this.error(conn, "error.savedGameNoBots");
+    if (this.seats.length >= (this.opts.maxPlayers ?? 6)) return this.error(conn, "error.roomFull");
+    const used = new Set(this.seats.map((s) => s.color.toLowerCase()));
+    const color = BOT_COLORS.find((c) => !used.has(c)) ?? BOT_COLORS[0]!;
+    const t = createTranslator(host.lang);
+    let n = 1;
+    while (this.seats.some((s) => s.name === t("lobby.botName", { n }))) n++;
+    const seat: Seat = { player: this.newPlayerId(), name: t("lobby.botName", { n }), color, lang: host.lang, token: hex(12), conn: null, isHost: false, bot: true };
+    this.seats.push(seat);
+    this.log.info(`${seat.player} (${seat.name}) lades till som datorspelare`);
+    this.sendScreenInfo();
+    this.broadcastLobby();
+  }
+
+  private removeBot(conn: Conn, host: Seat, player: PlayerId): void {
+    if (!host.isHost) return this.error(conn, "error.hostOnly");
+    if (this.phase !== "lobby") return this.error(conn, "error.gameStarted");
+    const target = this.seats.find((s) => s.player === player);
+    if (!target) return this.error(conn, "error.unknownPlayer");
+    if (!target.bot) return this.error(conn, "error.notABot");
+    if (target.fromSave) return this.error(conn, "error.savedGameNoBots");
+    this.removeSeat(target);
+    this.sendScreenInfo();
+    this.broadcastLobby();
+  }
+
+  /** Planerar nästa delsteg om det är en datorspelares tur. Pausen gör att dragen hinner ses på storskärmen. */
+  private scheduleBot(): void {
+    if (this.botTimer || this.disposed) return;
+    const state = this.state;
+    if (this.phase !== "playing" || !state || state.finished) return;
+    if (!this.activeSeat()?.bot) return;
+    this.botTimer = setTimeout(() => {
+      this.botTimer = null;
+      this.botMove();
+    }, this.opts.botPauseMs ?? 800);
+  }
+
+  private botMove(): void {
+    const state = this.state;
+    const seat = this.activeSeat();
+    if (this.disposed || this.phase !== "playing" || !state || state.finished || !seat?.bot) return;
+    try {
+      const step = chooseBotStep(this.engine, state);
+      this.step(this.botConn, seat, step);
+    } catch (e) {
+      this.log.error(`botfel: ${e instanceof Error ? (e.stack ?? e.message) : String(e)}`);
+    }
+    if (this.state !== state) {
+      this.botFailures = 0;
+      return; // broadcastGame har redan planerat nästa drag
+    }
+    if (++this.botFailures >= BOT_MAX_FAILURES) {
+      this.botFailures = 0;
+      this.log.warn(`${seat.player} fastnade, turen hoppas över`);
+      return this.advanceTurn(state, null);
+    }
+    this.scheduleBot();
   }
 
   private hostAction(conn: Conn, seat: Seat, player: PlayerId, action: HostAction): void {
@@ -766,7 +868,8 @@ export class Room {
 
   private lobbySeats(): LobbySeat[] {
     return this.seats.map((s) => ({
-      player: s.player, name: s.name, color: s.color, connected: s.conn !== null, isHost: s.isHost,
+      player: s.player, name: s.name, color: s.color, connected: s.bot ? true : s.conn !== null, isHost: s.isHost,
+      ...(s.bot ? { bot: true } : {}),
     }));
   }
 
@@ -803,7 +906,7 @@ export class Room {
 
   private screenInfo(): ServerMessage {
     const seatUrls: Record<PlayerId, string> = {};
-    for (const s of this.seats) seatUrls[s.player] = `${this.baseUrl}/p?s=${s.token}`;
+    for (const s of this.seats) if (!s.bot) seatUrls[s.player] = `${this.baseUrl}/p?s=${s.token}`;
     return { type: "screenInfo", joinUrl: `${this.baseUrl}/p?g=${this.gameCode}`, seatUrls };
   }
 
@@ -828,6 +931,7 @@ export class Room {
     if (withCamera) this.sendCamera();
     this.sendWaitingFor();
     this.sendWarnings(this.activeSeat());
+    this.scheduleBot();
   }
 
   private sendSeatGame(seat: Seat, legal: Step[]): void {
