@@ -142,3 +142,17 @@ button.on { border-color: var(--accent); }
 .banner { font-size: 1rem; flex-wrap: nowrap; gap: 8px; }
 .banner small { font-size: 0.72rem; white-space: nowrap; }
 .banner small:nth-of-type(1) { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; }
+
+/* Regelvyn */
+.rules { position: fixed; inset: 0; z-index: 30; background: var(--bg); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
+.rules header { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--panel); }
+.rules header h1 { margin: 0; }
+.rules header .back { flex: 1; text-align: left; font-weight: 600; }
+.rules-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 12px 24px; max-width: 520px; width: 100%; margin: 0 auto; line-height: 1.45; }
+.rules-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rules-list button { width: 100%; text-align: left; }
+.rules-h1 { font-size: 1.25rem; color: var(--text); margin: 4px 0 8px; }
+.rules-h2 { font-size: 1.05rem; color: var(--accent); margin: 16px 0 4px; }
+.rules-body p { margin: 0 0 10px; }
+.rules-body ul:not(.rules-list) { margin: 0 0 10px; padding-left: 20px; }
+.rules-body li { margin-bottom: 4px; }

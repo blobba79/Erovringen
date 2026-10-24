@@ -7,6 +7,7 @@ import { availableLanguages } from "../../i18n/index";
 import { changeHandSize, chooseSave, setVariant, startChoices, toggleExpansion } from "../logic/options";
 import { loadName, saveName } from "../logic/session";
 import { LangSelect, PALETTE, useClient, useClientState, useT } from "./common";
+import { RulesButton } from "./rules";
 
 export function JoinView({ takenColors, savedColors }: { takenColors: ReadonlySet<string>; savedColors?: readonly string[] }) {
   const c = useClient();
@@ -138,6 +139,9 @@ export function LobbyView() {
       )}
       <SeatActions seats={lobby.seats} host={s.isHost} />
       {s.isHost ? <HostOptions options={lobby.options} available={lobby.available} saves={lobby.saves} /> : <p class="hint">{t("lobby.waitingForHost")}</p>}
+      <div class="row">
+        <RulesButton expansions={lobby.options.expansions} lang={s.lang} />
+      </div>
       <LangSelect />
     </main>
   );
