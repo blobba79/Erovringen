@@ -1,5 +1,6 @@
 {
   "phone.scanQr": "Scan the QR code on the big screen to join the game.",
+  "turn.yourChoice": "Your choice",
   "phone.you": "(you)",
   "phone.notConnected": "{player} is not connected.",
   "phone.hostWait": "Wait",

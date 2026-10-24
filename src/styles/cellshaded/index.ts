@@ -30,3 +30,4 @@ export const cellshadedStyle: GraphicStyle = {
 export default cellshadedStyle;
 export { THEME } from "./theme";
 export { drawCounterIcon } from "./counters";
+export { drawFerry, drawDie, drawDiceArrow } from "./marks";

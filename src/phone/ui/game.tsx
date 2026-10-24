@@ -10,7 +10,7 @@ import { featureAtPoint } from "../logic/hit";
 import { visibleCounters } from "../logic/counters";
 import { drawCounterIcon } from "../../styles/cellshaded/index";
 import { rotationsAt, spotsFor } from "../logic/spots";
-import { deriveTurn, figureSupply, type TurnView } from "../logic/turnview";
+import { chooserOf, deriveTurn, figureSupply, type TurnView } from "../logic/turnview";
 import { SeatActions } from "./connect";
 import { AfterView, Tools, Warnings } from "./extras";
 import { ExpansionStage } from "./expansion";
@@ -25,7 +25,7 @@ export function GameView({ s }: { s: PhoneState }) {
   const state = s.state!;
   const me = s.player;
   const view = deriveTurn(state, me, s.hand);
-  const current = state.players.find((p) => p.id === state.turn.player);
+  const current = state.players.find((p) => p.id === chooserOf(state.turn));
   const myColor = state.players.find((p) => p.id === me)?.color ?? null;
   const has = (type: Step["type"]) => s.legal.some((x) => x.type === type);
 
@@ -70,7 +70,7 @@ function Banner({ state, view, name }: { state: PublicState; view: TurnView; nam
     : "turn.extraPlacements";
   return (
     <h1 class={`banner${view.mine ? " mine" : ""}`}>
-      {view.mine ? t("turn.yourTurn") : t("turn.waiting", { player: name })}
+      {view.isActor ? t("turn.yourChoice") : view.mine ? t("turn.yourTurn") : t("turn.waiting", { player: name })}
       <small>{view.mine ? t(phaseKey) : ""}</small>
       <small class="left">{t("turn.tilesLeft", { count: state.drawPileCount })}</small>
     </h1>

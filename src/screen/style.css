@@ -98,3 +98,7 @@ h1, h2, h3 { margin: 0 0 0.4em; }
 .counter { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .counter .dot { width: 0.8em; height: 0.8em; margin-right: 0.25em; }
 .counter .cicon { width: 1.3em; height: 1.3em; vertical-align: middle; margin-right: 0.2em; }
+
+.banner .chooser { font-weight: 800; border-left: 0.15vmax solid currentColor; padding-left: 1vmax; }
+.dice-note { position: absolute; top: 8vmax; left: 50%; transform: translateX(-50%); font-size: 2.4vmax; font-weight: 800; padding: 0.5vmax 2vmax; border-radius: 3vmax; background: color-mix(in srgb, var(--c-backgroundDark, #000) 88%, transparent); color: var(--c-text, #fff); border: 0.3vmax solid var(--c-accent, #e64); animation: dice-in 0.25s ease-out; }
+@keyframes dice-in { from { opacity: 0; transform: translateX(-50%) scale(0.8); } }

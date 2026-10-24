@@ -9,6 +9,7 @@ import type { PlayerId, Pos, Step } from "../shared/state";
 import type { Rotation } from "../shared/tiles";
 import { initialRotation, nextRotation, placementsOf, rotationsAt, spotsFor, type Placement } from "./logic/spots";
 import { expansionView, previewTargets, targetsKey } from "./logic/expansion";
+import { chooserOf } from "./logic/turnview";
 import {
   clearSeat, loadLang, loadSeat, loadWarnings, pickLang, planStart, saveLang, saveSeat, saveWarnings, type StartPlan, type StorageLike,
 } from "./logic/session";
@@ -225,8 +226,8 @@ export class Client {
   }
 
   private onState(state: PublicState): void {
-    const wasMine = this.s.state?.turn.player === this.s.player && !this.s.state?.finished;
-    const mine = state.turn.player === this.s.player && !state.finished;
+    const wasMine = !!this.s.state && chooserOf(this.s.state.turn) === this.s.player && !this.s.state.finished;
+    const mine = chooserOf(state.turn) === this.s.player && !state.finished;
     const patch: Partial<PhoneState> = { state };
     this.sentTargets = ""; // servern glömmer förhandsvisningen när tillståndet ändras
     if (mine && !wasMine) patch.turnNonce = this.s.turnNonce + 1;
@@ -235,7 +236,7 @@ export class Client {
       patch.placements = [];
       patch.warnings = [];
     }
-    const uiKey = `${state.turn.player}/${state.turn.phase}/${state.turn.pending.length}`;
+    const uiKey = `${state.turn.player}/${state.turn.actor ?? ""}/${state.turn.phase}/${state.turn.pending.length}`;
     if (uiKey !== this.uiKey) {
       this.uiKey = uiKey;
       patch.edge = null;
