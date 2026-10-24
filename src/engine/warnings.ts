@@ -11,7 +11,7 @@ import { baseExt, makeCtx, type Env } from "./context";
 import { baseModule } from "./base-module";
 import { analyze, type Area } from "./features";
 import { ROTATIONS, neighbour } from "./geometry";
-import { adjustedPoints, areaValue, majorityOwners } from "./scoring";
+import { adjustedPoints, areaValue, majorityOwners, strength } from "./scoring";
 import { rotateTile } from "./tileinfo";
 import { allTileTypes } from "../tiles/index";
 
@@ -62,7 +62,9 @@ export function stepWarnings(
   }
 
   // Sista pjäsen i förrådet (inte abboten, och inte om området avslutas nu så att pjäsen kommer tillbaka).
-  if (placedFig && placedFig.type === "placeFigure" && placedFig.kind !== "abbot") {
+  // Bara följare: inte abboten, byggmästaren eller grisen.
+  if (placedFig && placedFig.type === "placeFigure" && placedFig.kind !== "abbot" &&
+    strength({ id: "", kind: placedFig.kind, owner: player, location: { at: "supply" } }) > 0) {
     const left = state.figures.filter(
       (f) => f.owner === player && f.kind === placedFig.kind && f.location.at === "supply",
     ).length;

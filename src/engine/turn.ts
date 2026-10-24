@@ -72,7 +72,8 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
   }
   delete baseExt(state).snapshot;
   state.turn.pending = [];
-  const again = activeModules(env, state.setup).some((m) => m.hooks.extraTurn?.(ctx));
+  // Alla moduler tillfrågas (de nollställer sina egna flaggor), inte bara fram till första ja.
+  const again = activeModules(env, state.setup).map((m) => m.hooks.extraTurn?.(ctx) ?? false).some(Boolean);
   for (const m of activeModules(env, state.setup)) {
     const handled = engineHook(m, "dealAfterTurn")?.(ctx, again);
     if (handled === undefined) continue;

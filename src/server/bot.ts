@@ -8,7 +8,7 @@
 
 import type { GameState, PlayerId, Step } from "../shared/state";
 import type { EngineApi } from "../engine/index";
-import { areaValue, majorityOwners } from "../engine/index";
+import { areaValue, majorityOwners, strength } from "../engine/index";
 
 /** Hur mycket ett ofärdigt område är värt per poäng det är värt nu, efter sort. */
 const POTENTIAL: Record<string, number> = { city: 0.55, road: 0.5, cloister: 0.65, garden: 0.65, field: 0.45 };
@@ -22,7 +22,7 @@ const MAX_QUICK = 16;
 type Rnd = () => number;
 
 function scarcity(state: GameState, me: PlayerId): number {
-  const left = state.figures.filter((f) => f.owner === me && f.location.at === "supply" && f.kind !== "abbot").length;
+  const left = state.figures.filter((f) => f.owner === me && f.location.at === "supply" && f.kind !== "abbot" && strength(f) > 0).length;
   const raw = 0.25 * (7 - left) + 0.6 * Math.max(0, 3 - left);
   // Mot slutet spelar det ingen roll att spara pjäser.
   return raw * Math.min(1, state.drawPile.length / 15);

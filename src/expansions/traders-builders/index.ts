@@ -25,7 +25,7 @@ import type { EngineHookContext } from "../../engine/context";
 import { playerOf } from "../../engine/context";
 import { analyze } from "../../engine/features";
 import { rotatedAt } from "../../engine/board";
-import { completedCitiesAround, returnToSupply } from "../../engine/scoring";
+import { completedCitiesAround, returnToSupply, strength } from "../../engine/scoring";
 import { TILE_DATA } from "../../tiles/index";
 
 export const BUILDER_KIND = "builder";
@@ -35,8 +35,6 @@ export type Good = (typeof GOODS)[number];
 export const goodsCounter = (g: string) => `goods.${g}`;
 
 const ID = "traders-builders";
-/** Följare som bär upp byggmästaren och grisen (och vars vikt vid majoritet är 1 respektive 2). */
-const FOLLOWER_WEIGHT: Record<string, number> = { meeple: 1, "large-meeple": 2 };
 
 interface TbExt {
   /** Spelaren har lagt en bricka som byggde vidare på sin byggmästares område denna tur. */
@@ -56,7 +54,8 @@ const set: TileSet = (TILE_DATA[ID] as { set: TileSet }).set;
 const props = (ctx: EngineHookContext, pos: Pos, feature: string): Record<string, unknown> =>
   (rotatedAt(ctx.state.board, ctx.types, pos)?.features.find((f) => f.id === feature)?.props ?? {}) as Record<string, unknown>;
 
-const isFollowerOf = (f: Figure, owner: PlayerId) => f.owner === owner && f.kind in FOLLOWER_WEIGHT;
+/** Följare (motorns styrka > 0) bär upp byggmästaren och grisen. */
+const isFollowerOf = (f: Figure, owner: PlayerId) => f.owner === owner && strength(f) > 0;
 
 /** Samma poängpost som motorn skriver, men utan område (varor och grisens påslag). */
 function award(ctx: EngineHookContext, player: PlayerId, points: number, reason: string, pos?: Pos, feature?: string) {
@@ -150,8 +149,7 @@ export const tradersBuildersModule: ExpansionModule = {
         if (pigs.length === 0) continue;
         const sums = new Map<PlayerId, number>();
         for (const f of area.figures)
-          if (f.owner !== null && f.kind in FOLLOWER_WEIGHT)
-            sums.set(f.owner, (sums.get(f.owner) ?? 0) + (FOLLOWER_WEIGHT[f.kind] as number));
+          if (f.owner !== null && strength(f) > 0) sums.set(f.owner, (sums.get(f.owner) ?? 0) + strength(f));
         const best = Math.max(0, ...sums.values());
         const cities = completedCitiesAround(an, area);
         const ref = area.nodes[0]!;
