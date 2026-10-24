@@ -31,6 +31,11 @@ export interface EngineHooks {
    * sig inte i (motorn fyller handen som vanligt), `null` = spelet är slut.
    */
   dealAfterTurn(ctx: EngineHookContext): PlayerId | null | undefined;
+  /**
+   * Vid byte av en bricka som ingen kan lägga: modulen drar själv ersättaren ur högen. Returnera
+   * `{ tile }` (tile utelämnad = ingen ersättare, handen krymper) eller `undefined` för vanlig dragning.
+   */
+  exchangeDraw(ctx: EngineHookContext): { tile?: string } | undefined;
 }
 
 export const engineHook = <K extends keyof EngineHooks>(m: ExpansionModule, k: K): EngineHooks[K] | undefined =>

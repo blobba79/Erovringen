@@ -1,16 +1,23 @@
 // Floden (River I, ingår i grundspelet; s. 27-30).
 //
 // - Källan är startbrickan. Flodbrickorna blandas och läggs först i högen, sjön sist av dem.
+// - Variant "river.sets": "2" (standard) använder två uppsättningar av de vanliga flodbrickorna
+//   (2 x 10) men bara en källa och en sjö (s. 27 not 36); "1" är originalfloden.
 // - En flodbricka måste fortsätta floden (läggas vid den öppna änden) och får inte göra en
 //   omedelbar U-sväng (två kurvor åt samma håll efter varandra).
-// - Sjön får läggas först när inga andra flodbrickor finns i högen eller på den egna handen.
-// - Så länge floden inte är klar håller ingen brickor mellan turerna: den som har tur drar en
-//   bricka ur flodhögen och måste lägga den (oavsett handstorlek). De vanliga händerna delas ut
-//   först när sjön är lagd, i turordning med start hos nästa spelare.
-// - Variant "river.startTile": "shuffle" (standard) blandar in den vanliga startbrickan bland
-//   flodbrickorna; "afterRiver" gör den till nästa bricka efter sjön (nästa spelare drar den).
-// - Variant "river.deadEnds": "allow" (standard, originalregeln) förbjuder bara en omedelbar
-//   U-sväng; "forbid" förbjuder även flodbrickor som kan köra fast floden (som JCloisterZone).
+// - Sjön får läggas först när inga andra flodbrickor finns i högen eller på någon hand.
+// - Flodfasen: händerna delas vid start ut upp till handstorleken med flodbrickor (turordning från
+//   startspelaren) och fylls under fasen bara på med flodbrickor, aldrig vanliga. En spelare utan
+//   flodbricka hoppas över. Sjön hålls undan tills alla andra flodbrickor är lagda och ges då till
+//   nästa spelare. Därefter fylls alla händer med vanliga brickor upp till handstorleken, i
+//   turordning från nästa spelare. Byter man en bricka som inte går att lägga under flodfasen
+//   får man en ny flodbricka, eller ingen om högen bara har sjön kvar (aldrig en vanlig bricka).
+// - Variant "river.startTile": "afterRiver" (standard) lägger den vanliga startbrickan överst i högen
+//   när sjön är lagd, så den följer med i första vanliga utdelningen; "shuffle" blandar in den bland
+//   flodbrickorna.
+// - Variant "river.deadEnds": "forbid" (standard) förbjuder flodbrickor (och inblandad startbricka)
+//   som kan köra fast floden (som JCloisterZone); "allow" är originalregeln där bara en
+//   omedelbar U-sväng är förbjuden.
 
 import type { ExpansionModule, RuleVariantDefinition } from "../../shared/expansion";
 import type { Edge, TileSet, TileType } from "../../shared/tiles";
@@ -32,8 +39,9 @@ export interface RiverExt {
 }
 
 const variants: RuleVariantDefinition[] = [
-  { id: "startTile", options: ["shuffle", "afterRiver"], default: "shuffle" },
-  { id: "deadEnds", options: ["allow", "forbid"], default: "allow" },
+  { id: "startTile", options: ["shuffle", "afterRiver"], default: "afterRiver" },
+  { id: "deadEnds", options: ["allow", "forbid"], default: "forbid" },
+  { id: "sets", options: ["2", "1"], default: "2" },
 ];
 
 const riverEdgesOf = (rt: ReturnType<typeof rotateTile>): Edge[] => EDGES.filter((e) => rt.edgeKind[e] === "river");
@@ -79,7 +87,10 @@ export function makeRiverModule(
     const flanks = (q: Pos) => [neighbour(q, EDGES[(i + 1) % 4]!), neighbour(q, EDGES[(i + 3) % 4]!)];
     return [...flanks(adj), adj2, ...flanks(adj2)];
   };
-  const forbidDeadEnds = (s: GameState) => (s.setup.variants["river.deadEnds"] ?? "allow") === "forbid";
+  /** Hur många flodbrickor framåt kontrollen ser (hela floden vore för dyrt med 20 brickor). */
+  const LOOKAHEAD = 7;
+  const safeMemo = new Map<string, boolean>();
+  const forbidDeadEnds = (s: GameState) => (s.setup.variants["river.deadEnds"] ?? "forbid") === "forbid";
 
   /**
    * Variant "forbid": kan floden alltid fortsätta, vilka av de återstående flodbrickorna (rakt eller
@@ -88,16 +99,31 @@ export function makeRiverModule(
    * Varje steg följer samma regler som den riktiga placeringen: fri ruta, ingen omedelbar U-sväng
    * och fria skyddsrutor framför den nya änden. Efter sista flodbrickan måste sjöns ruta vara fri.
    */
-  function safe(occ: Set<string>, end: Pos, dir: Edge, last: number, straight: number, curves: number): boolean {
+  function safe(occ: Set<string>, end: Pos, dir: Edge, last: number, straight: number, curves: number, budget = LOOKAHEAD): boolean {
+    // Rena funktionen memoiseras på det som kan påverka resten: upptagna rutor inom räckhåll.
+    const reach = Math.min(straight + curves, budget) + 3;
+    const near = [...occ].filter((k) => {
+      const p = parseKey(k);
+      return Math.abs(p.x - end.x) <= reach && Math.abs(p.y - end.y) <= reach;
+    }).sort();
+    const key = `${end.x},${end.y},${dir},${last},${straight},${curves},${budget}|${near.join(";")}`;
+    const hit = safeMemo.get(key);
+    if (hit !== undefined) return hit;
+    const res = safeUncached(occ, end, dir, last, straight, curves, budget);
+    if (safeMemo.size > 200_000) safeMemo.clear();
+    safeMemo.set(key, res);
+    return res;
+  }
+  function safeUncached(occ: Set<string>, end: Pos, dir: Edge, last: number, straight: number, curves: number, budget: number): boolean {
     const q = neighbour(end, dir);
     if (occ.has(posKey(q))) return false;
-    if (straight + curves === 0) return true;
+    if (straight + curves === 0 || budget === 0) return true;
     const tryTurn = (turn: number): boolean => {
       if (turn !== 0 && turn === last) return false;
       const exit = EDGES[(edgeIndex(dir) + turn) % 4]!;
       if (reserved(q, exit).some((r) => occ.has(posKey(r)))) return false;
       const next = new Set(occ).add(posKey(q));
-      return safe(next, q, exit, turn, straight - (turn === 0 ? 1 : 0), curves - (turn === 0 ? 0 : 1));
+      return safe(next, q, exit, turn, straight - (turn === 0 ? 1 : 0), curves - (turn === 0 ? 0 : 1), budget - 1);
     };
     return (straight === 0 || tryTurn(0)) && (curves === 0 || tryTurn(1) || tryTurn(3));
   }
@@ -115,39 +141,80 @@ export function makeRiverModule(
   const endTurn = (end: { pos: Pos; edge: Edge }, p: Edge[]): number =>
     p.length === 2 && !isStraight(p) ? turnOf(p.find((e) => e !== end.edge)!, end.edge) : 0;
 
+  /** Antal brickor i flodstapeln (före sjön) överst i högen. */
+  const stackLen = (s: GameState): number => {
+    if (lake !== undefined) return Math.max(0, s.drawPile.indexOf(lake));
+    let n = 0;
+    while (n < s.drawPile.length && ids.has(s.drawPile[n]!)) n++;
+    return n;
+  };
+  /** Nästa spelare med bricka på hand, från och med plats `from`. */
+  const seatWithTiles = (s: GameState, from: number): number | undefined => {
+    for (let k = 0; k < s.players.length; k++) {
+      const i = (from + k) % s.players.length;
+      if (s.players[i]!.hand.length > 0) return i;
+    }
+    return undefined;
+  };
+
   const engineHooks: Partial<EngineHooks> = {
-    // Första spelaren drar en flodbricka; ingen annan får något än.
+    // Händerna fylls upp till handstorleken med flodbrickor, startspelaren först.
     dealAtStart(c, first) {
       const s = c.state;
       ext(s).dealt = false;
-      const t = s.drawPile.shift();
-      if (t !== undefined) s.players.find((p) => p.id === first)!.hand.push(t);
+      const at = s.players.findIndex((p) => p.id === first);
+      for (let round = 0; round < s.setup.handSize; round++)
+        for (let k = 0; k < s.players.length; k++)
+          if (stackLen(s) > 0) s.players[(at + k) % s.players.length]!.hand.push(s.drawPile.shift()!);
       return true;
     },
     dealAfterTurn(c) {
       const s = c.state;
       const r = ext(s);
       if (r.dealt) return undefined;
+      const cur = s.players.find((p) => p.id === c.player)!;
       const start = nextSeat(s, c.player);
       const over = r.done || riverTiles(s).length === 0;
-      if (over && r.waitingStart !== undefined) {
-        // "afterRiver": startbrickan är nästa bricka, dragen av nästa spelare.
-        s.drawPile.unshift(r.waitingStart);
-        delete r.waitingStart;
-      } else if (over) {
-        // Vanliga händer, upp till handstorleken, i turordning från nästa spelare.
+      if (over) {
+        // Sjön är lagd: startbrickan (afterRiver) överst, sedan vanliga händer i turordning från nästa spelare.
         r.dealt = true;
-        for (let round = 0; round < s.setup.handSize; round++)
+        if (r.waitingStart !== undefined) {
+          s.drawPile.unshift(r.waitingStart);
+          delete r.waitingStart;
+        }
+        for (let more = true; more; ) {
+          more = false;
           for (let k = 0; k < s.players.length; k++) {
-            const t = s.drawPile.shift();
-            if (t !== undefined) s.players[(start + k) % s.players.length]!.hand.push(t);
+            const p = s.players[(start + k) % s.players.length]!;
+            if (p.hand.length < s.setup.handSize && s.drawPile.length > 0) {
+              p.hand.push(s.drawPile.shift()!);
+              more = true;
+            }
           }
-        return s.players[start]!.hand.length > 0 ? s.players[start]!.id : null;
+        }
+        const i = seatWithTiles(s, start);
+        return i === undefined ? null : s.players[i]!.id;
       }
-      const t = s.drawPile.shift();
-      if (t === undefined) return null;
-      s.players[start]!.hand.push(t);
-      return s.players[start]!.id;
+      // Mitt i floden: den som lagt fyller på med flodbrickor, den som är näst i tur och har en bricka spelar.
+      while (cur.hand.length < s.setup.handSize && stackLen(s) > 0) {
+        cur.hand.push(s.drawPile.shift()!);
+        c.emit({ type: "tileDrawn", player: cur.id });
+      }
+      const i = seatWithTiles(s, start);
+      if (i !== undefined) return s.players[i]!.id;
+      // Alla andra flodbrickor är lagda: sjön går till nästa spelare.
+      if (lake !== undefined && s.drawPile[0] === lake) {
+        s.players[start]!.hand.push(s.drawPile.shift()!);
+        return s.players[start]!.id;
+      }
+      return null;
+    },
+    // Byte under flodfasen ger en flodbricka (eller ingen), aldrig en vanlig bricka eller sjön i förtid.
+    exchangeDraw(c) {
+      const s = c.state;
+      const r = ext(s);
+      if (r.dealt || r.done) return undefined;
+      return stackLen(s) > 0 ? { tile: s.drawPile.shift()! } : {};
     },
   };
 
@@ -164,16 +231,19 @@ export function makeRiverModule(
         const s = ctx.state;
         s.ext.river = { done: false } satisfies RiverExt;
         const plain = ctx.env.modules.find((m) => m.id === "base")?.tileSets[0]?.start;
-        const river = s.drawPile.filter((t) => ids.has(t) && t !== lake);
+        let river = s.drawPile.filter((t) => ids.has(t) && t !== lake);
+        // Två uppsättningar: de vanliga flodbrickorna dubbleras, men bara en källa (startbrickan) och en sjö.
+        if ((s.setup.variants["river.sets"] ?? "2") === "2") river = [...river, ...river];
         const rest = s.drawPile.filter((t) => !ids.has(t));
+        const lakeIn = lake !== undefined && s.drawPile.includes(lake);
         const at = plain === undefined ? -1 : rest.indexOf(plain);
         if (at >= 0) {
           rest.splice(at, 1);
-          if ((s.setup.variants["river.startTile"] ?? "shuffle") === "afterRiver") ext(s).waitingStart = plain;
+          if ((s.setup.variants["river.startTile"] ?? "afterRiver") === "afterRiver") ext(s).waitingStart = plain;
           else river.push(plain as string);
         }
         shuffle(s, river);
-        s.drawPile = [...river, ...(lake !== undefined && s.drawPile.includes(lake) ? [lake] : []), ...rest];
+        s.drawPile = [...river, ...(lakeIn ? [lake as string] : []), ...rest];
       },
       canPlaceTile(c, pos, step) {
         const ctx = c as EngineHookContext;

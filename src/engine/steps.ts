@@ -3,7 +3,7 @@
 
 import type { GameEvent, GameState, Step } from "../shared/state";
 import { analyze } from "./features";
-import { activeModules, makeCtx, playerOf, type Env } from "./context";
+import { activeModules, engineHook, makeCtx, playerOf, type Env } from "./context";
 import { exchangeAllowed, figureSteps } from "./legal";
 import { hasAnyPlacement, isLegalPlacement } from "./placement";
 import { addScore, adjustedPoints, areaValue, returnToSupply } from "./scoring";
@@ -33,7 +33,12 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
       const old = hand[step.handIndex];
       if (old === undefined) return "error.invalidTile";
       baseExt(state).discarded.push(old);
-      const fresh = state.drawPile.shift();
+      let custom: { tile?: string } | undefined;
+      for (const m of mods) {
+        custom = engineHook(m, "exchangeDraw")?.(ctx);
+        if (custom) break;
+      }
+      const fresh = custom ? custom.tile : state.drawPile.shift();
       if (fresh !== undefined) {
         hand[step.handIndex] = fresh;
         events.push({ type: "tileDrawn", player });

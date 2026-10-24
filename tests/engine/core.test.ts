@@ -101,16 +101,17 @@ describe("nytt spel", () => {
     expect(steps.every((x) => x.type === "chooseTile" || x.type === "exchangeTile")).toBe(true);
   });
 
-  test("med floden: källan är startbricka, flodbrickorna först i högen, sjön sist av dem", () => {
+  test("med floden: källan är startbricka, 20 flodbrickor först i högen, sjön sist av dem", () => {
     const s = eng.newGame(setupOf(["base", "river"], { n: 2 }));
     expect(s.board["0,0"]?.type).toBe("river/s");
     const all = [...s.players.flatMap((p) => p.hand), ...s.drawPile];
-    expect(all).toHaveLength(72 + 11);
-    // 10 flodbrickor + vanliga startbrickan, sjön på plats 12 (index 11); en är utdelad (första spelaren)
-    expect(s.drawPile.indexOf("river/I.e")).toBe(11 - 1);
-    expect(s.drawPile.slice(0, 10).filter((t) => t.startsWith("river/") || t === "base/RCr").length).toBe(10);
-    expect(s.drawPile.slice(11).some((t) => t.startsWith("river/") && t !== "river/I.e")).toBe(false);
-    expect(all.filter((t) => t === "base/RCr")).toHaveLength(4);
+    // 71 vanliga utan startbrickan (som väntar tills sjön är lagd) + 2 x 10 flodbrickor + sjön.
+    expect(all).toHaveLength(71 + 21);
+    expect(s.players.map((p) => p.hand.length)).toEqual([1, 1]);
+    expect(s.drawPile.indexOf("river/I.e")).toBe(20 - 2);
+    expect(s.drawPile.slice(0, 18).every((t) => t.startsWith("river/") && t !== "river/I.e")).toBe(true);
+    expect(s.drawPile.slice(19).some((t) => t.startsWith("river/"))).toBe(false);
+    expect(all.filter((t) => t === "base/RCr")).toHaveLength(3);
   });
 
   test("brickdatan i högen stämmer med mängderna", () => {
