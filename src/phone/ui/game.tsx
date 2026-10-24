@@ -29,7 +29,10 @@ export function GameView({ s }: { s: PhoneState }) {
   return (
     <main class="view game">
       <Banner state={state} view={view} name={current?.name ?? ""} />
-      <ScoreBar state={state} me={me} />
+      <div class="topbar">
+        <ScoreBar state={state} me={me} />
+        {me && <Supply state={state} me={me} color={myColor} />}
+      </div>
       {s.waiting.length > 0 && <SeatActions seats={s.waiting} host={s.isHost} />}
       {state.finished && <AfterView s={s} />}
       {view.mine && <Warnings s={s} />}
@@ -47,7 +50,6 @@ export function GameView({ s }: { s: PhoneState }) {
       {view.mine && <PadBlock s={s} view={view} />}
       <HandStrip s={s} view={view} />
       {!state.finished && <Tools s={s} phase={view.phase} mine={view.mine} />}
-      {me && <Supply state={state} me={me} color={myColor} />}
       {state.finished && <LangSelect />}
     </main>
   );
@@ -121,7 +123,7 @@ function Stage({ s, view }: { s: PhoneState; view: TurnView }) {
 function PlaceStage({ s, view }: { s: PhoneState; view: TurnView }) {
   const t = useT();
   const c = useClient();
-  const size = useTileSize(0.3, 240);
+  const size = useTileSize(0.3, 190);
   if (!view.tileId) return null;
   const board = s.state!.board;
   const edge = s.edge;
@@ -139,17 +141,19 @@ function PlaceStage({ s, view }: { s: PhoneState; view: TurnView }) {
           />
         ))}
       </div>
-      <p class="hint">{edge === null ? t("phone.pickEdge") : spots.length > 0 ? t("phone.pickSpot") : t("phone.noSpots")}</p>
-      <button type="button" class={`big${edge === "all" ? " on" : ""}`} onClick={() => c.selectEdge("all")}>
-        {t("turn.allPositions")}
-      </button>
-      {edge !== null && (
-        <div class="digits">
-          {spots.map((p, i) => (
-            <button type="button" class="digit" onClick={() => c.placeAt(p)}>{i + 1}</button>
-          ))}
-        </div>
-      )}
+      <div class="side">
+        <p class="hint small">{edge === null ? t("phone.pickEdge") : spots.length > 0 ? t("phone.pickSpot") : t("phone.noSpots")}</p>
+        <button type="button" class={`big${edge === "all" ? " on" : ""}`} onClick={() => c.selectEdge("all")}>
+          {t("turn.allPositions")}
+        </button>
+        {edge !== null && (
+          <div class="digits">
+            {spots.map((p, i) => (
+              <button type="button" class="digit" onClick={() => c.placeAt(p)}>{i + 1}</button>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -157,7 +161,7 @@ function PlaceStage({ s, view }: { s: PhoneState; view: TurnView }) {
 function FigureStage({ s, view }: { s: PhoneState; view: TurnView }) {
   const t = useT();
   const c = useClient();
-  const size = useTileSize(0.34, 280);
+  const size = useTileSize(0.28, 220);
   const placed = view.placedTile;
   const type = placed ? tileType(placed.type) : undefined;
   const steps = s.legal.filter((x): x is FigureStep => x.type === "placeFigure");
@@ -231,8 +235,7 @@ function PadBlock({ s, view }: { s: PhoneState; view: TurnView }) {
   const c = useClient();
   return (
     <section class="padblock">
-      <Pad onMap={(m) => c.map(m)} onTap={() => c.inspect()} />
-      <p class="hint small">{t("phone.padHint")}</p>
+      <Pad onMap={(m) => c.map(m)} onTap={() => c.inspect()} hint={t("phone.padHint")} />
       <div class="row">
         <button type="button" onClick={() => c.map({ type: "fitAll" })}>{t("turn.showAll")}</button>
       </div>
@@ -240,7 +243,7 @@ function PadBlock({ s, view }: { s: PhoneState; view: TurnView }) {
   );
 }
 
-function Pad({ onMap, onTap }: { onMap: Client["map"]; onTap: () => void }) {
+function Pad({ onMap, onTap, hint }: { onMap: Client["map"]; onTap: () => void; hint: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const tracker = useRef<GestureTracker | null>(null);
   if (!tracker.current) tracker.current = new GestureTracker(300);
@@ -256,6 +259,8 @@ function Pad({ onMap, onTap }: { onMap: Client["map"]; onTap: () => void }) {
     <div
       ref={ref}
       class="pad"
+      title={hint}
+      aria-label={hint}
       onPointerDown={(e) => {
         const el = e.currentTarget as HTMLDivElement;
         el.setPointerCapture(e.pointerId);

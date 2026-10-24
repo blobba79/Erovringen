@@ -66,10 +66,16 @@ button.on { border-color: var(--accent); }
 .scores li.turn { outline: 2px solid var(--accent); }
 .scores li b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 9ch; }
 .supply { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; overflow-x: auto; }
-.supply li { display: flex; align-items: center; gap: 6px; background: var(--panel); border-radius: 10px; padding: 2px 8px; font-size: 0.75rem; flex: 0 0 auto; white-space: nowrap; }
+.supply li { display: flex; align-items: center; gap: 4px; background: var(--panel); border-radius: 10px; padding: 2px 8px; font-size: 0.75rem; flex: 0 0 auto; white-space: nowrap; }
 .supply li.none { opacity: 0.5; }
 
 .stage { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.stage.place { flex-direction: row; flex-wrap: wrap; align-items: stretch; justify-content: center; }
+.stage.place .side { flex: 1 1 110px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
+.stage.place .side .hint { text-align: left; }
+.stage.place .side .big { flex: 0 0 auto; }
+.stage.place .digits { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); }
+.stage.place .digit { min-height: 44px; }
 .stage canvas { border-radius: 8px; touch-action: manipulation; }
 .tile-frame { position: relative; }
 .edge { position: absolute; background: #ffffff18; border: 2px solid #ffffff55; border-radius: 8px; padding: 0; min-height: 0; }
@@ -85,7 +91,7 @@ button.on { border-color: var(--accent); }
 .actions { display: flex; gap: 8px; position: sticky; bottom: 0; background: linear-gradient(transparent, var(--bg) 25%); padding-top: 8px; }
 .hand .tiles { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; }
 .hand .tiles .tile-btn { flex: 0 0 auto; }
-.hand h2, .hand > .hint { display: inline; }
+.hand h2 { display: none; }
 .hand { display: flex; flex-direction: column; gap: 4px; }
 .tile-btn { padding: 4px; min-height: 0; border-radius: 10px; position: relative; display: flex; flex-direction: column; align-items: center; }
 .tile-btn.enabled { border-color: var(--accent); }
@@ -99,7 +105,7 @@ button.on { border-color: var(--accent); }
 .padblock .hint { grid-column: 1 / -1; grid-row: 2; }
 .padblock .row { grid-column: 2; grid-row: 1; }
 .pad {
-  width: 100%; height: 22vh; min-height: 90px; max-height: 150px; touch-action: none; user-select: none; border-radius: 14px;
+  width: 100%; height: 14vh; min-height: 80px; max-height: 120px; touch-action: none; user-select: none; border-radius: 14px;
   background: radial-gradient(circle at 50% 50%, var(--panel2), var(--panel)); border: 2px dashed #ffffff40;
 }
 
@@ -129,3 +135,10 @@ button.on { border-color: var(--accent); }
 .stepper { display: flex; align-items: center; gap: 16px; }
 .stepper button { width: 60px; font-size: 1.4rem; }
 .stepper output { font-size: 1.4rem; min-width: 2ch; text-align: center; }
+
+.topbar { display: flex; gap: 6px; overflow-x: auto; }
+.topbar > ul { overflow: visible; flex: 0 0 auto; }
+.topbar .supply { border-left: 1px solid #ffffff33; padding-left: 6px; }
+.banner { font-size: 1rem; flex-wrap: nowrap; gap: 8px; }
+.banner small { font-size: 0.72rem; white-space: nowrap; }
+.banner small:nth-of-type(1) { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; }
