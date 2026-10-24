@@ -3,6 +3,7 @@ import type { GraphicStyle } from "../../shared/style";
 import { THEME } from "./theme";
 import { drawFigure, drawHighlight } from "./figures";
 import { drawTile } from "./tile";
+import { drawCounterIcon } from "./counters";
 
 export const cellshadedStyle: GraphicStyle = {
   id: THEME.id,
@@ -10,6 +11,7 @@ export const cellshadedStyle: GraphicStyle = {
   drawTile,
   drawFigure,
   drawHighlight,
+  drawCounterIcon,
   colors: {
     outline: THEME.ui.outline,
     background: THEME.ui.background,

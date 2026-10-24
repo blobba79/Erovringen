@@ -64,6 +64,11 @@ export interface GraphicStyle {
   drawTile(args: DrawTileArgs): void;
   drawFigure(args: DrawFigureArgs): void;
   drawHighlight(args: DrawHighlightArgs): void;
+  /**
+   * Ikon för en räknare hos spelaren (`goods.wine`, `gold` …) med mittpunkt (x, y).
+   * Returnerar false om stilen saknar ikon för räknaren.
+   */
+  drawCounterIcon?(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, size: number): boolean;
   /** Färger som gränssnittet runt kartan använder (bakgrund, kontur …). */
   colors: Readonly<Record<string, string>>;
 }
