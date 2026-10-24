@@ -3,6 +3,7 @@
 import type { GameStats, InspectResult, LobbySeat, Preview, PublicState, SavedGameInfo, ServerMessage, StartOptions } from "../shared/messages";
 import type { Figure, GameEvent, PlayerId } from "../shared/state";
 import type { Camera } from "./logic";
+import { type DiceShown, nextDice } from "./marks";
 
 export interface Model {
   connected: boolean;
@@ -24,6 +25,10 @@ export interface Model {
   /** Brickan som spelaren visat för alla, tills turen tar slut. */
   shownTile?: { player: PlayerId; tile: string };
   stats?: GameStats;
+  /** Flygmaskinens tärning som visas en stund; en gång per tur. */
+  dice?: DiceShown;
+  /** Nyckel för senast visade tärningen (så att samma händelse inte visas två gånger). */
+  lastDice?: string;
   waiting: LobbySeat[];
   /** Alla platser saknas (omstart): visa en QR-kod i taget. */
   restart: boolean;
@@ -50,7 +55,8 @@ export function reduce(m: Model, msg: ServerMessage): Model {
     case "events": {
       // Ett bekräftat drag: den visade brickan hör till turen som just tagit slut.
       const turnOver = msg.events.some((e) => e.type === "tilePlaced" || e.type === "turnStarted");
-      return { ...m, events: { seq: (m.events?.seq ?? 0) + 1, events: msg.events }, shownTile: turnOver ? undefined : m.shownTile };
+      const nd = nextDice(msg.events, m.lastDice, m.dice?.seq ?? 0);
+      return { ...m, events: { seq: (m.events?.seq ?? 0) + 1, events: msg.events }, shownTile: turnOver ? undefined : m.shownTile, ...(nd.dice ? { dice: nd.dice } : {}), lastDice: nd.last };
     }
     case "reaction":
       return { ...m, reaction: { seq: (m.reaction?.seq ?? 0) + 1, player: msg.player, emoji: msg.emoji } };

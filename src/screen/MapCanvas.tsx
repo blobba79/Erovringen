@@ -6,6 +6,7 @@ import type { Model } from "./store";
 import { type Camera, type View, featureShapes, fitCamera, inspectMarks, sameCamera, squareShape, stepCamera } from "./logic";
 import { drawMap, type DrawModel } from "./render";
 import { style, tileTypes } from "./data";
+import { type DiceData, diceAlpha } from "./marks";
 import type { InspectResult } from "../shared/messages";
 import type { Shape } from "../shared/style";
 import type { Pos } from "../shared/state";
@@ -38,9 +39,9 @@ function targetShapesOf(m: Model): Shape[] {
   );
 }
 
-export function MapCanvas({ model, inspect, replay, marks }: { model: Model; inspect?: InspectResult; replay?: ReplayPlayer; marks?: Pos[] }) {
+export function MapCanvas({ model, inspect, replay, marks, dice }: { model: Model; inspect?: InspectResult; replay?: ReplayPlayer; marks?: Pos[]; dice?: { data: DiceData; start: { current: number } } }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const live = useRef<{ draw: DrawModel; target: Camera | undefined; replay?: ReplayPlayer }>({ draw: { areaShapes: [], previewSpots: [] }, target: undefined });
+  const live = useRef<{ draw: DrawModel; target: Camera | undefined; replay?: ReplayPlayer; dice?: { data: DiceData; start: { current: number } } }>({ draw: { areaShapes: [], previewSpots: [] }, target: undefined });
 
   const draw = useMemo<DrawModel>(() => {
     const state = model.state;
@@ -61,6 +62,7 @@ export function MapCanvas({ model, inspect, replay, marks }: { model: Model; ins
   live.current.draw = draw;
   live.current.target = model.camera;
   live.current.replay = replay;
+  live.current.dice = dice;
 
   useEffect(() => {
     const canvas = ref.current;
@@ -89,7 +91,7 @@ export function MapCanvas({ model, inspect, replay, marks }: { model: Model; ins
       const { draw: dm, target } = live.current;
       const goal = target ?? (dm.state ? fitCamera(dm.state.board, view) : { x: 0, y: 0, zoom: 8, rotation: 0 });
       cur = cur ? (sameCamera(cur, goal) ? cur : stepCamera(cur, goal, dt)) : goal;
-      drawMap(ctx, view, dpr, cur, style, tileTypes, { ...dm, replay: live.current.replay?.view(now) });
+      drawMap(ctx, view, dpr, cur, style, tileTypes, { ...dm, replay: live.current.replay?.view(now), dice: live.current.dice ? { data: live.current.dice.data, alpha: diceAlpha(now - live.current.dice.start.current) } : undefined });
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);

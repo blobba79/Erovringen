@@ -14,6 +14,8 @@ import { axisTicks, reasonRows, recordMarks, scoreChart } from "./stats";
 import { style, tileTypes } from "./data";
 import { drawCounterIcon } from "../styles/cellshaded/index";
 import { tileImage } from "./render";
+import { diceAlpha } from "./marks";
+import { actorOf } from "./logic";
 
 /** Läses en gång när sidan startar, så att det gäller även efter återanslutning och byte av vy. */
 const ANDROID_APP = typeof location !== "undefined" && isAndroidApp(location.search);
@@ -192,11 +194,13 @@ function TurnBanner({ state, tr }: { state: PublicState; tr: Translate }) {
   const p = state.players.find((x) => x.id === state.turn.player);
   if (!p) return null;
   const key = phaseKey(state.turn.phase, (k) => tr(k) !== k);
+  const actor = actorOf(state);
   return (
     <div class="banner" style={{ borderColor: p.color }}>
       <Dot color={p.color} />
       <span class="who">{tr("screen.turnOf", { player: p.name })}</span>
       <span class="phase">{tr(key)}</span>
+      {actor && <span class="chooser" style={{ color: actor.color }}>{tr("screen.chooser", { player: actor.name })}</span>}
     </div>
   );
 }
@@ -380,13 +384,14 @@ function Game({ model, tr }: { model: Model; tr: Translate }) {
   const board = useRef(new ReactionBoard());
   const [, setTick] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const diceStart = useRef(-1e9);
   const kick = () => {
     if (timer.current) return;
     timer.current = setInterval(() => {
       setTick((n) => n + 1);
       const t = performance.now();
       replay.current.view(t);
-      if (!replay.current.active && Object.keys(board.current.active(t)).length === 0) {
+      if (!replay.current.active && Object.keys(board.current.active(t)).length === 0 && diceAlpha(t - diceStart.current) === 0) {
         clearInterval(timer.current);
         timer.current = undefined;
       }
@@ -397,17 +402,24 @@ function Game({ model, tr }: { model: Model; tr: Translate }) {
     if (model.events && replay.current.push(model.events.events, performance.now())) kick();
   }, [model.events?.seq]);
   useEffect(() => {
+    if (!model.dice) return;
+    diceStart.current = performance.now();
+    kick();
+  }, [model.dice?.seq]);
+  useEffect(() => {
     if (!model.reaction) return;
     board.current.push(model.reaction.player, model.reaction.emoji, performance.now());
     kick();
   }, [model.reaction?.seq]);
   const now = performance.now();
   const view = replay.current.view(now);
+  const diceOn = model.dice && diceAlpha(now - diceStart.current) > 0 ? model.dice.data : undefined;
   const marks = useMemo(() => (state.finished && model.stats ? recordMarks(model.stats) : undefined), [state.finished, model.stats]);
   return (
     <div class="game">
-      <MapCanvas model={model} inspect={shown} replay={replay.current} marks={marks} />
+      <MapCanvas model={model} inspect={shown} replay={replay.current} marks={marks} dice={model.dice ? { data: model.dice.data, start: diceStart } : undefined} />
       <TurnBanner state={state} tr={tr} />
+      {diceOn && diceOn.options === 0 && <div class="dice-note">{tr("screen.dice.home")}</div>}
       <Scoreboard state={state} tr={tr} view={view} reactions={board.current.active(now)} />
       <ShownTile model={model} tr={tr} />
       <Remaining state={state} tr={tr} />

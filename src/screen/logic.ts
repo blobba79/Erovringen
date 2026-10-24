@@ -311,3 +311,10 @@ export function visibleCounters(counters: Record<string, number> | undefined): {
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     .map(([id, count]) => ({ id, count, color: COUNTER_COLORS[id] ?? "#999999" }));
 }
+
+/** Spelaren som väljer när det inte är den som har tur (turn.actor), annars undefined. */
+export function actorOf(state: { turn: { player: string; actor?: string }; players: readonly { id: string; name: string; color: string }[] }): { id: string; name: string; color: string } | undefined {
+  const a = state.turn.actor;
+  if (!a || a === state.turn.player) return undefined;
+  return state.players.find((p) => p.id === a);
+}

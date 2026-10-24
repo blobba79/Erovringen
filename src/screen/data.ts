@@ -2,8 +2,11 @@
 
 import { allTileTypes } from "../tiles/index";
 import { toTileTypes } from "../engine/index";
+import { registerClientModules } from "./modules";
 import { cellshadedStyle } from "../styles/cellshaded/index";
 import type { GraphicStyle } from "../shared/style";
+
+registerClientModules();
 
 export const tileTypes = toTileTypes(allTileTypes());
 export const style: GraphicStyle = cellshadedStyle;

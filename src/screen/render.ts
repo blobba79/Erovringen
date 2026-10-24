@@ -10,6 +10,8 @@ import {
   cacheSize, figureSpots, pxPerTile, spotLabels, squareShape, targetLabels, type TargetRef, tileCacheKey, worldToScreen,
 } from "./logic";
 import { type ReplayView, landingLook } from "./replay";
+import { type DiceData, ferryLines, isFerry } from "./marks";
+import { drawDiceArrow, drawDie, drawFerry } from "../styles/cellshaded/index";
 
 export type TileTypeMap = Map<string, TileType>;
 
@@ -50,6 +52,8 @@ export interface DrawModel {
   prevFigures?: Figure[];
   /** Platser att markera (rekord efter spelet). */
   marks?: Pos[];
+  /** Flygmaskinens tärning och hur synlig den är (0-1). */
+  dice?: { data: DiceData; alpha: number };
 }
 
 const toScreen = (cam: Camera, view: View, shapes: readonly Shape[]): Shape[] =>
@@ -140,7 +144,12 @@ export function drawMap(
   // pjäser, upprätta
   if (state) {
     const players = new Map(state.players.map((p) => [p.id, p.color]));
-    for (const f of figureSpots(state.figures, types, state.board)) {
+    // färjor ligger över sjön mellan två kanter och har inget område att stå på
+    for (const l of ferryLines(state.figures)) {
+      const a = worldToScreen(cam, view, l.a), b = worldToScreen(cam, view, l.b);
+      drawFerry(ctx, a.x, a.y, b.x, b.y, px);
+    }
+    for (const f of figureSpots(state.figures.filter((x) => !isFerry(x)), types, state.board)) {
       const c = worldToScreen(cam, view, f);
       style.drawFigure({ ctx, kind: f.kind, color: f.owner ? players.get(f.owner) ?? null : null, x: c.x, y: c.y - px * 0.1, size: px * 0.5 });
     }
@@ -201,6 +210,19 @@ export function drawMap(
       drawText(ctx, `+${pop.points}`, { x: c.x, y: c.y - px * (0.2 + 0.6 * pop.progress) }, Math.max(20, px * 0.5), text, outline);
       ctx.restore();
     }
+  }
+
+  // flygmaskinens tärning: pil från maskinen till landningsrutan, markerad ruta och tärningen
+  const dice = model.dice;
+  if (dice && dice.alpha > 0) {
+    const d = dice.data;
+    const a = worldToScreen(cam, view, d.from), b = worldToScreen(cam, view, d.to);
+    ctx.save();
+    ctx.globalAlpha = dice.alpha;
+    hl([squareShape(d.to)], d.options > 0 ? "open" : "blocked");
+    drawDiceArrow(ctx, a.x, a.y, b.x, b.y, Math.max(5, px * 0.07));
+    drawDie(ctx, a.x, a.y - px * 0.1, Math.max(28, px * 0.45), d.roll);
+    ctx.restore();
   }
 
   // sikte i mitten
