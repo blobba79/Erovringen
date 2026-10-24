@@ -5,7 +5,6 @@ Med flygmaskiner kan du skicka en följare genom luften till en annan bricka. Hu
 ## Det här ingår
 - 8 brickor med en flygmaskin. En pil på flygmaskinen visar riktningen: rakt eller diagonalt.
 - En tärning med sidorna 1, 1, 2, 2, 3 och 3. Spelet slår den åt dig.
-- En extra bricka med skördecirkel, som beskrivs under Crop Circles II.
 
 ## Så går turen till
 - Lägg brickan som vanligt.

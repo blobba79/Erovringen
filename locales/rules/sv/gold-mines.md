@@ -5,7 +5,6 @@ Guldgruvorna lägger guldtackor på brickorna. Den som vinner en väg, stad elle
 ## Det här ingår
 - 8 brickor med guldsymbol.
 - 16 guldtackor. De ligger på brickorna och tillhör ingen förrän någon tar dem.
-- En extra bricka med skördecirkel, som beskrivs under Crop Circles II.
 
 ## Så går turen till
 - Lägger du en guldbricka placerar du den som vanligt. Sedan lägger du en guldtacka på den brickan och en på en granne, även en diagonal.

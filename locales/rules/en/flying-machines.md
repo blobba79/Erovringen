@@ -5,7 +5,6 @@ With flying machines you can send a follower through the air to another tile. A 
 ## What is included
 - 8 tiles with a flying machine. An arrow on the flying machine shows the direction: straight or diagonal.
 - A die with the faces 1, 1, 2, 2, 3 and 3. The game rolls it for you.
-- An extra tile with a crop circle, described under Crop Circles II.
 
 ## How a turn works
 - Place the tile as usual.

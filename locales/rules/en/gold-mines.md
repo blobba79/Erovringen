@@ -5,7 +5,6 @@ The Gold Mines put gold bars on the tiles. Whoever wins a road, city or cloister
 ## What is included
 - 8 tiles with a gold symbol.
 - 16 gold bars. They lie on the tiles and belong to no one until someone takes them.
-- An extra tile with a crop circle, described under Crop Circles II.
 
 ## How a turn works
 - When you place a gold tile, place it as usual. Then you put one gold bar on that tile and one on an adjacent tile, diagonals included.

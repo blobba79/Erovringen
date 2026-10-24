@@ -5,7 +5,6 @@ Magikern och häxan är två neutrala figurer som du placerar på en väg eller 
 ## Det här ingår
 - 1 magiker och 1 häxa.
 - 8 brickor med magikersymbol.
-- En extra bricka med skördecirkel, som beskrivs under Crop Circles II.
 
 ## Så går turen till
 - Lägger du en bricka med magikersymbol måste du direkt efter att den lagts placera eller flytta exakt en av figurerna.

@@ -5,7 +5,6 @@ Färjorna binder ihop vägar som slutar vid sjöar, så att vägar kan korsa vat
 ## Det här ingår
 - 8 brickor med sjö.
 - 8 färjor. De är neutrala och tillhör ingen spelare.
-- En extra bricka med skördecirkel, som beskrivs under Crop Circles II.
 
 ## Så går turen till
 - Lägger du en sjöbricka placerar du den som vanligt och får sedan ställa en följare, till exempel på en av vägarna.

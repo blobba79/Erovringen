@@ -5,7 +5,6 @@ The mage and the witch are two neutral figures that you place on a road or city.
 ## What is included
 - 1 mage and 1 witch.
 - 8 tiles with a mage symbol.
-- An extra tile with a crop circle, described under Crop Circles II.
 
 ## How a turn works
 - When you place a tile with a mage symbol, right after placing it you must place or move exactly one of the two figures.

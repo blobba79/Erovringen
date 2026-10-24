@@ -5,7 +5,6 @@ Ferries join roads that end at lakes, so that roads can cross the water. Ferries
 ## What is included
 - 8 tiles with a lake.
 - 8 ferries. They are neutral and belong to no player.
-- An extra tile with a crop circle, described under Crop Circles II.
 
 ## How a turn works
 - When you draw a lake tile, place it as usual and then you may deploy a follower, for example on one of its roads.
