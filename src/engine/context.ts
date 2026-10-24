@@ -28,9 +28,15 @@ export interface EngineHooks {
   dealAtStart(ctx: EngineHookContext, first: PlayerId): boolean;
   /**
    * När en tur avslutats: dela ut brickor och välj nästa spelare. `undefined` = modulen lägger
-   * sig inte i (motorn fyller handen som vanligt), `null` = spelet är slut.
+   * sig inte i (motorn fyller handen som vanligt), `null` = spelet är slut. `again` = spelaren
+   * som just spelat har en extra tur (och ska då få turen igen om hen har en bricka).
    */
-  dealAfterTurn(ctx: EngineHookContext): PlayerId | null | undefined;
+  dealAfterTurn(ctx: EngineHookContext, again: boolean): PlayerId | null | undefined;
+  /**
+   * Brickor som lämnat en hand (spelare borttagen eller överhoppad) ska läggas tillbaka i högen.
+   * Returnera true om modulen lade tillbaka dem själv; annars gör motorn det (sist, blandat).
+   */
+  returnTiles(ctx: EngineHookContext, tiles: string[]): boolean;
   /**
    * Vid byte av en bricka som ingen kan lägga: modulen drar själv ersättaren ur högen. Returnera
    * `{ tile }` (tile utelämnad = ingen ersättare, handen krymper) eller `undefined` för vanlig dragning.

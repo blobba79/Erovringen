@@ -94,9 +94,11 @@ describe("floden", () => {
     const board: [string, number, number, 0][] = [...spring];
     const s = scenario(eng, { board, expansions: [...RIVER], n: 3, handSize: 3, hands: [["river/IFI", "river/IFI"], [], []], pile: ["river/IFI", "river/I.e", ...PLAIN] });
     const a = play(eng, s, { type: "chooseTile", handIndex: 0 }, place$(1, 0, 0), NOFIG, CONFIRM).state;
-    // p1 fyller på från flodstapeln (1 bricka), p2 och p3 har inget: p1 spelar igen.
-    expect(a.players[0]!.hand).toEqual(["river/IFI", "river/IFI"]);
-    expect(a.turn.player).toBe("p1");
+    // Gammal sparning med tomma händer: påfyllningen går i turordning från nästa spelare, så p2 får
+    // den sista flodbrickan och har turen.
+    expect(a.players[0]!.hand).toEqual(["river/IFI"]);
+    expect(a.players[1]!.hand).toEqual(["river/IFI"]);
+    expect(a.turn.player).toBe("p2");
     expect(a.drawPile[0]).toBe("river/I.e");
   });
 
