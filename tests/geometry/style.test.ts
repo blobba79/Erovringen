@@ -26,6 +26,19 @@ test("stilen ritar alla brickor i alla vridningar utan fel och är deterministis
   }
 });
 
+test("räknarikoner ritas för kända id:n och okänt ger false", async () => {
+  const { drawCounterIcon } = await import("../../src/styles/cellshaded");
+  for (const id of ["goods.wine", "goods.grain", "goods.cloth", "gold"]) {
+    const { ctx, calls } = fakeCtx();
+    expect(drawCounterIcon(ctx, id, 10, 10, 20), id).toBe(true);
+    expect(calls.n, id).toBeGreaterThan(5);
+  }
+  const { ctx, calls } = fakeCtx();
+  expect(drawCounterIcon(ctx, "mystery", 10, 10, 20)).toBe(false);
+  expect(drawCounterIcon(ctx, "toString", 10, 10, 20)).toBe(false);
+  expect(calls.n).toBe(0);
+});
+
 test("pjäser och markeringar ritas", () => {
   const { ctx, calls } = fakeCtx();
   for (const kind of ["meeple", "large-meeple", "abbot", "builder", "okänd"]) {

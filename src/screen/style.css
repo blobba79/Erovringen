@@ -97,3 +97,4 @@ h1, h2, h3 { margin: 0 0 0.4em; }
 .counters { display: inline-flex; gap: 0.7em; margin-right: 0.8em; font-size: 0.8em; opacity: 0.95; }
 .counter { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .counter .dot { width: 0.8em; height: 0.8em; margin-right: 0.25em; }
+.counter .cicon { width: 1.3em; height: 1.3em; vertical-align: middle; margin-right: 0.2em; }

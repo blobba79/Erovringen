@@ -12,6 +12,7 @@ import { ReplayPlayer, type ReplayView, shownScore } from "./replay";
 import { ReactionBoard } from "./reactions";
 import { axisTicks, reasonRows, recordMarks, scoreChart } from "./stats";
 import { style, tileTypes } from "./data";
+import { drawCounterIcon } from "../styles/cellshaded/index";
 import { tileImage } from "./render";
 
 /** Läses en gång när sidan startar, så att det gäller även efter återanslutning och byte av vy. */
@@ -125,6 +126,26 @@ function TileThumb({ type, count }: { type: string; count: number }) {
   );
 }
 
+/** Räknarens ikon i en liten canvas som är lika hög som radens text; okänd räknare ger en färgad prick. */
+function CounterIcon({ id, color }: { id: string; color: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const [known, setKnown] = useState(true);
+  useEffect(() => {
+    const c = ref.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx) return;
+    const px = c.getBoundingClientRect().width || 16;
+    const dpr = window.devicePixelRatio || 1;
+    c.width = c.height = Math.max(1, Math.round(px * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, px, px);
+    setKnown(drawCounterIcon(ctx, id, px / 2, px / 2, px));
+  }, [id]);
+  return known
+    ? <canvas ref={ref} class="cicon" aria-hidden="true" />
+    : <span class="dot" style={{ background: color }} />;
+}
+
 function Counters({ counters, tr }: { counters: Record<string, number>; tr: Translate }) {
   const list = visibleCounters(counters);
   if (list.length === 0) return null;
@@ -135,7 +156,7 @@ function Counters({ counters, tr }: { counters: Record<string, number>; tr: Tran
         const label = tr(key) !== key ? tr(key) : c.id;
         return (
           <span key={c.id} class="counter" title={label} data-counter={c.id}>
-            <span class="dot" style={{ background: c.color }} />
+            <CounterIcon id={c.id} color={c.color} />
             <span class="clabel">{label}</span> {c.count}
           </span>
         );

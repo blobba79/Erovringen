@@ -159,3 +159,4 @@ button.on { border-color: var(--accent); }
 .scores .counters { display: inline-flex; gap: 4px; }
 .scores .counter { white-space: nowrap; font-size: 0.75rem; }
 .scores .counter .dot { width: 9px; height: 9px; margin-right: 2px; }
+.scores .counter .cicon { vertical-align: middle; margin-right: 1px; }
