@@ -15,20 +15,17 @@
 // - Grisen ("pig") ställs på ett fält där spelaren redan har en bonde. Den räknas inte vid
 //   majoritet; är ägaren bland dem som vinner fältet ger den 4 i stället för 3 per färdig stad
 //   (påslaget 1 per stad delas ut i finalScoring, per ägare).
-// - Byggmästaren och grisen ställs med ett eget delsteg ({ type: "expansion", action:
-//   "placeBuilder" | "placePig", data: { pos, feature } }), eftersom motorns vanliga pjässteg inte
-//   tillåter pjäser på upptagna områden. Steget avslutar pjäsfasen (som en vanlig placering).
-// - Pjäsernas placeableOn är tom: motorn erbjuder dem aldrig som vanliga pjäser.
+// - Byggmästaren och grisen är vanliga placeFigure-steg (joinsOwn: motorn erbjuder dem bara på
+//   områden där spelaren redan har en egen följare). De räknas inte vid majoritet (STRENGTH 0).
 
 import type { ExpansionModule } from "../../shared/expansion";
-import type { Figure, PlayerId, Pos, Step } from "../../shared/state";
+import type { Figure, PlayerId, Pos } from "../../shared/state";
 import type { TileSet } from "../../shared/tiles";
 import type { EngineHookContext } from "../../engine/context";
 import { playerOf } from "../../engine/context";
 import { analyze } from "../../engine/features";
 import { rotatedAt } from "../../engine/board";
 import { completedCitiesAround, returnToSupply } from "../../engine/scoring";
-import { placedStep } from "../../engine/turnstate";
 import { TILE_DATA } from "../../tiles/index";
 
 export const BUILDER_KIND = "builder";
@@ -61,34 +58,6 @@ const props = (ctx: EngineHookContext, pos: Pos, feature: string): Record<string
 
 const isFollowerOf = (f: Figure, owner: PlayerId) => f.owner === owner && f.kind in FOLLOWER_WEIGHT;
 
-/** Placeringar som byggmästaren och grisen kan få på brickan som just lagts. */
-function placements(ctx: EngineHookContext): Step[] {
-  const s = ctx.state;
-  const placed = placedStep(s);
-  if (!placed) return [];
-  const rt = rotatedAt(s.board, ctx.types, placed.pos);
-  if (!rt) return [];
-  const supply = (kind: string) =>
-    s.figures.some((f) => f.kind === kind && f.owner === ctx.player && f.location.at === "supply");
-  const canBuilder = supply(BUILDER_KIND);
-  const canPig = supply(PIG_KIND);
-  if (!canBuilder && !canPig) return [];
-  const an = analyze(s.board, s.figures, ctx.types);
-  const out: Step[] = [];
-  for (const feature of rt.features) {
-    const area = an.areaAt(placed.pos, feature.id);
-    if (!area || !area.figures.some((f) => isFollowerOf(f, ctx.player))) continue;
-    const action =
-      (area.kind === "road" || area.kind === "city") && canBuilder ? "placeBuilder"
-      : area.kind === "field" && canPig ? "placePig"
-      : null;
-    if (action) out.push({ type: "expansion", expansion: ID, action, data: { pos: placed.pos, feature: feature.id } });
-  }
-  return out;
-}
-
-const sameStep = (a: Step, b: Step) => JSON.stringify(a) === JSON.stringify(b);
-
 /** Samma poängpost som motorn skriver, men utan område (varor och grisens påslag). */
 function award(ctx: EngineHookContext, player: PlayerId, points: number, reason: string, pos?: Pos, feature?: string) {
   if (points <= 0) return;
@@ -101,8 +70,8 @@ export const tradersBuildersModule: ExpansionModule = {
   requires: ["base"],
   tileSets: [set],
   figures: [
-    { kind: BUILDER_KIND, count: 1, placeableOn: [] },
-    { kind: PIG_KIND, count: 1, placeableOn: [] },
+    { kind: BUILDER_KIND, count: 1, placeableOn: ["road", "city"], joinsOwn: true },
+    { kind: PIG_KIND, count: 1, placeableOn: ["field"], joinsOwn: true },
   ],
   variants: [],
   hooks: {
@@ -110,27 +79,6 @@ export const tradersBuildersModule: ExpansionModule = {
       const ctx = c as EngineHookContext;
       ext(ctx);
       for (const p of ctx.state.players) for (const g of GOODS) p.counters[goodsCounter(g)] ??= 0;
-    },
-
-    extraSteps(c, phase) {
-      if (phase !== "placeFigure") return [];
-      return placements(c as EngineHookContext);
-    },
-
-    applyStep(c, step) {
-      if (step.expansion !== ID) return "error.illegalStep";
-      const ctx = c as EngineHookContext;
-      if (ctx.state.turn.phase !== "placeFigure") return "error.illegalStep";
-      if (!placements(ctx).some((s) => sameStep(s, step))) return "error.illegalFigure";
-      const { pos, feature } = step.data as { pos: Pos; feature: string };
-      const kind = step.action === "placeBuilder" ? BUILDER_KIND : PIG_KIND;
-      const fig = ctx.state.figures.find((f) => f.kind === kind && f.owner === ctx.player && f.location.at === "supply");
-      if (!fig) return "error.noFigureLeft";
-      fig.location = { at: "feature", pos: { ...pos }, feature };
-      ctx.emit({ type: "figurePlaced", figure: fig.id, location: fig.location });
-      // Byggmästaren och grisen ersätter turens följare.
-      ctx.state.turn.phase = "confirm";
-      return null;
     },
 
     afterTilePlaced(c, pos) {

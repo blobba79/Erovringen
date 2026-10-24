@@ -1,11 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { TILE_DATA } from "../../../src/tiles/index";
 import { tradersBuildersModule } from "../../../src/expansions/traders-builders/index";
-import { strength } from "../../../src/engine/scoring";
 import { realEngine, setupOf } from "../../engine/helpers";
 import { CONFIRM, NOFIG, fig$, inSupply, place$, play, scenario, score, type Rot } from "../../engine/scenario";
 import { playGame, type Strategy } from "../../players/random-player";
-import type { GameState, Step } from "../../../src/shared/state";
+import type { GameState } from "../../../src/shared/state";
 import type { ExpansionId } from "../../../src/shared/tiles";
 
 const eng = realEngine();
@@ -16,11 +15,8 @@ const B = (p: string) => `${p}:builder:0`;
 const P = (p: string) => `${p}:pig:0`;
 const TB = (t: string) => `traders-builders/${t}`;
 const goods = (s: GameState, p: string, g: string) => s.players.find((x) => x.id === p)!.counters[`goods.${g}`];
-const tbStep = (action: string, x: number, y: number, feature: string): Step => ({
-  type: "expansion", expansion: "traders-builders", action, data: { pos: { x, y }, feature },
-});
 const actions = (s: GameState) =>
-  eng.legalSteps(s).flatMap((x) => (x.type === "expansion" ? [`${x.action}:${(x.data as { feature: string }).feature}`] : []));
+  eng.legalSteps(s).flatMap((x) => x.type === "placeFigure" && (x.kind === "builder" || x.kind === "pig") ? [`${x.kind}:${x.feature}`] : []);
 
 // Stad med vin (Cc.w: stad N+W) som stängs av två base/C.
 const cityBoard: [string, number, number, Rot][] = [[TB("Cc.w"), 0, 0, 0], ["base/C", -1, 0, 90]];
@@ -93,13 +89,13 @@ describe("byggmästaren", () => {
   test("kan ställas på väg med egen följare, inte på väg utan eller på fält", () => {
     const s = sc({ board: road(1), hands: [["base/RFr"], ["base/L"]], figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }] });
     const placed = play(eng, s, place$(1, 0, 0)).state;
-    expect(actions(placed)).toEqual(["placeBuilder:road0"]);
+    expect(actions(placed)).toEqual(["builder:road0"]);
     const t = sc({ board: road(1), hands: [["base/RFr"], []], figures: [{ id: M("p2"), x: 0, y: 0, feature: "road0" }] });
     expect(actions(play(eng, t, place$(1, 0, 0)).state)).toEqual([]);
   });
   test("ersätter följaren; ingen extra tur samma tur som den ställs", () => {
     const s = sc({ board: road(1), hands: [["base/RFr"], ["base/L"]], pile: ["base/RFr"], figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }] });
-    const r = play(eng, s, place$(1, 0, 0), tbStep("placeBuilder", 1, 0, "road0"));
+    const r = play(eng, s, place$(1, 0, 0), fig$("builder", 1, 0, "road0"));
     expect(r.state.turn.phase).toBe("confirm");
     expect(eng.legalSteps(r.state).some((x) => x.type === "placeFigure")).toBe(false);
     const done = play(eng, r.state, CONFIRM).state;
@@ -108,7 +104,7 @@ describe("byggmästaren", () => {
   });
   test("ångra tar tillbaka byggmästaren", () => {
     const s = sc({ board: road(1), hands: [["base/RFr"], []], figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }] });
-    const r = play(eng, s, place$(1, 0, 0), tbStep("placeBuilder", 1, 0, "road0"), { type: "undo" });
+    const r = play(eng, s, place$(1, 0, 0), fig$("builder", 1, 0, "road0"), { type: "undo" });
     expect(inSupply(r.state, B("p1"))).toBe(true);
     expect(r.state.turn.phase).toBe("placeFigure");
   });
@@ -173,7 +169,6 @@ describe("byggmästaren", () => {
     expect(inSupply(r.state, B("p1"))).toBe(true);
   });
   test("räknas inte vid majoritet", () => {
-    if (strength({ id: "x", kind: "builder", owner: "p1", location: { at: "supply" } }) !== 0) return; // kräver motorändringen
     const s = sc({
       board: [["base/LR", 0, 0, 0]], hands: [["base/LR"], []],
       figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }, { id: B("p1"), x: 0, y: 0, feature: "road0" }, { id: M("p2"), x: 0, y: 0, feature: "road0" }],
@@ -191,7 +186,7 @@ describe("grisen", () => {
   test("kan bara ställas på fält med egen bonde", () => {
     const s = sc({ board: [["base/C", 0, 0, 0]], hands: [["base/L"], []], figures: [fig(M("p1"))] });
     const placed = play(eng, s, place$(1, 0, 0)).state;
-    expect(actions(placed)).toEqual(["placePig:field0"]);
+    expect(actions(placed)).toEqual(["pig:field0"]);
     const t = sc({ board: [["base/C", 0, 0, 0]], hands: [["base/L"], []], figures: [fig(M("p2"))] });
     expect(actions(play(eng, t, place$(1, 0, 0)).state)).toEqual([]);
   });
@@ -204,13 +199,11 @@ describe("grisen", () => {
     expect(score(last(s), "p1")).toBe(3);
   });
   test("delad majoritet: bara grisens ägare får 4", () => {
-    if (strength({ id: "x", kind: "pig", owner: "p1", location: { at: "supply" } }) !== 0) return; // kräver motorändringen
     const s = sc({ board: fieldBoard, hands: [["base/L"], []], pile: [], figures: [fig(M("p1")), fig(P("p1")), fig(M("p2"))] });
     const f = last(s);
     expect([score(f, "p1"), score(f, "p2")]).toEqual([4, 3]);
   });
   test("grisen räknas inte vid majoritet (ägaren med minoritet får ingenting)", () => {
-    if (strength({ id: "x", kind: "pig", owner: "p1", location: { at: "supply" } }) !== 0) return; // kräver motorändringen
     const s = scenario(eng, {
       expansions: ["base", "traders-builders", "inns-cathedrals"], board: fieldBoard, hands: [["base/L"], []], pile: [],
       figures: [fig(M("p1")), fig(P("p1")), fig("p2:large-meeple:0")],
