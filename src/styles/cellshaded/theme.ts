@@ -55,6 +55,15 @@ export const THEME = {
     outlineW: 0.06,
     largeScale: 1.28,
     shadowScale: [0.5, 0.16] as const,
+    /** Neutrala och särskilda pjäser. */
+    extra: {
+      hat: "#FFD23F", wood: "#8C5A3C", metal: "#B8C2C6", skin: "#F6D2A8",
+      pig: "#F7A8B8", pigDark: "#D9788F",
+      mage: "#7A4BD8", witch: "#3A2D4D", witchBand: "#9B5DE5",
+      dragon: "#E5372F", dragonBelly: "#F6C766", dragonWing: "#B8221C", eye: "#FFE066",
+      fairy: "#FFE9F5", fairyWing: "#BFEFFF", sparkle: "#FFF3B0",
+    },
+    dragonScale: 1.3,
   },
 
   highlight: {

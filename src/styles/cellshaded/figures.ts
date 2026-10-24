@@ -1,6 +1,8 @@
 // Pjäser och markeringar. Pjäsen ritas runt (x, y) med höjden `size` i pixlar.
 import type { DrawFigureArgs, DrawHighlightArgs } from "../../shared/style";
 import { THEME } from "./theme";
+import { drawBuilder, drawDragon, drawFairy, drawMage, drawPig, drawWitch } from "./figures-extra";
+import { drawGoldBar } from "./symbols";
 import { type Ctx, ellipse, pathPoly, shade } from "./util";
 
 type P = [number, number];
@@ -47,7 +49,7 @@ export function drawFigure({ ctx, kind, color, x, y, size }: DrawFigureArgs): vo
   const f = THEME.figure;
   const light = color ?? f.neutral, dark = shade(light, f.shadeMix);
   const large = kind === "large-meeple" || kind === "big-meeple";
-  const S = size * (large ? f.largeScale : 1), ow = f.outlineW;
+  const S = size * (large ? f.largeScale : kind === "dragon" ? f.dragonScale : 1), ow = f.outlineW;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(S, S);
@@ -58,7 +60,14 @@ export function drawFigure({ ctx, kind, color, x, y, size }: DrawFigureArgs): vo
   ctx.fillStyle = `rgba(0,0,0,${THEME.shadowAlpha})`;
   ctx.fill();
   ctx.restore();
-  if (kind === "abbot") {
+  if (kind === "builder") drawBuilder(ctx, light, dark, ow);
+  else if (kind === "pig") drawPig(ctx, light, dark, ow);
+  else if (kind === "mage") drawMage(ctx, ow);
+  else if (kind === "witch") drawWitch(ctx, ow);
+  else if (kind === "dragon") drawDragon(ctx, ow);
+  else if (kind === "fairy") drawFairy(ctx, ow);
+  else if (kind === "gold-bar") drawGoldBar(ctx, 0, 0.05, 0.85);
+  else if (kind === "abbot") {
     body(ctx, ABBOT, light, dark, ow);
     head(ctx, 0, -0.28, 0.2, light, dark, ow);
     ctx.fillStyle = f.glint;
