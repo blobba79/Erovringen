@@ -43,5 +43,10 @@
   "help.expansion.gold-mines": "The Gold Mines: when you place a tile with a gold symbol, one gold bar goes on it and one on a neighbouring tile you choose (diagonals count). When a feature is scored, the gold on its tiles goes to the players who score it. At the end each bar is worth 1 point for 1-3 bars, 2 for 4-6, 3 for 7-9 and 4 for 10 or more.",
   "help.expansion.mage-witch": "Mage & Witch: when you place a tile with a magic symbol, you must move the mage or the witch to an unfinished road or city. The mage gives +1 point per tile when that feature is scored; the witch halves the score, rounded up.",
   "help.phase.gold": "Choose a neighbouring tile (diagonals count) for the second gold bar. Then you may place a figure as usual.",
-  "help.phase.mage-witch": "Move the mage or the witch to an unfinished road or city: pick a number. If there is nowhere to go, remove one of them from the board."
+  "help.phase.mage-witch": "Move the mage or the witch to an unfinished road or city: pick a number. If there is nowhere to go, remove one of them from the board.",
+  "help.expansion.ferries": "The Ferries: after you place a lake tile (and your figure), place a ferry linking two of its road ends into one road. When your tile extends a road that has a ferry, you may move the first ferry on that road to link another pair of road ends on its lake. Each ferry moves at most once per turn.",
+  "help.phase.ferries-place": "Choose which two road ends of the lake tile the ferry links.",
+  "help.phase.ferries-move": "You may move a ferry: tap its number, then choose which road ends it should link. Tap Done when you do not want to move more.",
+  "help.expansion.flying-machines": "The Flying Machines: when you place a tile with a flying machine, you may let a follower fly instead of placing it normally. The die (1-3) decides how many tiles it flies in the direction of the machine; it lands on an unfinished road, city or cloister there, even an occupied one. If it cannot land, it returns to your supply.",
+  "help.phase.flying-machines": "Pick the number of the road, city or cloister where your follower lands."
 }
