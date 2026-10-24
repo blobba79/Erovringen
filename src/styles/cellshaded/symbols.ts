@@ -168,3 +168,11 @@ export function drawSymbol(ctx: Ctx, name: string, x: number, y: number, s: numb
   }
   ctx.restore();
 }
+
+/** Ritar en enskild guldtacka (räknaren "gold"), mitt (x, y), storlek s. */
+export function drawGoldBar(ctx: Ctx, x: number, y: number, s: number): void {
+  ctx.save();
+  ctx.lineJoin = "round";
+  ingot(ctx, x, y - s * 0.06, s * 1.5);
+  ctx.restore();
+}

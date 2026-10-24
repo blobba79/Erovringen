@@ -8,6 +8,7 @@ import { computeGeometry } from "../../geometry/index";
 import { GestureTracker } from "../logic/gestures";
 import { featureAtPoint } from "../logic/hit";
 import { visibleCounters } from "../logic/counters";
+import { drawCounterIcon } from "../../styles/cellshaded/index";
 import { rotationsAt, spotsFor } from "../logic/spots";
 import { deriveTurn, figureSupply, type TurnView } from "../logic/turnview";
 import { SeatActions } from "./connect";
@@ -74,6 +75,26 @@ function Banner({ state, view, name }: { state: PublicState; view: TurnView; nam
   );
 }
 
+/** Räknarens ikon i en liten canvas; okänd räknare ger en färgad prick (texten visas då bredvid). */
+function CounterIcon({ id, color }: { id: string; color: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const px = 14;
+  const known = color !== "#999999";
+  useEffect(() => {
+    const c = ref.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    c.width = c.height = Math.round(px * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, px, px);
+    drawCounterIcon(ctx, id, px / 2, px / 2, px);
+  }, [id]);
+  return known
+    ? <canvas ref={ref} class="cicon" aria-hidden="true" style={{ width: `${px}px`, height: `${px}px` }} />
+    : <span class="dot" style={{ background: color }} />;
+}
+
 function ScoreBar({ state, me }: { state: PublicState; me: PlayerId | null }) {
   const t = useT();
   return (
@@ -90,7 +111,7 @@ function ScoreBar({ state, me }: { state: PublicState; me: PlayerId | null }) {
                 const label = t(key) !== key ? t(key) : c.id;
                 return (
                   <span class="counter" title={label} data-counter={c.id}>
-                    <span class="dot" style={{ background: c.color }} />
+                    <CounterIcon id={c.id} color={c.color} />
                     {c.color === "#999999" ? `${label} ` : ""}{c.count}
                   </span>
                 );
