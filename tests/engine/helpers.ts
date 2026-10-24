@@ -13,8 +13,9 @@ import { goldMinesModule } from "../../src/expansions/gold-mines/index";
 import { mageWitchModule } from "../../src/expansions/mage-witch/index";
 import { ferriesModule } from "../../src/expansions/ferries/index";
 import { flyingMachinesModule } from "../../src/expansions/flying-machines/index";
+import { cropCircles2Module } from "../../src/expansions/crop-circles-2/index";
 
-export const ALL_MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule, goldMinesModule, mageWitchModule, ferriesModule, flyingMachinesModule];
+export const ALL_MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule, tradersBuildersModule, goldMinesModule, mageWitchModule, ferriesModule, flyingMachinesModule, cropCircles2Module];
 
 export function realEngine(): EngineApi {
   return createEngine(ALL_MODULES, allTileTypes().values());

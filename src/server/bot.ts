@@ -8,7 +8,7 @@
 
 import type { GameState, PlayerId, Step } from "../shared/state";
 import type { EngineApi } from "../engine/index";
-import { areaValue, majorityOwners, strength } from "../engine/index";
+import { actorOf, areaValue, majorityOwners, strength } from "../engine/index";
 
 /** Hur mycket ett ofärdigt område är värt per poäng det är värt nu, efter sort. */
 const POTENTIAL: Record<string, number> = { city: 0.55, road: 0.5, cloister: 0.65, garden: 0.65, field: 0.45 };
@@ -51,7 +51,7 @@ function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step)
   let r = eng.apply(state, me, step);
   for (let guard = 0; guard < 6 && r.ok; guard++) {
     const s = r.state;
-    if (s.finished || s.turn.player !== me) return evaluate(eng, s, me);
+    if (s.finished || actorOf(s) !== me) return evaluate(eng, s, me);
     const legal = eng.legalSteps(s);
     // I en expansions egen fas finns varken "confirm" eller "noFigure": ta bekräfta, annars första egna steget.
     const next =
@@ -99,7 +99,8 @@ function bestPlacement(eng: EngineApi, state: GameState, me: PlayerId, rnd: Rnd)
 
 /** Nästa delsteg för den aktiva spelaren. Kastar om det inte finns några tillåtna steg. */
 export function chooseBotStep(eng: EngineApi, state: GameState, rnd: Rnd = Math.random): Step {
-  const me = state.turn.player;
+  // Spelaren som ska välja (turn.actor när en annan än den som har tur väljer).
+  const me = actorOf(state);
   const steps = eng.legalSteps(state);
   const confirm = steps.find((s) => s.type === "confirm");
   if (confirm) return confirm;
@@ -130,6 +131,9 @@ export function chooseBotStep(eng: EngineApi, state: GameState, rnd: Rnd = Math.
 
   // Pjäsfasen (och expansionernas egna steg): provspela varje val.
   const options = steps.filter((s) => s.type !== "undo");
+  // Val som ändrar för alla (Crop Circles II lägg till eller ta bort): provspelning ger ingen skillnad, så slumpa med lätt övervikt för att lägga till.
+  const modes = options.filter((s) => s.type === "expansion" && s.action === "mode");
+  if (modes.length > 0) return (rnd() < 0.7 ? modes[0] : modes[modes.length - 1]) as Step;
   let best: { step: Step; value: number } | null = null;
   for (const step of options) {
     const v = finishValue(eng, state, me, step);

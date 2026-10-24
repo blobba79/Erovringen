@@ -3,7 +3,7 @@
 import type { GameState, Step } from "../shared/state";
 import { analyze } from "./features";
 import { rotatedAt } from "./board";
-import { activeModules, makeCtx, playerOf, type Env } from "./context";
+import { activeModules, actorOf, engineHook, makeCtx, playerOf, type Env } from "./context";
 import { hasAnyPlacement, legalPlacements } from "./placement";
 import { strength } from "./scoring";
 import { currentTile, placedStep } from "./turnstate";
@@ -43,6 +43,14 @@ export function figureSteps(env: Env, state: GameState): Step[] {
   return out;
 }
 
+/** Får spelaren som har tur ångra just nu? */
+export function undoAllowed(env: Env, state: GameState): boolean {
+  if (state.turn.pending.length === 0) return false;
+  const ctx = makeCtx(env, state, state.turn.player, []);
+  return activeModules(env, state.setup).every((m) => engineHook(m, "canUndo")?.(ctx) !== false);
+}
+
+/** Tillåtna delsteg för den som ska göra nästa steg (`turn.actor`, annars spelaren som har tur). */
 export function legalSteps(env: Env, state: GameState): Step[] {
   if (state.finished) return [];
   const { turn } = state;
@@ -73,6 +81,7 @@ export function legalSteps(env: Env, state: GameState): Step[] {
   }
   const ctx = makeCtx(env, state, player, []);
   for (const m of activeModules(env, state.setup)) if (m.hooks.extraSteps) out.push(...m.hooks.extraSteps(ctx, turn.phase));
-  if (turn.pending.length > 0) out.push({ type: "undo" });
+  // Ångra hör till spelaren som har tur; en annan spelare som väljer (actor) får inte ångra.
+  if (actorOf(state) === player && undoAllowed(env, state)) out.push({ type: "undo" });
   return out;
 }

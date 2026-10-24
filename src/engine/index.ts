@@ -13,5 +13,5 @@ export { frontier, geometricPlacements, toTileTypes, type Board, type TileTypes 
 export { nextRandom, randomInt, shuffle } from "./rng";
 export * from "./geometry";
 export { stepWarnings } from "./warnings";
-export { baseExt, activeModules, type Env, type EngineHookContext, type BaseExt } from "./context";
+export { baseExt, activeModules, actorOf, type Env, type EngineHookContext, type BaseExt } from "./context";
 export { enterPhase, leavePhase } from "./phases";

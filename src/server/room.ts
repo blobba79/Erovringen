@@ -7,7 +7,7 @@ import type {
 } from "../shared/messages";
 import type { GameEvent, GameState, PlayerId, Pos, Step } from "../shared/state";
 import type { ExpansionModule } from "../shared/expansion";
-import { STATE_VERSION, stepWarnings as engineStepWarnings } from "../engine/index";
+import { STATE_VERSION, actorOf, stepWarnings as engineStepWarnings } from "../engine/index";
 import type { EngineApi } from "../engine/index";
 import { baseExt } from "../engine/context";
 import { finishTurn, returnTiles } from "../engine/turn";
@@ -120,6 +120,8 @@ export class Room {
   private pendingSave: { id: string; file: SaveFile } | null = null;
   private saveId: string | null = null;
   private stepLog: { player: PlayerId; step: Step }[] = [];
+  /** Vem som gjorde varje väntande delsteg (flera spelare kan välja under samma tur, t.ex. Crop Circles II). */
+  private pendingBy: PlayerId[] = [];
   /** false när spelet inte längre går att spela om från `stepLog` (överhopp, bortplockad spelare, återställt från ögonblicksbild). */
   private stepLogOk = true;
   private tracker: StatsTracker | null = null;
@@ -485,7 +487,7 @@ export class Room {
   // ---------------------------------------------------------------- spelet
 
   private activeSeat(): Seat | undefined {
-    return this.state ? this.seats.find((s) => s.player === this.state!.turn.player) : undefined;
+    return this.state ? this.seats.find((s) => s.player === actorOf(this.state!)) : undefined;
   }
 
   private playing(conn: Conn): GameState | null {
@@ -500,16 +502,23 @@ export class Room {
     const state = this.playing(conn);
     if (!state) return;
     if (!step || typeof step !== "object" || typeof step.type !== "string") return this.error(conn, "error.badMessage");
-    if (state.turn.player !== seat.player) return this.error(conn, "error.notYourTurn");
+    // Spelaren som ska välja (turn.actor, annars den som har tur) gör stegen; ångra hör till den som har tur.
+    if (step.type === "undo" ? state.turn.player !== seat.player : actorOf(state) !== seat.player)
+      return this.error(conn, "error.notYourTurn");
     if (step.type === "placeTile" && (!ROTATIONS.includes(step.rotation) || !isPos(step.pos)))
       return this.error(conn, "error.illegalPlacement");
     const res = this.engine.apply(state, seat.player, step);
     if (!res.ok) return this.error(conn, res.error, res.params);
     const before = state.turn.player;
     this.state = res.state;
+    const by = this.pendingBy.slice(0, state.turn.pending.length);
+    while (by.length < state.turn.pending.length) by.push(state.turn.player);
+    if (step.type === "undo") this.pendingBy = by.slice(0, res.state.turn.pending.length);
+    else if (step.type === "confirm") this.pendingBy = [];
+    else this.pendingBy = [...by, seat.player];
     if (step.type === "confirm") {
       // Hela turen (delstegen och bekräftelsen) in i loggen, händelserna in i statistiken, sedan sparas spelet.
-      if (this.stepLogOk) for (const p of [...state.turn.pending, step]) this.stepLog.push({ player: seat.player, step: p });
+      if (this.stepLogOk) [...state.turn.pending, step].forEach((p, i) => this.stepLog.push({ player: by[i] ?? seat.player, step: p }));
       this.tracker?.addTurn(res.events, res.state);
       this.save();
     }
@@ -540,7 +549,7 @@ export class Room {
   private setPreview(conn: Conn, seat: Seat, preview: Preview): void {
     const state = this.playing(conn);
     if (!state) return;
-    if (state.turn.player !== seat.player) return this.error(conn, "error.notYourTurn");
+    if (actorOf(state) !== seat.player) return this.error(conn, "error.notYourTurn");
     if (!preview || typeof preview !== "object") return this.error(conn, "error.badMessage");
     this.preview = { player: seat.player, preview };
     this.sendScreens({ type: "preview", ...this.preview });
@@ -549,7 +558,7 @@ export class Room {
   private map(conn: Conn, seat: Seat, control: MapControl): void {
     const state = this.playing(conn);
     if (!state) return;
-    if (state.turn.player !== seat.player) return this.error(conn, "error.notYourTurn");
+    if (actorOf(state) !== seat.player) return this.error(conn, "error.notYourTurn");
     if (!control || typeof control !== "object") return this.error(conn, "error.badMessage");
     const tiles = () => this.boardPositions();
     if (control.type === "fitAll") {
@@ -563,7 +572,7 @@ export class Room {
   private inspect(conn: Conn, seat: Seat): void {
     const state = this.playing(conn);
     if (!state) return;
-    if (state.turn.player !== seat.player) return this.error(conn, "error.notYourTurn");
+    if (actorOf(state) !== seat.player) return this.error(conn, "error.notYourTurn");
     const result = inspectAt(this.engine, state, this.camera.x, this.camera.y, state.setup.showClosingTiles);
     const msg: ServerMessage = { type: "inspect", result };
     this.sendScreens(msg);
@@ -675,7 +684,7 @@ export class Room {
         return this.rosterChanged();
       case "skip": {
         if (this.phase !== "playing" || !this.state) return this.error(conn, "error.gameNotStarted");
-        if (this.state.turn.player !== player) return this.error(conn, "error.cannotSkip");
+        if (this.state.turn.player !== player && actorOf(this.state) !== player) return this.error(conn, "error.cannotSkip");
         this.log.info(`värden hoppade över ${player}`);
         return this.advanceTurn(this.state, null);
       }
@@ -818,7 +827,7 @@ export class Room {
     for (const t of tiles)
       for (const p of this.engine.placementsFor(s, t)) seen.set(`${p.pos.x},${p.pos.y}`, { x: p.pos.x, y: p.pos.y });
     // Målen för ett expansionsval (magikern, draken …) ska också synas.
-    if (this.preview?.player === s.turn.player)
+    if (this.preview?.player === actorOf(s))
       for (const t of this.preview.preview.targets ?? []) seen.set(`${t.pos.x},${t.pos.y}`, { x: t.pos.x, y: t.pos.y });
     return [...seen.values()];
   }
@@ -942,7 +951,15 @@ export class Room {
     if (!state || !seat.conn) return;
     const hand = state.players.find((p) => p.id === seat.player)?.hand ?? [];
     this.send(seat.conn, { type: "hand", tiles: [...hand] });
-    this.send(seat.conn, { type: "legalSteps", steps: state.turn.player === seat.player ? legal : [] });
+    // Stegen går till den som ska välja. Den som har tur får bara ångra medan en annan väljer.
+    const actor = actorOf(state);
+    const steps =
+      actor === seat.player
+        ? legal
+        : state.turn.player === seat.player && this.engine.canUndo(state)
+          ? ([{ type: "undo" }] as Step[])
+          : [];
+    this.send(seat.conn, { type: "legalSteps", steps });
   }
 
   /** Allt en ny eller återansluten anslutning behöver för att komma ikapp. */

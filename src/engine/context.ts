@@ -59,6 +59,14 @@ export interface EngineHooks {
    * vars färja flyttats).
    */
   scoreAround(ctx: EngineHookContext): Pos[];
+  /**
+   * Efter poängräkningen när turen bekräftats (Crop Circles II): modulen får lägga en egen fas innan
+   * turen avslutas. Returnera fasens namn, eller `undefined` för att avsluta turen som vanligt. Fasen
+   * får sätta `turn.actor`. Turen avslutas när fasen lämnar över till "confirm" och spelaren bekräftar.
+   */
+  afterScoring(ctx: EngineHookContext): string | undefined;
+  /** Falskt = spelaren som har tur får inte ångra just nu (någon annan har redan valt). */
+  canUndo(ctx: EngineHookContext): boolean;
 }
 
 export const engineHook = <K extends keyof EngineHooks>(m: ExpansionModule, k: K): EngineHooks[K] | undefined =>
@@ -76,6 +84,11 @@ export interface BaseExt {
 
 export function baseExt(state: GameState): BaseExt {
   return state.ext.base as BaseExt;
+}
+
+/** Spelaren som ska göra nästa delsteg: `turn.actor` om den är satt, annars spelaren som har tur. */
+export function actorOf(state: GameState): PlayerId {
+  return state.turn.actor ?? state.turn.player;
 }
 
 /** Moduler som är påslagna i spelet; grundspelet alltid, i registreringsordning. */
