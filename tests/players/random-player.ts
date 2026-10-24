@@ -79,7 +79,9 @@ export function checkInvariants(eng: EngineApi, s: GameState, initial: { tiles: 
   if (Object.keys(s.board).length % 7 === 0) {
     for (const a of eng.analyze(s).areas) {
       if (a.kind === "river") continue;
-      if (a.kind !== "field" && a.figures.length > 1 && (a.kind === "cloister" || a.kind === "garden")) throw new Error("två pjäser på ett kloster");
+      // Flygmaskinen och sädescirklarna får ställa en följare till på ett upptaget kloster.
+      const shared = s.setup.expansions.includes("flying-machines") || s.setup.expansions.includes("crop-circles-2");
+      if (!shared && a.figures.length > 1 && (a.kind === "cloister" || a.kind === "garden")) throw new Error("två pjäser på ett kloster");
     }
   }
   for (const p of s.players) if (p.score < 0 || !Number.isInteger(p.score)) throw new Error(`poäng ${p.score}`);

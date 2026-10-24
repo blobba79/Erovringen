@@ -51,7 +51,9 @@ function build(type: TileType, rotation: Rotation): RotatedTile {
     })
     .sort()
     .join("|");
-  return { type, rotation, features, edgeKind, edgeFeature, halfFeature, signature: sig };
+  // En symbol med riktning (t.ex. flygmaskinens "flier:N") gör varje vridning olik de andra.
+  const directed = (type.symbols ?? []).some((s) => String(s).includes(":"));
+  return { type, rotation, features, edgeKind, edgeFeature, halfFeature, signature: directed ? `${sig}#${rotation}` : sig };
 }
 
 export function rotateTile(type: TileType, rotation: Rotation): RotatedTile {

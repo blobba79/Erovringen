@@ -111,7 +111,7 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
 }
 
 /** Fasen efter pjässteget: en modul (färjorna) kan lägga en egen fas före "confirm". */
-function phaseAfterFigure(ctx: EngineHookContext, mods: ExpansionModule[]): string {
+export function phaseAfterFigure(ctx: EngineHookContext, mods: ExpansionModule[]): string {
   for (const m of mods) {
     const phase = engineHook(m, "afterFigureStep")?.(ctx);
     if (phase !== undefined) return phase;

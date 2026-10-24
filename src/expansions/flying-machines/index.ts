@@ -29,6 +29,7 @@ import { rotatedAt } from "../../engine/board";
 import { posKey } from "../../engine/geometry";
 import { randomInt } from "../../engine/rng";
 import { placedStep } from "../../engine/turnstate";
+import { phaseAfterFigure } from "../../engine/steps";
 import { TILE_DATA } from "../../tiles/index";
 
 const ID = "flying-machines";
@@ -160,7 +161,8 @@ export const flyingMachinesModule: ExpansionModule = {
           data: { player: ctx.player, roll, from: flight.from, to, direction: flight.dir, kind: d.choice, options: options.length } satisfies DiceEventData,
         });
         if (options.length === 0) {
-          s.turn.phase = "confirm";
+          // Som efter ett vanligt pjässteg: t.ex. färjorna kan vilja ha sin fas.
+          s.turn.phase = phaseAfterFigure(ctx, activeModules(ctx.env, s.setup));
         } else {
           (s.ext as Record<string, FlyExt>)[ID] = { kind: d.choice, to };
           s.turn.phase = FLY_PHASE;
@@ -177,7 +179,7 @@ export const flyingMachinesModule: ExpansionModule = {
         fig.location = { at: "feature", pos: { ...d.pos }, feature: d.feature };
         ctx.emit({ type: "figurePlaced", figure: fig.id, location: fig.location });
         delete (s.ext as Record<string, unknown>)[ID];
-        s.turn.phase = "confirm";
+        s.turn.phase = phaseAfterFigure(ctx, activeModules(ctx.env, s.setup));
         return null;
       }
       return "error.illegalStep";
