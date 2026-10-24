@@ -49,5 +49,7 @@
   "help.phase.ferries-place": "Choose which two road ends of the lake tile the ferry links.",
   "help.phase.ferries-move": "You may move a ferry: tap its number, then choose which road ends it should link. Tap Done when you do not want to move more.",
   "help.expansion.flying-machines": "The Flying Machines: when you place a tile with a flying machine, you may let a follower fly instead of placing it normally. The die (1-3) decides how many tiles it flies in the direction of the machine; it lands on an unfinished road, city or cloister there, even an occupied one. If it cannot land, it returns to your supply.",
-  "help.phase.flying-machines": "Pick the number of the road, city or cloister where your follower lands."
+  "help.phase.flying-machines": "Pick the number of the road, city or cloister where your follower lands.",
+  "help.phase.crop-circles-2": "A crop circle was placed. First the player whose turn it is chooses: everyone adds a follower or everyone removes one, on a city, road or field of the circle's kind. Then each player in turn chooses where. If you cannot, you are skipped.",
+  "help.expansion.crop-circles-2": "Crop Circles II: when a tile with a crop circle (city, road or field) is placed, all players either add a follower next to one of their own, or all remove one, in a feature of the circle's kind."
 }

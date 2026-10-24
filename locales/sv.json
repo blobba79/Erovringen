@@ -291,5 +291,14 @@
   "step.ferries.place.E-W": "Förbind öster och väster",
   "step.ferries.move.E-W": "Förbind öster och väster",
   "step.ferries.place.S-W": "Förbind söder och väster",
-  "step.ferries.move.S-W": "Förbind söder och väster"
+  "step.ferries.move.S-W": "Förbind söder och väster",
+  "phase.crop-circles-2": "Sädescirkel",
+  "help.phase.crop-circles-2": "En sädescirkel har lagts. Först väljer den som har tur: alla lägger till en följare eller alla tar bort en, i en stad, på en väg eller ett fält av cirkelns sort. Sedan väljer var och en i tur och ordning var. Kan du inte, hoppas du över.",
+  "help.expansion.crop-circles-2": "Crop Circles II: när en bricka med sädescirkel (stad, väg eller fält) läggs lägger alla till en följare bredvid en egen, eller tar alla bort en, i ett område av cirkelns sort.",
+  "step.crop-circles-2.mode": "Alla väljer",
+  "step.crop-circles-2.mode.add": "Alla får lägga till en följare",
+  "step.crop-circles-2.mode.remove": "Alla tar bort en följare",
+  "step.crop-circles-2.add": "Lägg till en följare här",
+  "step.crop-circles-2.remove": "Ta bort följaren här",
+  "step.crop-circles-2.skip": "Lägg inte till något"
 }

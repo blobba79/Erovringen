@@ -276,5 +276,14 @@
   "step.ferries.place.E-W": "Link east and west",
   "step.ferries.move.E-W": "Link east and west",
   "step.ferries.place.S-W": "Link south and west",
-  "step.ferries.move.S-W": "Link south and west"
+  "step.ferries.move.S-W": "Link south and west",
+  "phase.crop-circles-2": "Crop circle",
+  "help.phase.crop-circles-2": "A crop circle was placed. First the player whose turn it is chooses: everyone adds a follower or everyone removes one, on a city, road or field of the circle's kind. Then each player in turn chooses where. If you cannot, you are skipped.",
+  "help.expansion.crop-circles-2": "Crop Circles II: when a tile with a crop circle (city, road or field) is placed, all players either add a follower next to one of their own, or all remove one, in a feature of the circle's kind.",
+  "step.crop-circles-2.mode": "Everyone chooses",
+  "step.crop-circles-2.mode.add": "Everyone may add a follower",
+  "step.crop-circles-2.mode.remove": "Everyone removes a follower",
+  "step.crop-circles-2.add": "Add a follower here",
+  "step.crop-circles-2.remove": "Remove the follower here",
+  "step.crop-circles-2.skip": "Add nothing"
 }
