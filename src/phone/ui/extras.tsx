@@ -6,6 +6,7 @@ import { LOCALES } from "../../i18n/index";
 import { helpKeys } from "../logic/help";
 import { standings, topRecords } from "../logic/after";
 import { LangSelect, useClient, useT } from "./common";
+import { RulesButton } from "./rules";
 
 export const EMOJIS = ["👍", "👏", "😂", "😮", "😢", "🔥"] as const;
 
@@ -43,6 +44,7 @@ export function Tools({ s, phase, mine }: { s: PhoneState; phase: string; mine: 
         <button type="button" class={panel === "react" ? "on" : ""} onClick={() => toggle("react")}>
           {t("phone.react")}
         </button>
+        <RulesButton expansions={s.state?.setup.expansions ?? []} lang={s.lang} />
       </div>
       {panel === "react" && (
         <div class="row emojis">
