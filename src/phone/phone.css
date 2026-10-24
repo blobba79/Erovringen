@@ -160,3 +160,8 @@ button.on { border-color: var(--accent); }
 .scores .counter { white-space: nowrap; font-size: 0.75rem; }
 .scores .counter .dot { width: 9px; height: 9px; margin-right: 2px; }
 .scores .counter .cicon { vertical-align: middle; margin-right: 1px; }
+.stage.expansion { width: 100%; }
+.expgroup { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.expgroup .row, .expoptions { width: 100%; }
+.exptitle { margin: 0; font-weight: 700; }
+.digit.on { outline: 3px solid var(--fg, #fff); }

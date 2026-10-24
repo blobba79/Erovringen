@@ -8,6 +8,7 @@ import type {
 import type { PlayerId, Pos, Step } from "../shared/state";
 import type { Rotation } from "../shared/tiles";
 import { initialRotation, nextRotation, placementsOf, rotationsAt, spotsFor, type Placement } from "./logic/spots";
+import { expansionView, previewTargets, targetsKey } from "./logic/expansion";
 import {
   clearSeat, loadLang, loadSeat, loadWarnings, pickLang, planStart, saveLang, saveSeat, saveWarnings, type StartPlan, type StorageLike,
 } from "./logic/session";
@@ -65,6 +66,8 @@ export interface PhoneState {
   edge: EdgeChoice | null;
   /** Vald del i steget "Välj pjäs". */
   feature: { pos: Pos; feature: string } | null;
+  /** Valt mål (siffra) i ett expansionssteg, när flera steg finns på målet. */
+  target: number | null;
   /** Varningar för nybörjare slagna på (sparas på telefonen). */
   warningsOn: boolean;
   /** Varningar om de väntande delstegen (bara när de är på och det är min tur). */
@@ -84,6 +87,7 @@ export class Client {
   private pendingJoin: { name: string; color: string } | null = null;
   private pendingRotate: { pos: Pos; rotation: Rotation } | null = null;
   private uiKey = "";
+  private sentTargets = "";
   private errorN = 0;
 
   constructor(factory: TransportFactory, private deps: ClientDeps) {
@@ -106,6 +110,7 @@ export class Client {
       turnNonce: 0,
       edge: null,
       feature: null,
+      target: null,
       warningsOn: loadWarnings(deps.storage),
       warnings: [],
       selectedTile: null,
@@ -192,6 +197,7 @@ export class Client {
       case "legalSteps": {
         const placements = placementsOf(m.steps);
         this.set({ legal: m.steps, ...(placements.length > 0 ? { placements } : {}) });
+        this.syncTargets();
         this.continueRotation(m.steps);
         return;
       }
@@ -222,6 +228,7 @@ export class Client {
     const wasMine = this.s.state?.turn.player === this.s.player && !this.s.state?.finished;
     const mine = state.turn.player === this.s.player && !state.finished;
     const patch: Partial<PhoneState> = { state };
+    this.sentTargets = ""; // servern glömmer förhandsvisningen när tillståndet ändras
     if (mine && !wasMine) patch.turnNonce = this.s.turnNonce + 1;
     if (!mine) {
       patch.legal = [];
@@ -233,6 +240,7 @@ export class Client {
       this.uiKey = uiKey;
       patch.edge = null;
       patch.feature = null;
+      patch.target = null;
       patch.selectedTile = null;
     }
     this.set(patch);
@@ -252,13 +260,41 @@ export class Client {
     this.send({ type: "preview", preview: p });
   }
 
+  /** Förhandsvisningen av det som är valt just nu: kant och platser, område och expansionens mål. */
+  private composePreview(over: Partial<PhoneState> = {}): Preview {
+    const cur = { ...this.s, ...over };
+    const p: Preview = {};
+    if (cur.edge !== null && cur.state) {
+      p.edge = cur.edge;
+      p.spots = spotsFor(placementsOf(cur.legal), cur.state.board, cur.edge);
+    }
+    if (cur.feature) p.feature = cur.feature;
+    const targets = previewTargets(expansionView(cur.legal));
+    if (targets.length > 0) p.targets = targets;
+    return p;
+  }
+
+  /** Skickar målen i expansionens steg till storskärmen när de ändrats. */
+  private syncTargets(): void {
+    const key = targetsKey(expansionView(this.s.legal));
+    if (key === this.sentTargets) return;
+    this.sentTargets = key;
+    if (key !== "") this.preview(this.composePreview());
+  }
+
   /** Välj kant (eller "Alla platser") i steget "Placera brickan". */
   selectEdge(edge: EdgeChoice): void {
-    const st = this.s.state;
-    if (!st) return;
-    const spots = spotsFor(placementsOf(this.s.legal), st.board, edge);
+    if (!this.s.state) return;
     this.set({ edge });
-    this.preview({ edge, spots });
+    this.preview(this.composePreview({ edge }));
+  }
+
+  /** Välj ett mål (siffra) i ett expansionssteg: ett enda steg görs direkt, annars visas valen. */
+  pickTarget(n: number): void {
+    const t = expansionView(this.s.legal).targets.find((x) => x.n === n);
+    if (!t) return;
+    if (t.steps.length === 1) this.step(t.steps[0]!);
+    else this.set({ target: n });
   }
 
   /** Välj plats; brickan läggs direkt med första passande rotation. */
@@ -290,7 +326,7 @@ export class Client {
   /** Välj del av brickan (eller null för att ångra valet). */
   selectFeature(f: { pos: Pos; feature: string } | null): void {
     this.set({ feature: f });
-    this.preview(f ? { feature: f } : {});
+    this.preview(this.composePreview({ feature: f }));
   }
 
   map(control: MapControl): void {

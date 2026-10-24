@@ -52,7 +52,12 @@ function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step)
   for (let guard = 0; guard < 6 && r.ok; guard++) {
     const s = r.state;
     if (s.finished || s.turn.player !== me) return evaluate(eng, s, me);
-    const next = eng.legalSteps(s).find((x) => x.type === (s.turn.phase === "confirm" ? "confirm" : "noFigure"));
+    const legal = eng.legalSteps(s);
+    // I en expansions egen fas finns varken "confirm" eller "noFigure": ta bekräfta, annars första egna steget.
+    const next =
+      legal.find((x) => x.type === (s.turn.phase === "confirm" ? "confirm" : "noFigure")) ??
+      legal.find((x) => x.type === "confirm") ??
+      legal.find((x) => x.type === "expansion");
     if (!next) return null;
     r = eng.apply(s, me, next);
   }
