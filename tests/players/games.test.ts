@@ -4,6 +4,7 @@
 import { describe, expect, test } from "bun:test";
 import { realEngine, setupOf } from "../engine/helpers";
 import { playGame, type Strategy } from "./random-player";
+import type { ExpansionId } from "../../src/shared/tiles";
 
 const eng = realEngine();
 const GAMES = Number(process.env.GAMES ?? 300);
@@ -11,13 +12,15 @@ const GAMES = Number(process.env.GAMES ?? 300);
 function setupFor(i: number) {
   const n = 2 + (i % 5); // 2-6 spelare
   const variant = i % 7 === 3 ? "afterRiver" : "shuffle";
-  return setupOf(["base", "river", "abbot"], {
+  // Varannan omgång med alla färdiga expansioner.
+  const expansions: ExpansionId[] = i % 2 ? ["base", "river", "abbot", "inns-cathedrals"] : ["base", "river", "abbot"];
+  return setupOf(expansions, {
     n, seed: 1000 + i, handSize: i % 11 === 5 ? 3 : 1, variants: { "river.startTile": variant },
   });
 }
 
 describe("slumpspelare", () => {
-  test(`${GAMES} partier med grundspel, flod och abbot går att spela färdigt`, () => {
+  test(`${GAMES} partier med grundspel, flod, abbot och I&C går att spela färdigt`, () => {
     let totalTurns = 0;
     let withScore = 0;
     for (let i = 0; i < GAMES; i++) {

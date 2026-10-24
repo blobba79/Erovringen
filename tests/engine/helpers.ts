@@ -7,8 +7,9 @@ import { allTileTypes } from "../../src/tiles/index";
 import { baseModule, createEngine, type EngineApi } from "../../src/engine/index";
 import { riverModule } from "../../src/expansions/river/index";
 import { abbotModule } from "../../src/expansions/abbot/index";
+import { innsCathedralsModule } from "../../src/expansions/inns-cathedrals/index";
 
-export const ALL_MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule];
+export const ALL_MODULES: ExpansionModule[] = [baseModule, riverModule, abbotModule, innsCathedralsModule];
 
 export function realEngine(): EngineApi {
   return createEngine(ALL_MODULES, allTileTypes().values());
