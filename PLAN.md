@@ -94,6 +94,7 @@ Fas 6: expansionerna, en i taget i ordningen nedan, och spelreglerna i spelet.
 
 **Konventioner för fas 6:**
 - En expansion är klar när modulen finns i `src/expansions/<id>/` med tester i `tests/expansions/<id>/`, är anmäld i `src/server/modules.ts`, har texter i `locales/` och har granskats av `regelgranskare`.
+- **Spelarens räknare** (`players[].counters`): varor i Traders & Builders heter `goods.wine`, `goods.grain` och `goods.cloth`, guldtackor i The Gold Mines `gold`. Texten för en räknare är `counter.<id>`. Storskärmen och telefonen visar alla räknare som inte är noll, så nya expansioner behöver inte ändra dem.
 - **Spelregler i spelet:** begripliga sammanfattningar för spelare (inte de tekniska sammanfattningarna i `regler/sammanfattning/`) ligger i `locales/rules/<språk>/<id>.md`, en fil per del (`base`, `river`, `abbot` och expansionernas id). De beskriver reglerna som de fungerar i Erövringen, med husregler och standardvarianter. Formatet är en enkel delmängd av Markdown: `#` och `##` rubriker, stycken, `-` listor och `**fetstil**`. Svenska och engelska. `locales/rules/index.ts` importerar filerna som text. Telefonen visar dem under knappen **Regler**, i lobbyn och under spelet, för de delar som är med i spelet.
 
 **Förslag på expansionsordning** (enklast först, de som påverkar mest sist):
