@@ -249,5 +249,17 @@
   "help.expansion.river": "The River: flodbrickorna läggs först, och varje ny flodbricka måste fortsätta floden utan att vika tillbaka. Tills sjön är lagd har spelarna bara flodbrickor på hand.",
   "help.expansion.abbot": "The Abbot: i stället för en vanlig pjäs får du placera din abbot på en trädgård eller ett kloster, eller ta tillbaka abboten från kartan för att få dess poäng.",
   "help.expansion.inns-cathedrals": "Inns & Cathedrals: en färdig väg med värdshus ger 2 poäng per bricka och en färdig stad med katedral 3 per bricka och vimpel, men båda ger inget om de är ofärdiga vid slutet. Den stora följaren räknas som två följare när man avgör vem som vinner ett område, men den dubblar inte poängen.",
-  "help.expansion.traders-builders": "Traders & Builders: den som gör en stad färdig tar dess varor. Vid slutet ger flest av varje vara 10 poäng (delad ledning ger alla 10). Byggmästaren ställs på en väg eller stad där du har en följare; bygger du vidare där får du en extra tur. Grisen ställs på ett fält där du har en bonde och ger 4 i stället för 3 per färdig stad."
+  "help.expansion.traders-builders": "Traders & Builders: den som gör en stad färdig tar dess varor. Vid slutet ger flest av varje vara 10 poäng (delad ledning ger alla 10). Byggmästaren ställs på en väg eller stad där du har en följare; bygger du vidare där får du en extra tur. Grisen ställs på ett fält där du har en bonde och ger 4 i stället för 3 per färdig stad.",
+  "help.expansion.gold-mines": "The Gold Mines: när du lägger en bricka med guldsymbol hamnar en guldtacka på den och en på en granne som du väljer (diagonalt räknas). När ett område räknas går guldet på dess brickor till de spelare som får poäng för det. Vid slutet är varje tacka värd 1 poäng om man har 1–3, 2 om 4–6, 3 om 7–9 och 4 om 10 eller fler.",
+  "help.expansion.mage-witch": "Mage & Witch: när du lägger en bricka med magisymbol måste du flytta magikern eller häxan till en ofärdig väg eller stad. Magikern ger +1 poäng per bricka när området räknas, häxan halverar poängen (avrundat uppåt).",
+  "help.phase.gold": "Välj en granne (diagonalt räknas) för den andra guldtackan. Sedan får du ställa ut en pjäs som vanligt.",
+  "help.phase.mage-witch": "Flytta magikern eller häxan till en ofärdig väg eller stad: välj en siffra. Finns ingen plats tar du bort en av dem från kartan.",
+  "phase.gold": "Lägg guld",
+  "phase.mage-witch": "Magiker och häxa",
+  "step.gold-mines.placeGold": "Lägg en guldtacka på en granne",
+  "step.mage-witch.move": "Flytta magikern eller häxan",
+  "step.mage-witch.remove": "Ta bort en pjäs från kartan",
+  "step.mage-witch.remove.mage": "Ta bort magikern",
+  "step.mage-witch.remove.witch": "Ta bort häxan",
+  "stats.reason.final.gold": "Guldtackor"
 }

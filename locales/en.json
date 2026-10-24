@@ -234,5 +234,17 @@
   "help.expansion.traders-builders": "Traders & Builders: whoever completes a city takes its trade goods. At the end, most of each good scores 10 points (ties all score 10). Your builder joins a road or city where you have a follower; extending it gives you an extra turn. Your pig joins a field where you have a farmer and makes it score 4 instead of 3 per completed city.",
   "screen.f11": "Press F11 for fullscreen",
   "screen.hotspot.title": "To play without internet:",
-  "screen.hotspot.text": "Turn on Wi-Fi hotspot on this device, then connect the phones to it and scan the QR code."
+  "screen.hotspot.text": "Turn on Wi-Fi hotspot on this device, then connect the phones to it and scan the QR code.",
+  "help.expansion.gold-mines": "The Gold Mines: when you place a tile with a gold symbol, one gold bar goes on it and one on a neighbouring tile you choose (diagonals count). When a feature is scored, the gold on its tiles goes to the players who score it. At the end each bar is worth 1 point for 1-3 bars, 2 for 4-6, 3 for 7-9 and 4 for 10 or more.",
+  "help.expansion.mage-witch": "Mage & Witch: when you place a tile with a magic symbol, you must move the mage or the witch to an unfinished road or city. The mage gives +1 point per tile when that feature is scored; the witch halves the score, rounded up.",
+  "help.phase.gold": "Choose a neighbouring tile (diagonals count) for the second gold bar. Then you may place a figure as usual.",
+  "help.phase.mage-witch": "Move the mage or the witch to an unfinished road or city: pick a number. If there is nowhere to go, remove one of them from the board.",
+  "phase.gold": "Place gold",
+  "phase.mage-witch": "Mage & Witch",
+  "step.gold-mines.placeGold": "Place a gold bar on a neighbouring tile",
+  "step.mage-witch.move": "Move the mage or the witch",
+  "step.mage-witch.remove": "Remove a figure from the board",
+  "step.mage-witch.remove.mage": "Remove the mage",
+  "step.mage-witch.remove.witch": "Remove the witch",
+  "stats.reason.final.gold": "Gold bars"
 }
