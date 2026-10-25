@@ -9,6 +9,7 @@ import { phaseForHand, placedStep } from "./turnstate";
 
 export function beginTurn(env: Env, state: GameState, player: PlayerId, events: GameEvent[], extra = false): void {
   state.turn = { player, phase: phaseForHand(playerOf(state, player).hand.length), pending: [] };
+  delete baseExt(state).undoLock;
   events.push({ type: "turnStarted", player });
   // Moduler som vill göra något när en tur börjar (fens poäng). `extra`: byggmästarens extra tur.
   const ctx = makeCtx(env, state, player, events);
@@ -76,6 +77,7 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
     scoreCompleted(ctx, an, an.areas.filter((a) => a.complete && around.some((p) => nearPlaced(a, p))));
   }
   delete baseExt(state).snapshot;
+  delete baseExt(state).undoLock;
   state.turn.pending = [];
   // Alla moduler tillfrågas (de nollställer sina egna flaggor, och Gold Mines delar ut guld), inte bara
   // fram till första ja. Sker före en eventuell fas efter poängräkningen; resultatet sparas till turens slut.

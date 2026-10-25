@@ -3,7 +3,7 @@ import type { GameEvent, GameState, Step } from "../../../src/shared/state";
 import type { ExpansionId } from "../../../src/shared/tiles";
 import { princessDragonModule } from "../../../src/expansions/princess-dragon/index";
 import { actorOf } from "../../../src/engine/index";
-import { engineHook, makeCtx } from "../../../src/engine/context";
+import { removePlayerStep, skipActorStep } from "../../../src/engine/host";
 import { realEngine, setupOf } from "../../engine/helpers";
 import { CONFIRM, NOFIG, fig$, inSupply, place$, play, scenario, score, type Rot } from "../../engine/scenario";
 import { makeRng, playGame, type Strategy } from "../../players/random-player";
@@ -386,38 +386,39 @@ describe("värden hoppar över den som flyttar draken", () => {
     dragonAt(s, 1, 1);
     return play(eng, s, place$(3, 0, 0), NOFIG).state;
   };
-  const skip = (s: GameState, remove?: string): GameState => {
-    const t = structuredClone(s);
-    if (remove) t.players = t.players.filter((p) => p.id !== remove);
-    engineHook(princessDragonModule, "skipActor")?.(makeCtx(eng.env, t, t.turn.player, []));
-    return t;
-  };
-
-  test("hoppas p2 över flyttar p3 i stället, och sedan p1 igen", () => {
-    let s = act(start(), mv(1, 0)).state;
-    expect(s.turn.actor).toBe("p2");
-    s = skip(s);
-    expect(s.turn.actor).toBe("p3");
-    expect(phase(s)).toBe("dragon");
-    s = act(s, pd(s)[0]!).state;
-    expect(s.turn.actor).toBeUndefined(); // p1
-  });
-
-  test("tas p2 bort faller hens senare platser också bort, och flytten slutar när ingen är kvar", () => {
-    let s = act(start(), mv(1, 0)).state;
-    s = skip(s, "p2");
-    expect(s.turn.actor).toBe("p3");
-    const actors: string[] = ["p1"];
+  /** Flyttar tills fasen är slut och returnerar vem som flyttade, i ordning. */
+  const rest = (s: GameState): { state: GameState; actors: string[] } => {
+    const actors: string[] = [];
     while (phase(s) === "dragon") {
       actors.push(actorOf(s));
       s = act(s, pd(s)[0]!).state;
     }
-    // p2:s båda platser är borta; flytten har fyra steg (p1 har redan gjort ett).
-    expect(actors.slice(0, 3)).toEqual(["p1", "p3", "p1"]);
+    return { state: s, actors };
+  };
+
+  test("hoppas p2 över tar p3 över hens steg: p3 flyttar två gånger i rad, sedan p1", () => {
+    let s = act(start(), mv(1, 0)).state;
+    expect(s.turn.actor).toBe("p2");
+    s = act(s, skipActorStep()).state;
+    expect(s.turn.actor).toBe("p3");
+    expect(phase(s)).toBe("dragon");
+    s = act(s, pd(s)[0]!).state;
+    expect(s.turn.actor).toBe("p3");
+    s = act(s, pd(s)[0]!).state;
+    expect(s.turn.actor).toBeUndefined(); // p1
+  });
+
+  test("tas p2 bort tar nästa spelare över hens platser, och draken flyttar ändå sex steg", () => {
+    let s = act(start(), mv(1, 0)).state;
+    s = act(s, removePlayerStep("p2")).state;
+    expect(s.turn.actor).toBe("p3");
+    const { state, actors } = rest(s);
+    expect(actors[0]).toBe("p3"); // p2:s plats tas över av p3 (flytten i rutnätet kör fast efter två steg)
     expect(actors).not.toContain("p2");
-    expect(s.turn.actor).toBeUndefined();
+    expect(state.turn.actor).toBeUndefined();
   });
 });
+
 
 describe("vad draken äter", () => {
   const ALL: ExpansionId[] = ["base", "abbot", "inns-cathedrals", "traders-builders", "mage-witch", "gold-mines", "princess-dragon"];

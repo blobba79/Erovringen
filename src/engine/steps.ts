@@ -5,6 +5,7 @@ import type { GameEvent, GameState, Step } from "../shared/state";
 import { analyze } from "./features";
 import type { ExpansionModule } from "../shared/expansion";
 import { activeModules, engineHook, makeCtx, playerOf, type EngineHookContext, type Env } from "./context";
+import { applyHostStep } from "./host";
 import { exchangeAllowed, figureSteps } from "./legal";
 import { hasAnyPlacement, isLegalPlacement } from "./placement";
 import { addScore, adjustedPoints, areaValue, notifyAreaScored, returnToSupply } from "./scoring";
@@ -101,6 +102,7 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
       return null;
     }
     case "expansion": {
+      if (step.expansion === "base") return applyHostStep(env, state, step, events);
       const m = mods.find((x) => x.id === step.expansion);
       if (!m?.hooks.applyStep) return "error.illegalStep";
       const err = m.hooks.applyStep(ctx, step);

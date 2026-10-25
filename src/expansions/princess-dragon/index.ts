@@ -35,10 +35,11 @@
 //     (startrutan räknas), aldrig fens ruta. Den äter alla följare och byggmästare/grisar på rutan som
 //     den går in på (inte neutrala pjäser, inte fen), och en byggmästare/gris hos en spelare som inte har
 //     någon följare kvar på området går också hem. Värden kan hoppa över eller ta bort den som flyttar
-//     (motorkroken `skipActor`): hens steg faller bort och nästa flyttar. Kan den inte gå vidare slutar flytten. Variant
+//     (motorkroken `skipActor`): nästa spelare i tur och ordning tar över hens steg, så att draken ändå
+//     flyttar sex rutor (s. 56). Kan den inte gå vidare slutar flytten. Variant
 //     "princess-dragon.dragonTiming": "before" (HiG, standard) = efter pjässteget, före poängräkningen
 //     (fasen kommer före "confirm"); "after" (RGG) = efter poängräkningen (när spelaren bekräftat).
-//     Ångra hör till spelaren som har tur så länge ingen annan flyttat draken.
+//     Ångra hör till spelaren som har tur, men bara efter det sista som någon annan flyttat (motorns undoLock).
 //  5. Poäng: fens 3 poäng till ägaren av följaren den står intill när området räknas (färdigt under
 //     spelet, eller vid slutet), oavsett majoritet (motorkroken `areaScored`).
 //
@@ -89,8 +90,6 @@ interface Ext {
   /** En dragbricka lades den här turen och draken ska flytta. */
   dragonTile?: boolean;
   move?: DragonMove;
-  /** Någon annan än spelaren som har tur har flyttat draken denna tur: ingen ångra. */
-  others?: boolean;
   /** Pjässorten som valts i fasen "portal". */
   portal?: string;
 }
@@ -180,10 +179,25 @@ function dragonTargets(ctx: EngineHookContext): Pos[] {
 /** Spelaren som flyttar draken härnäst: start hos den som har tur, sedan i sittordning. */
 function mover(ctx: EngineHookContext): PlayerId {
   const m = ext(ctx).move as DragonMove;
-  // Spelare som tagits bort av värden (utan att vara den som flyttade) hoppas över.
-  const here = new Set(ctx.state.players.map((p) => p.id));
-  m.order = m.order.filter((p, i) => i < m.count || here.has(p));
+  fixOrder(ctx, m);
   return m.order[m.count] ?? ctx.state.turn.player;
+}
+
+/** Nästa spelare i ordningen efter plats `k` (inte spelaren på `k` själv, om någon annan finns kvar) som är kvar i spelet. */
+function heir(m: DragonMove, k: number, here: Set<PlayerId>): PlayerId {
+  const n = m.order.length;
+  const me = m.order[k] as PlayerId;
+  for (let j = 1; j <= n; j++) {
+    const p = m.order[(k + j) % n] as PlayerId;
+    if (p !== me && here.has(p)) return p;
+  }
+  return me;
+}
+
+/** Platser som tillhör en spelare som värden tagit bort tas över av nästa spelare, så att draken alltid flyttar sex steg. */
+function fixOrder(ctx: EngineHookContext, m: DragonMove): void {
+  const here = new Set(ctx.state.players.map((p) => p.id));
+  for (let i = m.count; i < m.order.length; i++) if (!here.has(m.order[i] as PlayerId)) m.order[i] = heir(m, i, here);
 }
 
 /** Flytten är slut (sex steg, återvändsgränd eller inga flyttare kvar): vidare till nästa fas. */
@@ -196,8 +210,7 @@ function endMove(ctx: EngineHookContext): void {
 /** Nästa flyttare, eller slut om draken inte kan gå vidare eller alla steg är gjorda. */
 function advanceMove(ctx: EngineHookContext): void {
   const m = ext(ctx).move as DragonMove;
-  const here = new Set(ctx.state.players.map((p) => p.id));
-  m.order = m.order.filter((p, i) => i < m.count || here.has(p));
+  fixOrder(ctx, m);
   if (m.count >= m.order.length || dragonTargets(ctx).length === 0) endMove(ctx);
   else setActor(ctx);
 }
@@ -366,13 +379,8 @@ const engineHooks: Partial<EngineHooks> = {
     return wanted && startMove(c) ? DRAGON_PHASE : undefined;
   },
 
-  canUndo(c) {
-    return !ext(c).others;
-  },
-
   turnStarted(c, extra) {
     const e = ext(c);
-    delete e.others;
     delete e.dragonTile;
     delete e.move;
     delete e.portal;
@@ -416,15 +424,16 @@ export const princessDragonModule: ExpansionModule = {
       s.drawPile = s.drawPile.filter((t) => !isDragon(t));
     },
 
-    // Värden hoppar över (eller tar bort) den som flyttar draken: hens steg faller bort och nästa flyttar.
+    // Värden hoppar över (eller tar bort) den som flyttar draken: nästa spelare i tur och ordning tar över
+    // hens steg, så att draken ändå flyttar sex rutor (s. 56). Gäller även den som har tur.
     skipActor(c: HookContext) {
       const ctx = c as EngineHookContext;
       const m = ext(ctx).move;
-      if (!m || ctx.state.turn.phase !== DRAGON_PHASE) return;
-      m.order.splice(m.count, 1);
+      if (!m || ctx.state.turn.phase !== DRAGON_PHASE) return false;
       const here = new Set(ctx.state.players.map((p) => p.id));
-      m.order = m.order.filter((p, i) => i < m.count || here.has(p));
+      if (here.has(m.order[m.count] as PlayerId)) m.order[m.count] = heir(m, m.count, here);
       advanceMove(ctx);
+      return true;
     },
 
     afterTilePlaced(c, pos) {
@@ -500,7 +509,6 @@ export const princessDragonModule: ExpansionModule = {
           dragon.location = { at: "tile", pos: { ...to } };
           m.visited.push({ ...to });
           m.count++;
-          if (who !== s.turn.player) e.others = true;
           ctx.emit({ type: "figurePlaced", figure: dragon.id, location: dragon.location });
           ctx.emit({ type: "expansion", expansion: ID, event: "move", data: { player: who, from, to, step: m.count } });
           eat(ctx, to);

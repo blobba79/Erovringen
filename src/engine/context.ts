@@ -67,10 +67,12 @@ export interface EngineHooks {
    */
   afterScoring(ctx: EngineHookContext): string | undefined;
   /**
-   * Värden hoppar över (eller tar bort) spelaren i `turn.actor`: modulen går vidare till nästa som ska
-   * välja, eller till nästa fas. En borttagen spelares pjäser är redan borta när kroken anropas.
+   * Värden hoppar över (eller tar bort) spelaren som ska göra nästa val (`turn.actor`, eller spelaren
+   * som har tur om hen väljer): modulen vars fas det är går vidare till nästa som ska välja, eller till
+   * nästa fas, och returnerar true. Andra moduler returnerar false. En borttagen spelares pjäser är redan
+   * borta när kroken anropas. Anropas som ett delsteg (se `host.ts`), så att omspelningen blir rätt.
    */
-  skipActor(ctx: EngineHookContext): void;
+  skipActor(ctx: EngineHookContext): boolean;
   /** Falskt = spelaren som har tur får inte ångra just nu (någon annan har redan valt). */
   canUndo(ctx: EngineHookContext): boolean;
   /**
@@ -100,6 +102,11 @@ export interface BaseExt {
   phaseQueue?: string[];
   /** Extra tur som `extraTurn` gav innan en fas efter poängräkningen (Crop Circles II); gäller vid turens slut. */
   extraTurnPending?: boolean;
+  /**
+   * Ångra spärras så långt tillbaka som en annan spelares val eller ett värdsteg: det går bara att
+   * ångra när `turn.pending` är längre än det här värdet. Finns medan turen pågår.
+   */
+  undoLock?: number;
 }
 
 export function baseExt(state: GameState): BaseExt {

@@ -21,7 +21,7 @@
 import type { ExpansionModule } from "../../shared/expansion";
 import type { Figure, PlayerId, Pos } from "../../shared/state";
 import type { TileSet } from "../../shared/tiles";
-import type { EngineHookContext } from "../../engine/context";
+import type { EngineHookContext, EngineHooks } from "../../engine/context";
 import { playerOf } from "../../engine/context";
 import { analyze } from "../../engine/features";
 import { rotatedAt } from "../../engine/board";
@@ -121,6 +121,14 @@ export const tradersBuildersModule: ExpansionModule = {
         if (area && area.tiles.some((t) => t.x === pos.x && t.y === pos.y)) e.extra = true;
       }
     },
+
+    // Spärren mot kedjor gäller bara den direkt efterföljande extra turen: en ny spelares tur (även när
+    // värden hoppat över andra) nollställer den.
+    ...({
+      turnStarted(c: EngineHookContext, extra: boolean) {
+        if (!extra) ext(c).second = null;
+      },
+    } satisfies Partial<EngineHooks> as object),
 
     extraTurn(c) {
       const ctx = c as EngineHookContext;

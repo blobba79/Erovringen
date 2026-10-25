@@ -47,11 +47,39 @@ export function evaluate(eng: EngineApi, state: GameState, me: PlayerId): number
 }
 
 /** Så många val i en expansions egen fas (porten, draken) provspelas när ett steg följs av ett val. */
-const MAX_FOLLOW_UPS = 12;
+const MAX_FOLLOW_UPS = 8;
+
+/**
+ * Räknebudget för ett drag. Med många expansioner och en stor karta kan antalet alternativ bli stort,
+ * och varje provspelning kostar några millisekunder. Budgeten delas ut i ordning efter hur lovande
+ * alternativen är, så att datorn alltid svarar inom ungefär en sekund. `sims` räknar provspelade steg
+ * (deterministiskt); `deadline` är en säkerhetsgräns i tid för de sällsynta fall där ett enskilt
+ * steg är ovanligt dyrt.
+ */
+const MAX_SIMS = 220;
+const MAX_MS = 900;
+
+interface Budget {
+  sims: number;
+  deadline: number;
+}
+
+const newBudget = (): Budget => ({ sims: MAX_SIMS, deadline: performance.now() + MAX_MS });
+const exhausted = (b: Budget) => b.sims <= 0 || performance.now() > b.deadline;
+/** En del av budgeten åt ett alternativ; det som blir över går tillbaka till `parent` via `give`. */
+const share = (parent: Budget, parts: number): Budget => ({ sims: Math.floor(parent.sims / Math.max(1, parts)), deadline: parent.deadline });
+const settle = (parent: Budget, child: Budget, given: number) => {
+  parent.sims -= given - child.sims;
+};
+
+function sim(eng: EngineApi, b: Budget, state: GameState, me: PlayerId, step: Step) {
+  b.sims--;
+  return eng.simulate(state, me, step);
+}
 
 /** Provspelar ett delsteg och resten av turen (utan pjäs, sedan bekräfta). Null om steget inte går. */
-function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step, depth = 0): number | null {
-  let r = eng.apply(state, me, step);
+function finishValue(eng: EngineApi, b: Budget, state: GameState, me: PlayerId, step: Step, depth = 0): number | null {
+  let r = sim(eng, b, state, me, step);
   for (let guard = 0; guard < 6 && r.ok; guard++) {
     const s = r.state;
     if (s.finished || actorOf(s) !== me) return evaluate(eng, s, me);
@@ -61,32 +89,63 @@ function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step,
       legal.find((x) => x.type === (s.turn.phase === "confirm" ? "confirm" : "noFigure")) ??
       legal.find((x) => x.type === "confirm");
     if (next) {
-      r = eng.apply(s, me, next);
+      r = sim(eng, b, s, me, next);
       continue;
     }
     const own = legal.filter((x) => x.type === "expansion");
     if (own.length === 0) return null;
-    // Ett val av flera (var porten ska stå, vart draken går): ta det bästa, ett steg djupt.
-    if (own.length > 1 && depth < 1) {
+    // Ett val av flera (var porten ska stå, vart draken går): ta det bästa, ett steg djupt. När budgeten är
+    // slut tas bara det första valet, så att alternativet ändå räknas färdigt och går att jämföra.
+    if (own.length > 1 && depth < 1 && !exhausted(b)) {
       let best: number | null = null;
       for (const o of own.slice(0, MAX_FOLLOW_UPS)) {
-        const v = finishValue(eng, s, me, o, depth + 1);
+        if (best !== null && exhausted(b)) break;
+        const v = finishValue(eng, b, s, me, o, depth + 1);
         if (v !== null && (best === null || v > best)) best = v;
       }
       return best;
     }
-    r = eng.apply(s, me, own[0] as Step);
+    r = sim(eng, b, s, me, own[0] as Step);
   }
   return r.ok ? evaluate(eng, r.state, me) : null;
 }
 
 const isFigureStep = (s: Step) => s.type !== "undo" && s.type !== "confirm" && s.type !== "noFigure";
 
-function bestPlacement(eng: EngineApi, state: GameState, me: PlayerId, rnd: Rnd): { step: Step; value: number } | null {
+/** Andel av en brickas budget som högst går åt till att pröva placeringar utan pjäs; resten går till pjäsvalen. */
+const QUICK_SHARE = 0.5;
+
+/**
+ * Placering och pjäs räknas ut tillsammans, så pjäsvalet sparas till nästa anrop i samma tur i stället
+ * för att räknas om. Nyckeln beskriver läget (spelare, fas, turens steg, kartans och högens storlek).
+ */
+const plans = new Map<string, Step>();
+const keyOf = (s: GameState) => `${actorOf(s)}|${s.turn.phase}|${JSON.stringify(s.turn.pending)}|${Object.keys(s.board).length}|${s.drawPile.length}`;
+
+/** Spara `steps` som plan från läget `from`; de första `skip` stegen gör anroparen själv och sparas inte. */
+function rememberPlan(eng: EngineApi, from: GameState, me: PlayerId, steps: Step[], skip = 0): void {
+  if (plans.size > 20) plans.clear();
+  let s = from;
+  for (const [i, st] of steps.entries()) {
+    if (i >= skip) plans.set(keyOf(s), st);
+    const r = eng.simulate(s, me, st);
+    if (!r.ok) return;
+    s = r.state;
+  }
+}
+
+interface Plan {
+  step: Step;
+  value: number;
+  /** Pjäsvalet som hör till placeringen (noFigure om ingen pjäs är bäst). */
+  figure: Step;
+}
+
+function bestPlacement(eng: EngineApi, b: Budget, state: GameState, me: PlayerId, rnd: Rnd): Plan | null {
   let placements = eng.legalSteps(state).filter((s) => s.type === "placeTile");
   if (placements.length === 0) return null;
+  // Platser som rör flest grannbrickor är oftast de som avslutar något; resten får slumpen avgöra.
   if (placements.length > MAX_QUICK) {
-    // Platser som rör flest grannbrickor är oftast de som avslutar något; resten får slumpen avgöra.
     const touch = (s: Step) => {
       if (s.type !== "placeTile") return 0;
       let n = 0;
@@ -95,20 +154,33 @@ function bestPlacement(eng: EngineApi, state: GameState, me: PlayerId, rnd: Rnd)
     };
     placements = placements.map((s) => ({ s, k: touch(s) })).sort((a, b) => b.k - a.k).slice(0, MAX_QUICK).map((x) => x.s);
   }
-  const quick: { step: Step; value: number }[] = [];
+  const quickStart = b.sims;
+  const quick: Plan[] = [];
   for (const step of placements) {
-    const v = finishValue(eng, state, me, step);
-    if (v !== null) quick.push({ step, value: v + rnd() * 0.02 });
+    if (quick.length > 0 && (exhausted(b) || quickStart - b.sims >= QUICK_SHARE * quickStart)) break;
+    const v = finishValue(eng, b, state, me, step);
+    if (v !== null) quick.push({ step, value: v + rnd() * 0.02, figure: { type: "noFigure" } });
   }
   quick.sort((a, b) => b.value - a.value);
   let best = quick[0] ?? null;
-  for (const cand of quick.slice(0, TOP_PLACEMENTS)) {
-    const placed = eng.apply(state, me, cand.step);
+  const top = quick.slice(0, TOP_PLACEMENTS);
+  for (const [i, cand] of top.entries()) {
+    if (exhausted(b)) break;
+    const placed = sim(eng, b, state, me, cand.step);
     if (!placed.ok) continue;
-    for (const fig of eng.legalSteps(placed.state).filter(isFigureStep)) {
-      const v = finishValue(eng, placed.state, me, fig);
-      if (v !== null && (!best || v + rnd() * 0.02 > best.value)) best = { step: cand.step, value: v + rnd() * 0.02 };
+    // Pjäsvalen: själva pjäserna (placeFigure) först, sedan expansionernas egna alternativ.
+    const figs = eng
+      .legalSteps(placed.state)
+      .filter(isFigureStep)
+      .sort((x, y) => Number(y.type === "placeFigure") - Number(x.type === "placeFigure"));
+    const given = Math.floor(b.sims / (top.length - i));
+    const child: Budget = { sims: given, deadline: b.deadline };
+    for (const fig of figs) {
+      if (exhausted(child)) break;
+      const v = finishValue(eng, child, placed.state, me, fig);
+      if (v !== null && (!best || v + rnd() * 0.02 > best.value)) best = { step: cand.step, value: v + rnd() * 0.02, figure: fig };
     }
+    settle(b, child, given);
   }
   return best;
 }
@@ -117,33 +189,50 @@ function bestPlacement(eng: EngineApi, state: GameState, me: PlayerId, rnd: Rnd)
 export function chooseBotStep(eng: EngineApi, state: GameState, rnd: Rnd = Math.random): Step {
   // Spelaren som ska välja (turn.actor när en annan än den som har tur väljer).
   const me = actorOf(state);
+  const budget = newBudget();
   const steps = eng.legalSteps(state);
   const confirm = steps.find((s) => s.type === "confirm");
   if (confirm) return confirm;
   if (steps.length === 0) throw new Error("inga tillåtna steg");
+  // Planen från förra draget i samma tur (placering och pjäs räknades ut tillsammans): använd den om den fortfarande går.
+  if (state.turn.pending.length === 0) plans.clear();
+  const planned = plans.get(keyOf(state));
+  if (planned && steps.some((s) => JSON.stringify(s) === JSON.stringify(planned))) return planned;
 
   const exchange = steps.filter((s) => s.type === "exchangeTile");
   if (exchange.length > 0) return exchange[Math.floor(rnd() * exchange.length)] as Step;
 
   const choose = steps.filter((s) => s.type === "chooseTile");
   if (choose.length > 0) {
-    let best: { step: Step; value: number } | null = null;
+    let best: { step: Step; value: number; after: GameState; plan: Plan } | null = null;
+    // Varje olika bricka på handen får lika stor del av budgeten.
+    const hand = state.players.find((p) => p.id === me)?.hand ?? [];
+    const tiles = choose.flatMap((s) => (s.type === "chooseTile" && hand[s.handIndex] !== undefined ? [hand[s.handIndex]!] : []));
+    const distinct = new Set(tiles).size;
     const seen = new Set<string>();
     for (const step of choose) {
       if (step.type !== "chooseTile") continue;
-      const tile = state.players.find((p) => p.id === me)?.hand[step.handIndex];
+      const tile = hand[step.handIndex];
       if (tile === undefined || seen.has(tile)) continue;
       seen.add(tile);
-      const r = eng.apply(state, me, step);
+      const r = sim(eng, budget, state, me, step);
       if (!r.ok) continue;
-      const b = bestPlacement(eng, r.state, me, rnd);
-      if (b && (!best || b.value > best.value)) best = { step, value: b.value };
+      const given = Math.floor(budget.sims / Math.max(1, distinct - seen.size + 1));
+      const child: Budget = { sims: given, deadline: budget.deadline };
+      const b = bestPlacement(eng, child, r.state, me, rnd);
+      settle(budget, child, given);
+      if (b && (!best || b.value > best.value)) best = { step, value: b.value, after: r.state, plan: b };
     }
-    return best?.step ?? (choose[0] as Step);
+    if (!best) return choose[0] as Step;
+    rememberPlan(eng, best.after, me, [best.plan.step, best.plan.figure]);
+    return best.step;
   }
 
-  const placement = steps.some((s) => s.type === "placeTile") ? bestPlacement(eng, state, me, rnd) : null;
-  if (placement) return placement.step;
+  const placement = steps.some((s) => s.type === "placeTile") ? bestPlacement(eng, budget, state, me, rnd) : null;
+  if (placement) {
+    rememberPlan(eng, state, me, [placement.step, placement.figure], 1);
+    return placement.step;
+  }
 
   // Pjäsfasen (och expansionernas egna steg): provspela varje val.
   const options = steps.filter((s) => s.type !== "undo");
@@ -152,7 +241,8 @@ export function chooseBotStep(eng: EngineApi, state: GameState, rnd: Rnd = Math.
   if (modes.length > 0) return (rnd() < 0.7 ? modes[0] : modes[modes.length - 1]) as Step;
   let best: { step: Step; value: number } | null = null;
   for (const step of options) {
-    const v = finishValue(eng, state, me, step);
+    if (best && exhausted(budget)) break;
+    const v = finishValue(eng, budget, state, me, step);
     if (v !== null && (!best || v + rnd() * 0.02 > best.value)) best = { step, value: v + rnd() * 0.02 };
   }
   return best?.step ?? (options.find((s) => s.type === "noFigure") ?? (options[0] as Step));

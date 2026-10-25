@@ -12,6 +12,7 @@ import type { EngineApi } from "../engine/index";
 import { activeModules, baseExt, engineHook, makeCtx } from "../engine/context";
 import { finishTurn, returnTiles } from "../engine/turn";
 import { returnToSupply } from "../engine/scoring";
+import { isHostStep, removePlayerStep, skipActorStep } from "../engine/host";
 import { currentTile } from "../engine/turnstate";
 import { chooseBotStep } from "./bot";
 import { createTranslator } from "../i18n/index";
@@ -503,6 +504,8 @@ export class Room {
     const state = this.playing(conn);
     if (!state) return;
     if (!step || typeof step !== "object" || typeof step.type !== "string") return this.error(conn, "error.badMessage");
+    // Värdsteg (expansion "base") görs bara av servern, aldrig av en telefon.
+    if (isHostStep(step)) return this.error(conn, "error.illegalStep");
     // Spelaren som ska välja (turn.actor, annars den som har tur) gör stegen; ångra hör till den som har tur.
     if (step.type === "undo" ? state.turn.player !== seat.player : actorOf(state) !== seat.player)
       return this.error(conn, "error.notYourTurn");
@@ -707,17 +710,52 @@ export class Room {
   }
 
   /**
+   * Värdens ingrepp (hoppa över den som väljer, ta bort en spelare) som ett motorsteg i turen. Steget
+   * hamnar i `turn.pending` och spelas om med resten; ett överhopp sparas också i stegloggen, en
+   * borttagning gör inte det (spelarna ändras). Falskt om motorn inte godtar steget.
+   */
+  private hostStep(state: GameState, step: Step, remove: PlayerId | null): boolean {
+    const actor = actorOf(state);
+    const res = this.engine.apply(state, actor, step);
+    if (!res.ok) return false;
+    const by = this.pendingBy.slice(0, state.turn.pending.length);
+    while (by.length < state.turn.pending.length) by.push(state.turn.player);
+    this.pendingBy = [...by, actor];
+    this.state = res.state;
+    if (remove) {
+      this.stepLogOk = false; // spelarna ändras: går inte att spela om från början
+      const seat = this.seats.find((x) => x.player === remove);
+      if (seat) this.removeSeat(seat);
+      this.passHostIfNeeded();
+    }
+    this.preview = null;
+    this.shown = null;
+    this.save();
+    if (res.events.length > 0) this.sendAll({ type: "events", events: res.events });
+    this.camera = this.fitCamera();
+    this.sendScreenInfo();
+    this.broadcastGame(true);
+    return true;
+  }
+
+  /**
    * Avbryter pågående delsteg för den aktiva spelaren och går vidare till nästa tur (hoppa över).
    * Med `remove` tas dessutom spelaren bort: pjäserna ut ur spelet och brickorna på hand
    * blandas tillbaka i högen.
    */
   private advanceTurn(state: GameState, remove: PlayerId | null, who: PlayerId = state.turn.player): void {
     const skipped = state.turn.player;
-    // Någon annan än spelaren som har tur väljer (Crop Circles II) och hoppas över: bara hens val faller
-    // bort, modulen går vidare till nästa som ska välja. Turen och de val andra redan gjort ligger kvar.
-    const actorOnly = state.turn.actor !== undefined && state.turn.actor === who && who !== skipped;
+    // Den som ska välja (turn.actor, annars den som har tur om hen väljer, t.ex. sist i Crop Circles II eller
+    // i draken) hoppas över, eller en annan spelare tas bort: det görs som ett delsteg i turen, så att
+    // omspelningen vid ångra och bekräfta ger samma tillstånd. De val andra redan gjort ligger kvar.
+    if (remove !== null ? remove !== skipped : who === actorOf(state)) {
+      const step = remove !== null ? removePlayerStep(remove) : skipActorStep();
+      if (this.hostStep(state, step, remove)) return;
+      // Hen som väljer är inte den som har tur: hela turen ska aldrig hoppas över av misstag.
+      if (who !== skipped || remove !== null) return;
+    }
     // Pågående tur avbryts bara om det är den frånvarandes tur.
-    const advance = !actorOnly && (remove === null || remove === skipped);
+    const advance = remove === null || remove === skipped;
     const snap = advance ? baseExt(state).snapshot : undefined;
     const s: GameState = structuredClone(snap ?? state);
     const events: GameEvent[] = [];
@@ -745,10 +783,6 @@ export class Room {
       const rctx = makeCtx(env, s, s.turn.player, events);
       for (const f of s.figures.filter((x) => x.owner === remove && x.location.at !== "supply")) returnToSupply(rctx, f);
       s.figures = s.figures.filter((f) => f.owner !== remove);
-    }
-    if (actorOnly) {
-      const ctx = makeCtx(env, s, s.turn.player, events);
-      for (const m of activeModules(env, s.setup)) engineHook(m, "skipActor")?.(ctx);
     }
     if (remove) {
       s.setup.players = s.setup.players.filter((x) => x.id !== remove);
