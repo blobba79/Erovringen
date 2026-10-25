@@ -30,6 +30,7 @@ import { posKey } from "../../engine/geometry";
 import { randomInt } from "../../engine/rng";
 import { placedStep } from "../../engine/turnstate";
 import { phaseAfterFigure } from "../../engine/steps";
+import { figureBlocked } from "../../engine/legal";
 import { TILE_DATA } from "../../tiles/index";
 
 const ID = "flying-machines";
@@ -105,7 +106,8 @@ function flierKinds(ctx: EngineHookContext): string[] {
 function landings(ctx: EngineHookContext, to: Pos, kind: string): { pos: Pos; feature: string }[] {
   const s = ctx.state;
   const rt = rotatedAt(s.board, ctx.types, to);
-  if (!rt) return [];
+  // Ingen får landa där draken står.
+  if (!rt || figureBlocked(ctx.env, s, to)) return [];
   const def = activeModules(ctx.env, s.setup).flatMap((m) => m.figures).find((d) => d.kind === kind);
   const an = analyze(s.board, s.figures, ctx.types);
   const out: { pos: Pos; feature: string }[] = [];
