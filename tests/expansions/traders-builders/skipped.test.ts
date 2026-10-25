@@ -5,9 +5,11 @@ import { describe, expect, test } from "bun:test";
 import { baseExt } from "../../../src/engine/context";
 import { finishTurn } from "../../../src/engine/turn";
 import { realEngine } from "../../engine/helpers";
+import type { Step } from "../../../src/shared/state";
 import { CONFIRM, NOFIG, place$, play, scenario } from "../../engine/scenario";
 
 const eng = realEngine();
+const TAKE: Step = { type: "expansion", expansion: "traders-builders", action: "extraTurn", data: { choice: "take" } };
 const second = (s: { ext: Record<string, unknown> }) => (s.ext["traders-builders"] as { second: string | null }).second;
 
 function start() {
@@ -21,7 +23,7 @@ function start() {
 describe("byggmästaren efter att värden hoppat över en spelare", () => {
   test("dubbelturen kommer tillbaka när p2 hoppas över i stället för att spela", () => {
     // Första delen: brickan bygger vidare på byggmästarens väg, extra tur.
-    let st = play(eng, start(), place$(1, 0, 0), NOFIG, CONFIRM).state;
+    let st = play(eng, start(), place$(1, 0, 0), NOFIG, CONFIRM, TAKE, CONFIRM).state;
     expect(st.turn.player).toBe("p1");
     // Andra delen: ingen kedja, sedan p2:s tur.
     st = play(eng, st, place$(2, 0, 0), NOFIG, CONFIRM).state;
@@ -36,11 +38,11 @@ describe("byggmästaren efter att värden hoppat över en spelare", () => {
     // p1 bygger vidare igen och får en ny dubbeltur.
     const r = play(eng, t, place$(3, 0, 0), NOFIG, CONFIRM).state;
     expect(r.turn.player).toBe("p1");
-    expect(r.turn.phase).toBe("placeTile");
+    expect(r.turn.phase).toBe("tb-extra"); // valet om en ny extra tur erbjuds igen
   });
 
   test("efter en vanlig dubbeltur kedjar den extra turen fortfarande inte", () => {
-    let st = play(eng, start(), place$(1, 0, 0), NOFIG, CONFIRM).state;
+    let st = play(eng, start(), place$(1, 0, 0), NOFIG, CONFIRM, TAKE, CONFIRM).state;
     st = play(eng, st, place$(2, 0, 0), NOFIG, CONFIRM).state;
     expect(st.turn.player).toBe("p2");
     expect(second(st)).toBeNull();

@@ -13,7 +13,7 @@ Expansionen ger dig byggmästaren som ger dubbla drag, grisen som höjer poänge
 I stället för en följare får du sätta ut din byggmästare eller din gris på brickan du just lade.
 
 - **Byggmästaren** får bara stå på en väg eller i en stad där du redan har en egen följare (tjuv eller riddare). Hur långt bort följaren står spelar ingen roll, och andras följare hindrar inte. Byggmästaren räknas inte vid majoritet.
-- **Dubbelt drag:** när du senare lägger en bricka som bygger ut vägen eller staden där din byggmästare står, får du ta ett extra drag. Du väljer själv om du vill. Först gör du hela den första delen (lägg bricka, sätt ut pjäs, poängräkna), sedan får du en ny bricka och en ny runda. Det blir aldrig ett tredje drag.
+- **Dubbelt drag:** när du senare lägger en bricka som bygger ut vägen eller staden där din byggmästare står, får du ta ett extra drag. Du väljer själv om du vill: när du har bekräftat draget frågar spelet om du vill ta det extra draget eller hoppa över det. Först gör du hela den första delen (lägg bricka, sätt ut pjäs, poängräkna), sedan får du en ny bricka och en ny runda. Det blir aldrig ett tredje drag. Äter draken din byggmästare samma tur som brickan byggde ut hans väg får du ändå ta det extra draget.
 - **Grisen** får bara stå på ett fält där du redan har en egen bonde.
 
 Byggmästaren och grisen går tillbaka till dig om din sista tjuv, riddare eller bonde lämnar platsen. Byggmästaren går också tillbaka när vägen eller staden poängräknas.

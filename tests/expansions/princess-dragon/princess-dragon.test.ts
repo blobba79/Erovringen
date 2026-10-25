@@ -762,6 +762,8 @@ describe("byggmästarens dubbeltur med dragbrickor", () => {
     r = finishDragon(r.state);
     expect(loc(r.state, "dragon:0")).toEqual({ at: "tile", pos: { x: 6, y: 5 } });
     r = play(eng, r.state, CONFIRM);
+    expect(phase(r.state)).toBe("tb-extra"); // den extra turen är frivillig
+    r = play(eng, r.state, { type: "expansion", expansion: "traders-builders", action: "extraTurn", data: { choice: "take" } }, CONFIRM);
     // Extra tur för p1: ingen fepoäng, och ny dragbricka ger en ny flytt.
     expect(r.state.turn.player).toBe("p1");
     expect(reasons(r.events)).toEqual([]);

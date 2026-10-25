@@ -8,7 +8,7 @@ The mage and the witch are two neutral figures that you place on a road or city.
 
 ## How a turn works
 - When you place a tile with a mage symbol, right after placing it you must place or move exactly one of the two figures.
-- The same applies if your tile joins the mage's and the witch's road or city: then one of them must move.
+- The same applies if your tile joins the mage's and the witch's road or city: then one of them must move. It also applies if a ferry (The Ferries) that you place or move does it.
 - If neither is on the board, you bring one into play. If both are on the board, you move one. If one is on the board, you choose freely: move it, or bring in the other.
 - The target is an unfinished road or city anywhere on the board. The mage and the witch may not be on the same road or in the same city, and a figure you move must end up on a different feature than before.
 - If there is no legal target, you remove a figure that is on the board.

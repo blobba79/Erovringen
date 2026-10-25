@@ -45,8 +45,9 @@
 //
 // - Modulen måste komma före Ferries i modullistan: när draken flyttat vidare frågas modulerna efter
 //   den om sin fas efter pjässteget (färjorna).
-// - OKLART: tar draken byggmästaren samma tur som brickan byggt vidare på hans område får ändå
-//   byggmästaren sin extra tur (Traders & Builders sätter den vid placeringen).
+// - Tar draken byggmästaren samma tur som brickan byggt vidare på hans område gäller den extra turen
+//   ändå (Traders & Builders avgör den vid placeringen; steg 9a säger "had a builder", och även en
+//   byggmästare som gått hem när området blev färdigt ger den, s. 37). Spelaren får välja att ta den.
 
 import type { ExpansionModule, HookContext, RuleVariantDefinition } from "../../shared/expansion";
 import type { ExpansionStepData, Figure, PlayerId, Pos, Step } from "../../shared/state";

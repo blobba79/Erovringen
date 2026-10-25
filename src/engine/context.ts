@@ -2,7 +2,7 @@
 
 import type { ExpansionModule, HookContext } from "../shared/expansion";
 import type { Edge } from "../shared/tiles";
-import type { Figure, GameEvent, GameSetup, GameState, PlayerId, Pos } from "../shared/state";
+import type { Figure, GameEvent, GameSetup, GameState, PlayerId, Pos, Step } from "../shared/state";
 import type { TileTypes } from "./board";
 import type { Area } from "./features";
 
@@ -75,6 +75,19 @@ export interface EngineHooks {
   skipActor(ctx: EngineHookContext): boolean;
   /** Falskt = spelaren som har tur får inte ångra just nu (någon annan har redan valt). */
   canUndo(ctx: EngineHookContext): boolean;
+  /**
+   * Efter att en modul utfört ett eget delsteg (`expansion`); anropas för alla moduler, efter att modulen
+   * som äger steget gjort sitt (och steget lagts i `pending`). Modulen får ändra turens fas, t.ex. Mage &
+   * Witch som tar fasen när en färja slagit ihop magikerns och häxans vägar.
+   */
+  afterExpansionStep(ctx: EngineHookContext, step: Extract<Step, { type: "expansion" }>): void;
+  /**
+   * När alla faser efter poängräkningen (`afterScoring`) är klara, precis innan en extra tur eller nästa
+   * spelare tar vid: modulen får lägga en sista fas (byggmästarens val att ta den extra turen). Returnera
+   * fasens namn, eller `undefined`. Modulen måste själv se till att den inte frågar igen när turen
+   * avslutas om fasen hoppas över (värden hoppar över en frånvarande spelare).
+   */
+  beforeNextTurn(ctx: EngineHookContext): string | undefined;
   /**
    * När en tur börjar (`ctx.player` är spelaren som fått turen): t.ex. fens poäng i The Princess & the
    * Dragon. `extra` är sant om turen är byggmästarens extra tur (andra delen av en dubbeltur).

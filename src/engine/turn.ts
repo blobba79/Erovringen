@@ -92,6 +92,14 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
     state.turn.phase = phase;
     return;
   }
+  // Sista fasen före nästa tur (byggmästarens val att ta den extra turen).
+  for (const m of activeModules(env, state.setup)) {
+    const phase = engineHook(m, "beforeNextTurn")?.(ctx);
+    if (phase === undefined) continue;
+    if (again) ext.extraTurnPending = true;
+    state.turn.phase = phase;
+    return;
+  }
   for (const m of activeModules(env, state.setup)) {
     const handled = engineHook(m, "dealAfterTurn")?.(ctx, again);
     if (handled === undefined) continue;

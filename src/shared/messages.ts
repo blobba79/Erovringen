@@ -148,7 +148,11 @@ export type ClientMessage =
   | { type: "hostAction"; player: PlayerId; action: HostAction }
   /** Bara värden, i lobbyn: lägg till eller ta bort en datorstyrd spelare. */
   | { type: "addBot" }
-  | { type: "removeBot"; player: PlayerId };
+  | { type: "removeBot"; player: PlayerId }
+  /** Från vilken spelares telefon som helst: visa eller dölj brickorna som är kvar på storskärmen. */
+  | { type: "showRemaining"; on: boolean }
+  /** Bara från storskärmen på den egna datorn: avsluta programmet (spelet är redan sparat). */
+  | { type: "quit" };
 
 /** Det som visas för alla. Händer och dolda val är borttagna. */
 export type PublicState = Omit<GameState, "players" | "rng" | "drawPile"> & {
@@ -215,6 +219,8 @@ export type ServerMessage =
   | { type: "warnings"; warnings: Warning[] }
   /** Till alla när spelet är slut. */
   | { type: "stats"; stats: GameStats }
+  /** Till alla: om brickorna som är kvar visas på storskärmen. */
+  | { type: "remainingShown"; on: boolean }
   | { type: "error"; key: string; params?: Record<string, string | number> };
 
 export interface SavedGame {

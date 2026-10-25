@@ -4,7 +4,10 @@ import { goldMinesModule, goldRate } from "../../../src/expansions/gold-mines/in
 import { realEngine, setupOf } from "../../engine/helpers";
 import { CONFIRM, NOFIG, fig$, place$, play, scenario, score, type Rot } from "../../engine/scenario";
 import { playGame, type Strategy } from "../../players/random-player";
-import type { GameState, Pos } from "../../../src/shared/state";
+import { actorOf } from "../../../src/engine/index";
+import { finishTurn } from "../../../src/engine/turn";
+import { removePlayerStep, skipActorStep } from "../../../src/engine/host";
+import type { GameState, Pos, Step } from "../../../src/shared/state";
 import type { ExpansionId } from "../../../src/shared/tiles";
 
 const eng = realEngine();
@@ -21,6 +24,18 @@ const putBar = (s: GameState, i: number, x: number, y: number) => {
   s.figures.find((f) => f.id === bar(i))!.location = { at: "tile", pos: { x, y } };
 };
 const goldSteps = (s: GameState) => eng.legalSteps(s).filter((x) => x.type === "expansion");
+const takeGold = (pos: Pos): Step => ({ type: "expansion", expansion: "gold-mines", action: "takeGold", data: { pos } });
+const act = (s: GameState, step: Step): GameState => {
+  const r = eng.apply(s, actorOf(s), step);
+  if (!r.ok) throw new Error(`${JSON.stringify(step)} nekades: ${r.error}`);
+  return r.state;
+};
+/** Spelarna tar var sin tacka (första alternativet) i fasen gold-pick tills den är klar, och sedan bekräftas turen. */
+function settle(s: GameState): GameState {
+  if (s.turn.phase !== "gold-pick") return s;
+  while (s.turn.phase === "gold-pick") s = act(s, goldSteps(s)[0]!);
+  return play(eng, s, CONFIRM).state;
+}
 const placeGold = (pos: Pos) => ({ type: "expansion" as const, expansion: "gold-mines" as ExpansionId, action: "placeGold", data: { pos } });
 
 describe("modulen", () => {
@@ -95,7 +110,7 @@ const roadScenario = (variants: Record<string, string>, bars: [number, number][]
   bars.forEach(([x, y], i) => putBar(s, i, x, y));
   return s;
 };
-const finishRoad = (s: GameState) => play(eng, s, place$(0, 2, 180), NOFIG, CONFIRM).state;
+const finishRoad = (s: GameState) => settle(play(eng, s, place$(0, 2, 180), NOFIG, CONFIRM).state);
 
 describe("utdelning", () => {
   test("ensam majoritet får alla tackor på vägens brickor; tackor utanför ligger kvar", () => {
@@ -155,7 +170,7 @@ describe("utdelning", () => {
     putBar(s, 0, 0, 0);
     putBar(s, 1, -1, -1);
     putBar(s, 2, 2, 0);
-    const r = play(eng, s, place$(1, 1, 0), NOFIG, CONFIRM).state;
+    const r = settle(play(eng, s, place$(1, 1, 0), NOFIG, CONFIRM).state);
     expect(score(r, "p1")).toBe(9);
     expect(gold(r, "p1")).toBe(2);
     expect(gold(r, "p2")).toBe(0);
@@ -180,6 +195,218 @@ describe("utdelning", () => {
     const given = r.figures.find((f) => f.id === bar(0))!;
     expect(given.location.at).toBe("supply");
     expect((r.ext["gold-mines"] as { taken: string[] }).taken).toEqual([bar(0)]);
+  });
+});
+
+describe("spelaren väljer tacka (en i taget, not 450)", () => {
+  /** Vägen är färdig efter bekräftelsen; spelarna har var sin följare, tackorna ligger på de angivna rutorna. */
+  const done = (bars: [number, number][], figs: { id: string; y: number }[], variants: Record<string, string> = {}) =>
+    play(eng, roadScenario(variants, bars, figs), place$(0, 2, 180), NOFIG, CONFIRM).state;
+  const both = [{ id: M("p1"), y: 0 }, { id: M("p2"), y: 1 }];
+
+  test("tackor på olika rutor: den aktiva väljer, och valen numreras på rutorna", () => {
+    const a = done([[0, 0], [0, 1], [0, 1]], both);
+    expect(a.turn.phase).toBe("gold-pick");
+    expect(a.turn.player).toBe("p1");
+    expect(a.turn.actor).toBeUndefined();
+    const steps = goldSteps(a);
+    expect(steps.every((x) => x.type === "expansion" && x.expansion === "gold-mines" && x.action === "takeGold")).toBe(true);
+    expect(steps.map((x) => (x as { data: { pos: Pos } }).data.pos).sort((p, q) => p.y - q.y)).toEqual([{ x: 0, y: 0 }, { x: 0, y: 1 }]);
+    expect(eng.legalSteps(a).some((x) => x.type === "confirm" || x.type === "placeTile")).toBe(false);
+    expect(eng.apply(a, "p1", takeGold({ x: 5, y: 5 })).ok).toBe(false); // ingen tacka där
+    // p1 tar tackan på (0,1). Då återstår en tacka på (0,0) och en på (0,1): p2 väljer, p1 får resten automatiskt.
+    const b = act(a, takeGold({ x: 0, y: 1 }));
+    expect(b.turn.phase).toBe("gold-pick");
+    expect(b.turn.actor).toBe("p2");
+    expect(gold(b, "p1")).toBe(1);
+    const c = act(b, takeGold({ x: 0, y: 0 }));
+    expect(c.turn.phase).toBe("confirm");
+    expect(c.turn.actor).toBeUndefined();
+    expect([gold(c, "p1"), gold(c, "p2")]).toEqual([2, 1]);
+    expect(barsOn(c)).toEqual([]);
+    // Valet spelar roll: tar p2 (0,0) får p1 sist tackan på (0,1), och tvärtom.
+    const taken = (pos: Pos) => {
+      const r = eng.apply(b, "p2", takeGold(pos));
+      if (!r.ok) throw new Error(r.error);
+      return r.events
+        .filter((e) => e.type === "expansion" && e.event === "gold")
+        .map((e) => (e as unknown as { data: { player: string; pos: Pos } }).data)
+        .map((d) => `${d.player}@${d.pos.x},${d.pos.y}`);
+    };
+    expect(taken({ x: 0, y: 0 })).toEqual(["p2@0,0", "p1@0,1"]);
+    expect(taken({ x: 0, y: 1 })).toEqual(["p2@0,1", "p1@0,0"]);
+  });
+
+  test("valet avgör vilken tacka som tas: den andra blir kvar för nästa", () => {
+    // p1 är ensam berättigad till tre tackor på två rutor: tar (0,0) först, sedan blir bara (0,1) kvar och tas automatiskt.
+    const a = done([[0, 0], [0, 1], [0, 1]], [{ id: M("p1"), y: 0 }]);
+    const evts = play(eng, a, takeGold({ x: 0, y: 0 })).events.filter((e) => e.type === "expansion" && e.event === "gold");
+    expect(evts.map((e) => (e as { data: { pos: Pos } }).data.pos)).toEqual([{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 1 }]);
+  });
+
+  test("automatiskt utan steg när allt ligger på samma ruta, eller när det bara finns en tacka", () => {
+    const same = done([[0, 1], [0, 1], [0, 1]], both);
+    expect(same.turn.phase).not.toBe("gold-pick");
+    expect([gold(same, "p1"), gold(same, "p2")]).toEqual([2, 1]); // ROD, BLÅ, ROD
+    const one = done([[0, 1]], both);
+    expect(one.turn.phase).not.toBe("gold-pick");
+    expect([gold(one, "p1"), gold(one, "p2")]).toEqual([1, 0]);
+  });
+
+  test("en annan spelare väljer i sin tur: turn.actor, och ångra hör till den som har tur", () => {
+    // Fyra tackor på tre rutor. p1 väljer först (0,0), sedan väljer p2 mellan de två rutor som återstår.
+    const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
+    expect(a.turn.actor).toBeUndefined();
+    const b = act(a, takeGold({ x: 0, y: 0 }));
+    expect(b.turn.phase).toBe("gold-pick");
+    expect(b.turn.player).toBe("p1");
+    expect(b.turn.actor).toBe("p2");
+    expect(actorOf(b)).toBe("p2");
+    // Bara p2 kan välja; p1 får ångra så länge p2 inte valt.
+    expect(eng.apply(b, "p1", takeGold({ x: 0, y: 2 })).ok).toBe(false);
+    expect(eng.legalSteps(b).some((x) => x.type === "undo")).toBe(false); // legalSteps gäller den som väljer
+    expect(eng.canUndo(b)).toBe(true);
+    const undone = eng.apply(b, "p1", { type: "undo" });
+    expect(undone.ok).toBe(true);
+    expect(undone.ok && undone.state.turn.actor).toBeUndefined();
+    expect(undone.ok && gold(undone.state, "p1")).toBe(0);
+    // p2 väljer: därefter är ångra spärrat.
+    const c = act(b, takeGold({ x: 0, y: 2 }));
+    expect(eng.canUndo(c)).toBe(false);
+    expect(eng.apply(c, "p1", { type: "undo" }).ok).toBe(false);
+    expect(eng.apply(c, "p2", { type: "undo" }).ok).toBe(false);
+  });
+
+  test("ångra tar tillbaka den aktiva spelarens val", () => {
+    const a = done([[0, 0], [0, 1], [0, 1]], [{ id: M("p1"), y: 0 }]);
+    const b = act(a, takeGold({ x: 0, y: 0 }));
+    expect(eng.canUndo(b)).toBe(true);
+    const u = play(eng, b, { type: "undo" }).state;
+    expect(JSON.stringify(u)).toBe(JSON.stringify(a));
+  });
+
+  test("variant per-feature: inga val, allt delas ut direkt", () => {
+    const s = done([[0, 0], [0, 1], [0, 1]], both, { "gold-mines.distribution": "per-feature" });
+    expect(s.turn.phase).toBe("placeTile");
+    expect([gold(s, "p1"), gold(s, "p2")]).toEqual([1, 1]);
+  });
+
+  test("värden hoppar över den som väljer: hens val görs automatiskt och de andra får välja", () => {
+    const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
+    const b = act(a, takeGold({ x: 0, y: 0 })); // p2 väljer nu
+    const state = act(b, skipActorStep());
+    const ctx = { state };
+    // p2 tar en tacka på (0,1) automatiskt; p1 har nu själv två rutor att välja mellan.
+    expect(ctx.state.turn.phase).toBe("gold-pick");
+    expect(ctx.state.turn.actor).toBeUndefined();
+    expect([gold(ctx.state, "p1"), gold(ctx.state, "p2")]).toEqual([1, 1]);
+    expect(eng.canUndo(ctx.state)).toBe(false); // det som delats ut automatiskt går inte att ångra
+    const end = act(ctx.state, goldSteps(ctx.state)[0]!);
+    // Bekräfta spelar om turen med överhoppet och ger samma utdelning (förut error.internal).
+    const done2 = play(eng, end, CONFIRM).state;
+    expect([gold(done2, "p1"), gold(done2, "p2")]).toEqual([2, 2]);
+    expect(end.turn.phase).toBe("confirm");
+    expect([gold(end, "p1"), gold(end, "p2")]).toEqual([2, 2]);
+    expect(barsOn(end)).toEqual([]);
+  });
+
+  test("värden hoppar över den som har tur under valet: resten delas ut automatiskt", () => {
+    const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
+    const skipped = structuredClone(a);
+    finishTurn(eng.env, skipped, []);
+    expect(skipped.turn.phase).not.toBe("gold-pick");
+    expect(skipped.turn.actor).toBeUndefined();
+    expect(gold(skipped, "p1") + gold(skipped, "p2")).toBe(4);
+    expect(barsOn(skipped)).toEqual([]);
+  });
+
+  test("en spelare som tagits bort delas det inte ut till", () => {
+    const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
+    const b = act(a, takeGold({ x: 0, y: 0 }));
+    const s = act(b, removePlayerStep("p2"));
+    // p1 är ensam kvar och väljer själv bland de tre tackorna; p2 får inget.
+    expect(s.turn.phase).toBe("gold-pick");
+    expect(s.turn.actor).toBeUndefined();
+    let st: GameState = s;
+    while (st.turn.phase === "gold-pick") st = act(st, goldSteps(st)[0]!);
+    expect(gold(st, "p1")).toBe(4);
+    expect(st.players.map((p) => p.id)).toEqual(["p1"]);
+    // Bekräfta spelar om borttagningen: p2 kommer inte tillbaka.
+    const fin = play(eng, st, CONFIRM).state;
+    expect(fin.players.map((p) => p.id)).toEqual(["p1"]);
+    expect(gold(fin, "p1")).toBe(4);
+  });
+
+  test("värden hoppar över den som har tur och väljer själv (steg): resten delas ut och turen kan bekräftas", () => {
+    const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
+    expect(a.turn.phase).toBe("gold-pick");
+    expect(a.turn.actor).toBeUndefined();
+    let b = act(a, skipActorStep());
+    // p1:s val görs automatiskt; p2 väljer själv resten.
+    expect(b.turn.actor).toBe("p2");
+    expect(gold(b, "p1")).toBeGreaterThan(0);
+    while (b.turn.phase === "gold-pick") b = act(b, goldSteps(b)[0]!);
+    expect(b.turn.phase).toBe("confirm");
+    expect(gold(b, "p1") + gold(b, "p2")).toBe(4);
+    expect(barsOn(b)).toEqual([]);
+    const c = play(eng, b, CONFIRM).state;
+    expect(gold(c, "p1") + gold(c, "p2")).toBe(4);
+    expect(c.turn.phase).not.toBe("gold-pick");
+  });
+});
+
+describe("tackor, draken och sädescirkeln: utdelningen kommer före steg 8 (s. 207-208)", () => {
+  test("drakens variant after: tackorna väljs och delas ut före drakens flytt", () => {
+    const EXPD: ExpansionId[] = ["base", "gold-mines", "princess-dragon"];
+    // Vägen (0,0)-(0,1)-(0,2) blir färdig av drakbrickan på (0,1). Draken står på (3,3), med en granne.
+    const s = scenario(eng, {
+      expansions: EXPD,
+      board: [["base/LR", 0, 0, 0], ["base/LR", 0, 2, 180], ["base/L", 3, 3, 0], ["base/L", 3, 4, 0]],
+      hands: [["princess-dragon/RFr.d"], ["base/L"]], pile: ["base/L", "base/L"],
+      variants: { "princess-dragon.dragonTiming": "after" },
+      figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }, { id: M("p2"), x: 0, y: 2, feature: "road0" }],
+    });
+    s.figures.find((f) => f.id === "dragon:0")!.location = { at: "tile", pos: { x: 3, y: 3 } };
+    putBar(s, 0, 0, 0);
+    putBar(s, 1, 0, 2);
+    let st = play(eng, s, place$(0, 1, 90), NOFIG, CONFIRM).state;
+    expect(st.turn.phase).toBe("gold-pick"); // först guldet (steg 7g) ...
+    st = act(st, goldSteps(st)[0]!);
+    expect(st.turn.phase).toBe("confirm");
+    expect(gold(st, "p1") + gold(st, "p2")).toBe(2);
+    st = play(eng, st, CONFIRM).state;
+    expect(st.turn.phase).toBe("dragon"); // ... sedan draken (steg 8c)
+    expect(st.turn.player).toBe("p1");
+  });
+
+  test("sädescirkeln kommer efter guldvalet", () => {
+    const EXPC: ExpansionId[] = ["base", "gold-mines", "crop-circles-2"];
+    // p1 och p2 delar en väg som sädescirkelbrickan (en kurva) gör färdig; p2 har en annan följare på en egen väg.
+    let tested = 0;
+    for (const rot of [0, 90, 180, 270] as Rot[]) {
+      const s = scenario(eng, {
+        expansions: EXPC,
+        board: [["base/LR", 0, 0, 0], ["base/LR", 1, 1, 90], ["base/RFr", 0, 9, 0]],
+        hands: [["crop-circles-2/RRr"], ["base/L"]], pile: ["base/L", "base/L"],
+        figures: [
+          { id: M("p1"), x: 0, y: 0, feature: "road0" }, { id: M("p2"), x: 1, y: 1, feature: "road0" },
+          { id: "p2:meeple:1", x: 0, y: 9, feature: "road0" },
+        ],
+      });
+      putBar(s, 0, 0, 0);
+      putBar(s, 1, 1, 1);
+      const placed = eng.apply(s, "p1", place$(0, 1, rot));
+      if (!placed.ok) continue;
+      let st = play(eng, placed.state, NOFIG, CONFIRM).state;
+      if (st.turn.phase !== "gold-pick") continue;
+      st = act(st, goldSteps(st)[0]!);
+      while (st.turn.phase === "gold-pick") st = act(st, goldSteps(st)[0]!);
+      expect(st.turn.phase).toBe("confirm");
+      st = play(eng, st, CONFIRM).state;
+      expect(st.turn.phase).toBe("crop-circles-2");
+      tested++;
+    }
+    expect(tested).toBeGreaterThan(0);
   });
 });
 

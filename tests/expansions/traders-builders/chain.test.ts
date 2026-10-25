@@ -11,6 +11,7 @@ import { CONFIRM, NOFIG, place$, play, scenario, type Rot } from "../../engine/s
 
 const eng = realEngine();
 const phase = (s: GameState) => s.turn.phase;
+const TAKE: Step = { type: "expansion", expansion: "traders-builders", action: "extraTurn", data: { choice: "take" } };
 
 /** Utför ett delsteg av den som ska välja (actor, annars den som har tur). */
 function act(s: GameState, step: Step): GameState {
@@ -43,6 +44,8 @@ describe("byggmästaren kedjar inte med en fas efter poängräkningen", () => {
     }
     expect(phase(st)).toBe("confirm");
     st = play(eng, st, CONFIRM).state;
+    expect(phase(st)).toBe("tb-extra"); // valet kommer sist, efter drakens fas
+    st = play(eng, st, TAKE, CONFIRM).state;
     expect(st.turn.player).toBe("p1"); // extra tur
     expect(st.turn.phase).toBe("placeTile");
     // Den extra turen bygger vidare igen (2,0): ingen tredje tur.
@@ -65,9 +68,13 @@ describe("byggmästaren kedjar inte med en fas efter poängräkningen", () => {
       ],
     });
     const finish = (st: GameState): GameState => {
-      for (let i = 0; i < 30 && (phase(st) === "crop-circles-2" || phase(st) === "confirm"); i++) {
+      for (let i = 0; i < 30 && (phase(st) === "crop-circles-2" || phase(st) === "confirm" || phase(st) === "tb-extra"); i++) {
         if (phase(st) === "confirm") {
           st = play(eng, st, CONFIRM).state;
+          continue;
+        }
+        if (phase(st) === "tb-extra") {
+          st = act(st, TAKE);
           continue;
         }
         const opts = eng.legalSteps(st).filter((x) => x.type === "expansion");

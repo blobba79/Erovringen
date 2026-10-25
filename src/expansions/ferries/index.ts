@@ -18,12 +18,16 @@
 //       expansion "ferries" action "skip"   data {}  (klar, flytta inga fler)
 //   Flyttbara färjor är den första färjan på varje väg som går ut från den lagda brickan (högst en
 //   per riktning; en andra färja bakom den första får inte flyttas). Varje färja flyttas högst en gång
-//   per tur; en färja som lagts ut den här turen flyttas inte. En färja flyttas till något annat par
+//   per tur (båda delarna av byggmästarens dubbeltur är samma tur); en färja som lagts ut den här turen
+//   flyttas inte. En färja flyttas till något annat par
 //   vägkanter på samma sjö (den behöver inte längre röra den förlängda vägen).
 // - Poäng: inga egna; vägar räknas som vanligt över färjorna. Vägar som blir färdiga av en lagd eller
 //   flyttad färja räknas i turens slut (motorkroken `scoreAround`).
 // - T&B: byggmästaren går hem om flyttandet gör att ägaren inte längre har någon följare på vägen.
 //   Att bara flytta en färja ger ingen extra tur (T&B ger den bara när brickan bygger vidare).
+// - Mage & Witch: slår en lagd eller flyttad färja ihop magikerns och häxans vägar flyttas en av dem, som när
+//   en bricka slår ihop dem (s. 154-155). Mage & Witch tar fasen när färjestegen är klara (motorkroken
+//   `afterExpansionStep` i Mage & Witch).
 // - Färjan är neutral: inget värde vid majoritet, kan inte fångas och räknas inte som mat åt draken.
 
 import type { ExpansionModule } from "../../shared/expansion";
@@ -45,15 +49,18 @@ const ID = "ferries";
 const set: TileSet = (TILE_DATA[ID] as { set: TileSet }).set;
 
 interface FerryExt {
-  /** Färjor som lagts ut eller flyttats den här turen. */
+  /** Färjor som flyttats den här turen (båda delarna av en dubbeltur); de flyttas inte igen. */
   moved: string[];
+  /** Färjor som lagts ut eller flyttats i den här delen av turen: runt dem räknas färdiga vägar. */
+  touched: string[];
   /** Färjor som får flyttas just nu. */
   movable: string[];
 }
 
 function ext(ctx: EngineHookContext): FerryExt {
   const s = ctx.state.ext as Record<string, unknown>;
-  if (!s[ID]) s[ID] = { moved: [], movable: [] } satisfies FerryExt;
+  if (!s[ID]) s[ID] = { moved: [], touched: [], movable: [] } satisfies FerryExt;
+  (s[ID] as FerryExt).touched ??= [];
   return s[ID] as FerryExt;
 }
 
@@ -194,14 +201,24 @@ const engineHooks: Partial<EngineHooks> = {
     if (!placed) return undefined;
     const e = ext(c);
     if (isLake(c, placed.pos)) return options(c, PLACE_PHASE).length > 0 ? PLACE_PHASE : undefined;
-    e.movable = firstFerries(c).map((f) => f.id);
+    // Varje färja flyttas högst en gång per tur, även i andra delen av en dubbeltur.
+    e.movable = firstFerries(c).map((f) => f.id).filter((id) => !e.moved.includes(id));
     const phase = nextPhase(c);
     return phase === "confirm" ? undefined : phase;
   },
 
+  // En ny spelares tur: alla färjor får flyttas igen. Andra delen av byggmästarens dubbeltur (`extra`) är
+  // samma tur ("högst en gång per tur", s. 148), så då behålls listan.
+  turnStarted(c, extra) {
+    const e = ext(c);
+    e.touched = [];
+    e.movable = [];
+    if (!extra) e.moved = [];
+  },
+
   scoreAround(c) {
-    const moved = ext(c).moved;
-    return c.state.figures.filter((f) => moved.includes(f.id) && f.location.at === "feature").map((f) => (f.location as { pos: Pos }).pos);
+    const touched = ext(c).touched ?? [];
+    return c.state.figures.filter((f) => touched.includes(f.id) && f.location.at === "feature").map((f) => (f.location as { pos: Pos }).pos);
   },
 };
 
@@ -237,14 +254,16 @@ export const ferriesModule: ExpansionModule = {
         const placed = placedStep(s)!;
         const ferry = s.figures.find((f) => isFerry(f) && f.location.at === "supply")!;
         ferry.location = { at: "feature", pos: { ...placed.pos }, feature: d.choice! };
-        e.moved.push(ferry.id);
+        e.touched.push(ferry.id);
         ctx.emit({ type: "figurePlaced", figure: ferry.id, location: ferry.location });
-        e.movable = firstFerries(ctx).map((f) => f.id).filter((id) => !e.moved.includes(id));
+        // Inte den nya färjan (en färja som lagts ut den här turen flyttas inte) och inte färjor som flyttats i turen.
+        e.movable = firstFerries(ctx).map((f) => f.id).filter((id) => !e.moved.includes(id) && !e.touched.includes(id));
       } else if (step.action === "move") {
         const ferry = s.figures.find((f) => f.id === d.figure)!;
         const pos = (ferry.location as { pos: Pos }).pos;
         ferry.location = { at: "feature", pos: { ...pos }, feature: d.choice! };
         e.moved.push(ferry.id);
+        e.touched.push(ferry.id);
         e.movable = e.movable.filter((id) => id !== ferry.id);
         ctx.emit({ type: "figurePlaced", figure: ferry.id, location: ferry.location });
       } else e.movable = [];
@@ -255,7 +274,9 @@ export const ferriesModule: ExpansionModule = {
 
     extraTurn(c) {
       const e = ext(c as EngineHookContext);
-      e.moved = [];
+      // Bara den här delens färjor nollställs; `moved` gäller hela turen, även båda delarna av en
+      // dubbeltur (nollställs i `turnStarted`).
+      e.touched = [];
       e.movable = [];
       return false;
     },

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
-import type { GameStats, InspectResult, LobbySeat, PublicState, SavedGameInfo } from "../shared/messages";
+import type { ClientMessage, GameStats, InspectResult, LobbySeat, PublicState, SavedGameInfo } from "../shared/messages";
 import type { Translate } from "../shared/i18n";
 import { LOCALES, availableLanguages, createTranslator } from "../i18n/index";
 import { MapCanvas } from "./MapCanvas";
@@ -16,6 +16,7 @@ import { drawCounterIcon } from "../styles/cellshaded/index";
 import { tileImage } from "./render";
 import { diceAlpha } from "./marks";
 import { actorOf } from "./logic";
+import { CURSOR_HIDE_MS, neutralSupply, playerSupply, type SupplyCount } from "./supply";
 
 /** Läses en gång när sidan startar, så att det gäller även efter återanslutning och byte av vy. */
 const ANDROID_APP = typeof location !== "undefined" && isAndroidApp(location.search);
@@ -167,11 +168,46 @@ function Counters({ counters, tr }: { counters: Record<string, number>; tr: Tran
   );
 }
 
+/** En pjässort som liten ikon i spelarens färg (null = neutral) med antal. */
+function FigureIcon({ item, color, label }: { item: SupplyCount; color: string | null; label: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current;
+    const ctx = c?.getContext("2d");
+    if (!c || !ctx) return;
+    const px = c.getBoundingClientRect().width || 20;
+    const dpr = window.devicePixelRatio || 1;
+    c.width = c.height = Math.max(1, Math.round(px * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, px, px);
+    style.drawFigure({ ctx, kind: item.kind, color, x: px / 2, y: px / 2, size: px * 0.8 });
+  }, [item.kind, color]);
+  return (
+    <span class="fig" title={label} data-kind={item.kind}>
+      <canvas ref={ref} class="ficon" aria-hidden="true" />
+      <span class="fcount">{item.count}</span>
+    </span>
+  );
+}
+
+function SupplyRow({ items, color, tr }: { items: SupplyCount[]; color: string | null; tr: Translate }) {
+  if (items.length === 0) return null;
+  return (
+    <div class="supply">
+      {items.map((it) => {
+        const key = `figure.${it.kind}`;
+        return <FigureIcon key={it.kind} item={it} color={color} label={tr(key) !== key ? tr(key) : it.kind} />;
+      })}
+    </div>
+  );
+}
+
 function Scoreboard({ state, tr, view, reactions }: { state: PublicState; tr: Translate; view?: ReplayView; reactions: Record<string, string> }) {
   const rank = new Map(standings(state.players).map((s) => [s.id, s.rank]));
+  const neutral = neutralSupply(state);
   return (
     <section class="panel scores">
-      <h3>{tr("screen.scoreboard")}</h3>
+      <h3>{tr("screen.scoreboard")} <span class="tiles-left">{tr("turn.tilesLeft", { count: state.drawPileCount })}</span></h3>
       <ul>
         {state.players.map((p) => (
           <li key={p.id} class={p.id === state.turn.player && !state.finished ? "turn" : ""}>
@@ -182,9 +218,15 @@ function Scoreboard({ state, tr, view, reactions }: { state: PublicState; tr: Tr
             {view?.gaining[p.id] ? <span class="gain">+{view.gaining[p.id]}</span> : null}
             <Counters counters={p.counters} tr={tr} />
             <span class="score">{shownScore(p.score, view, p.id)}</span>
+            <SupplyRow items={playerSupply(state, p.id)} color={p.color} tr={tr} />
           </li>
         ))}
       </ul>
+      {neutral.length > 0 && (
+        <div class="neutral" title={tr("screen.neutralFigures")}>
+          <SupplyRow items={neutral} color={null} tr={tr} />
+        </div>
+      )}
     </section>
   );
 }
@@ -212,7 +254,6 @@ function Remaining({ state, tr }: { state: PublicState; tr: Translate }) {
   );
   return (
     <section class="panel remaining">
-      <h3>{tr("turn.tilesLeft", { count: state.drawPileCount })}</h3>
       <div class="thumbs">
         {entries.map(([type, n]) => <TileThumb key={type} type={type} count={n} />)}
       </div>
@@ -422,7 +463,7 @@ function Game({ model, tr }: { model: Model; tr: Translate }) {
       {diceOn && diceOn.options === 0 && <div class="dice-note">{tr("screen.dice.home")}</div>}
       <Scoreboard state={state} tr={tr} view={view} reactions={board.current.active(now)} />
       <ShownTile model={model} tr={tr} />
-      <Remaining state={state} tr={tr} />
+      {model.remainingShown && <Remaining state={state} tr={tr} />}
       {shown && <InspectPanel result={shown} state={state} tr={tr} />}
       {state.finished && <FinalBoard state={state} tr={tr} stats={model.stats} />}
     </div>
@@ -447,13 +488,80 @@ function F11Hint({ tr }: { tr: Translate }) {
   return <div class="f11-hint">{tr("screen.f11")}</div>;
 }
 
-export function App({ model }: { model: Model }): ComponentChildren {
+/** Pekaren visas när musen rör sig och döljs efter tio sekunder utan rörelse (klassen `idle` på body). */
+function useIdleCursor(): void {
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const wake = () => {
+      document.body.classList.remove("idle");
+      clearTimeout(timer);
+      timer = setTimeout(() => document.body.classList.add("idle"), CURSOR_HIDE_MS);
+    };
+    wake();
+    window.addEventListener("mousemove", wake);
+    window.addEventListener("mousedown", wake);
+    return () => {
+      window.removeEventListener("mousemove", wake);
+      window.removeEventListener("mousedown", wake);
+      clearTimeout(timer);
+    };
+  }, []);
+}
+
+/** Helskärm och avsluta, i ett hörn. Avsluta frågar först. */
+function Controls({ tr, send }: { tr: Translate; send?: (m: ClientMessage) => void }) {
+  const [full, setFull] = useState(() => isFullscreenNow(document, window));
+  const [asking, setAsking] = useState(false);
+  useEffect(() => {
+    const update = () => setFull(isFullscreenNow(document, window));
+    document.addEventListener("fullscreenchange", update);
+    return () => document.removeEventListener("fullscreenchange", update);
+  }, []);
+  const toggleFull = () => {
+    try {
+      if (document.fullscreenElement) void document.exitFullscreen();
+      else void document.documentElement.requestFullscreen();
+    } catch {
+      /* webbläsaren nekade */
+    }
+  };
+  const fsLabel = tr(full ? "screen.exitFullscreen" : "screen.fullscreen");
+  return (
+    <>
+      <div class="controls">
+        {!ANDROID_APP && (
+          <button type="button" class="ctl fs" onClick={toggleFull} title={fsLabel}>
+            {full ? "⤢" : "⛶"} <span>{fsLabel}</span>
+          </button>
+        )}
+        <button type="button" class="ctl quit" onClick={() => setAsking(true)} title={tr("screen.quit")}>
+          {"⏻"} <span>{tr("screen.quit")}</span>
+        </button>
+      </div>
+      {asking && (
+        <div class="overlay quit-ask">
+          <section class="card">
+            <h2>{tr("screen.quit.confirm")}</h2>
+            <div class="buttons">
+              <button type="button" class="ctl yes" onClick={() => { setAsking(false); send?.({ type: "quit" }); }}>{tr("screen.quit.yes")}</button>
+              <button type="button" class="ctl no" onClick={() => setAsking(false)}>{tr("screen.quit.no")}</button>
+            </div>
+          </section>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function App({ model, send }: { model: Model; send?: (m: ClientMessage) => void }): ComponentChildren {
+  useIdleCursor();
   const tr = useMemo(() => createTranslator(model.lang in LOCALES ? model.lang : "en"), [model.lang]);
   return (
     <>
       {model.state ? <Game model={model} tr={tr} /> : <Lobby model={model} tr={tr} />}
       <Waiting model={model} tr={tr} />
       <F11Hint tr={tr} />
+      <Controls tr={tr} send={send} />
       {!model.connected && <div class="toast">{tr("reconnect.lost")}</div>}
       {model.errorKey && <div class="toast err">{tr(model.errorKey)}</div>}
     </>
