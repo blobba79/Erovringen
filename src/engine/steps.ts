@@ -106,6 +106,7 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
       const err = m.hooks.applyStep(ctx, step);
       if (err) return err;
       turn.pending.push(step);
+      for (const o of mods) engineHook(o, "afterExpansionStep")?.(ctx, step);
       return null;
     }
     default:

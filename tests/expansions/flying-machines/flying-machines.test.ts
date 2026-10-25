@@ -65,8 +65,8 @@ describe("flygning", () => {
     expect(dice(r.events)).toEqual([
       { player: "p1", roll: 1, from: { x: 1, y: 0 }, to: { x: 0, y: 0 }, direction: "W", kind: "meeple", options: 1 },
     ]);
-    // Bara själva landningssteget (och ångra) erbjuds.
-    expect(new Set(eng.legalSteps(r.state).map((x) => x.type))).toEqual(new Set(["expansion", "undo"]));
+    // Bara själva landningssteget erbjuds: efter slaget går det inte att ångra.
+    expect(new Set(eng.legalSteps(r.state).map((x) => x.type))).toEqual(new Set(["expansion"]));
     expect(exSteps(r.state).map((x) => x.action)).toEqual(["land"]);
     const r2 = play(eng, r.state, land(0, 0, "cloister"));
     const m = r2.state.figures.find((f) => f.id === "p1:meeple:0")!;
@@ -86,7 +86,7 @@ describe("flygning", () => {
     const r = play(eng, withRoll(sc(row, FM("F.o")), 3), place$(1, 0, 0), fly());
     expect(dice(r.events)[0]).toMatchObject({ roll: 3, to: { x: -2, y: 0 }, options: 0 });
     expect(r.state.turn.phase).toBe("confirm");
-    expect(eng.legalSteps(r.state).map((x) => x.type).sort()).toEqual(["confirm", "undo"]);
+    expect(eng.legalSteps(r.state).map((x) => x.type).sort()).toEqual(["confirm"]);
     expect(r.state.figures.filter((f) => f.owner === "p1").every((f) => f.location.at === "supply")).toBe(true);
     expect(play(eng, r.state, CONFIRM).state.turn.phase).toBe("placeTile");
   });
@@ -196,16 +196,27 @@ describe("landning", () => {
 });
 
 describe("ångra och omspelning", () => {
-  test("ångra tar tillbaka flygningen och samma tärning slås om", () => {
+  test("ångra är spärrat efter fly: slaget gäller och turen går bara framåt (s. 139-140)", () => {
     const base = withRoll(sc([["base/L", -1, 0, 0], ["base/L", 0, 0, 0]], FM("F.o")), 2);
-    const a = play(eng, base, place$(1, 0, 0), fly());
-    const u = play(eng, a.state, { type: "undo" });
-    expect(u.state.turn.phase).toBe("placeFigure");
-    const b = play(eng, u.state, fly());
-    expect(dice(b.events)).toEqual(dice(a.events));
-    expect(b.state).toEqual(a.state);
-    const again = play(eng, base, place$(1, 0, 0), fly());
-    expect(dice(again.events)).toEqual(dice(a.events));
+    // Före flygningen går det att ångra (brickan tas tillbaka).
+    const placed = play(eng, base, place$(1, 0, 0));
+    expect(eng.canUndo(placed.state)).toBe(true);
+    expect(play(eng, placed.state, { type: "undo" }).state.turn.phase).toBe("placeTile");
+    // Efter flygningen spärras ångra, både i landningsfasen och efter landningen.
+    const a = play(eng, placed.state, fly());
+    expect(eng.canUndo(a.state)).toBe(false);
+    expect(eng.legalSteps(a.state).some((x) => x.type === "undo")).toBe(false);
+    const u = eng.apply(a.state, "p1", { type: "undo" });
+    expect(u.ok).toBe(false);
+    const landed = play(eng, a.state, land(-1, 0, "cloister"));
+    expect(eng.canUndo(landed.state)).toBe(false);
+    expect(eng.apply(landed.state, "p1", { type: "undo" }).ok).toBe(false);
+    // Även när följaren inte kan landa (går hem).
+    const home = play(eng, withRoll(sc([["base/L", 0, 0, 0]], FM("F.o")), 3), place$(1, 0, 0), fly());
+    expect(eng.canUndo(home.state)).toBe(false);
+    // Samma tärning ger samma slag vid omspelning av turen (bekräftelse).
+    const done = play(eng, landed.state, CONFIRM);
+    expect(dice(done.events)).toEqual(dice(a.events));
   });
 
   test("bekräftad tur innehåller tärningshändelsen, och samma frö ger samma tärning", () => {

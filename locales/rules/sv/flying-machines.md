@@ -8,7 +8,7 @@ Med flygmaskiner kan du skicka en följare genom luften till en annan bricka. Hu
 
 ## Så går turen till
 - Lägg brickan som vanligt.
-- I stället för att ställa ut en följare som vanligt kan du låta en följare (vanlig eller stor) flyga från flygmaskinen. Abboten, byggmästaren och grisen flyger inte. Då slås tärningen, och följaren flyger så många brickor som tärningen visar, i pilens riktning.
+- I stället för att ställa ut en följare som vanligt kan du låta en följare (vanlig eller stor) flyga från flygmaskinen. Abboten, byggmästaren och grisen flyger inte. Då slås tärningen, och följaren flyger så många brickor som tärningen visar, i pilens riktning. När tärningen är slagen gäller slaget: du kan inte ångra flygningen eller din bricka.
 - Följaren hamnar på brickan där flygningen slutar, och du väljer vilken del av den. Det måste vara en ofärdig väg, stad eller ett ofärdigt kloster. Den får vara ledig eller redan upptagen, av dig eller någon annan.
 - Följaren får aldrig landa på ett fält, och aldrig på en plats där det inte finns någon bricka.
 - Finns ingen tillåten landning går följaren tillbaka till ditt förråd, och du får inte placera någon mer följare den turen.

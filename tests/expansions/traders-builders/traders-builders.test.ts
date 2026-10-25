@@ -4,7 +4,7 @@ import { tradersBuildersModule } from "../../../src/expansions/traders-builders/
 import { realEngine, setupOf } from "../../engine/helpers";
 import { CONFIRM, NOFIG, fig$, inSupply, place$, play, scenario, score, type Rot } from "../../engine/scenario";
 import { playGame, type Strategy } from "../../players/random-player";
-import type { GameState } from "../../../src/shared/state";
+import type { GameState, Step } from "../../../src/shared/state";
 import type { ExpansionId } from "../../../src/shared/tiles";
 
 const eng = realEngine();
@@ -14,6 +14,8 @@ const M = (p: string) => `${p}:meeple:0`;
 const B = (p: string) => `${p}:builder:0`;
 const P = (p: string) => `${p}:pig:0`;
 const TB = (t: string) => `traders-builders/${t}`;
+/** Valet att ta eller hoppa över byggmästarens extra tur. */
+const EXTRA = (choice: "take" | "skip"): Step => ({ type: "expansion", expansion: "traders-builders", action: "extraTurn", data: { choice } });
 const goods = (s: GameState, p: string, g: string) => s.players.find((x) => x.id === p)!.counters[`goods.${g}`];
 const actions = (s: GameState) =>
   eng.legalSteps(s).flatMap((x) => x.type === "placeFigure" && (x.kind === "builder" || x.kind === "pig") ? [`${x.kind}:${x.feature}`] : []);
@@ -113,7 +115,9 @@ describe("byggmästaren", () => {
       board: road(1), hands: [["base/RFr"], ["base/L"]], pile: ["base/RFr", "base/RFr", "base/L", "base/RFr"],
       figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }, { id: B("p1"), x: 0, y: 0, feature: "road0" }],
     });
-    const first = play(eng, s, place$(1, 0, 0), NOFIG, CONFIRM).state;
+    const offer = play(eng, s, place$(1, 0, 0), NOFIG, CONFIRM).state;
+    expect(offer.turn.phase).toBe("tb-extra"); // valet erbjuds efter bekräftelsen
+    const first = play(eng, offer, EXTRA("take"), CONFIRM).state;
     expect(first.turn.player).toBe("p1"); // extra tur
     expect(first.players[0]!.hand).toEqual(["base/RFr"]);
     const second = play(eng, first, place$(2, 0, 0), NOFIG, CONFIRM).state;
@@ -121,7 +125,7 @@ describe("byggmästaren", () => {
     // Nästa gång p1 bygger vidare får hen en ny extra tur.
     const p2 = play(eng, second, place$(0, 1, 0), NOFIG, CONFIRM).state;
     expect(p2.turn.player).toBe("p1");
-    const third = play(eng, p2, place$(3, 0, 0), NOFIG, CONFIRM).state;
+    const third = play(eng, p2, place$(3, 0, 0), NOFIG, CONFIRM, EXTRA("take"), CONFIRM).state;
     expect(third.turn.player).toBe("p1");
   });
   test("en bricka som inte bygger vidare ger ingen extra tur", () => {
@@ -144,7 +148,7 @@ describe("byggmästaren", () => {
       board: road(1), hands: [["base/RFr", "base/L", "base/L"], ["base/L", "base/L", "base/L"]], pile: ["base/RFr", "base/L"],
       handSize: 3, figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }, { id: B("p1"), x: 0, y: 0, feature: "road0" }],
     });
-    const r = play(eng, s, { type: "chooseTile", handIndex: 0 }, place$(1, 0, 0), NOFIG, CONFIRM).state;
+    const r = play(eng, s, { type: "chooseTile", handIndex: 0 }, place$(1, 0, 0), NOFIG, CONFIRM, EXTRA("take"), CONFIRM).state;
     expect(r.turn.player).toBe("p1");
     expect(r.players[0]!.hand.length).toBe(3);
     expect(r.turn.phase).toBe("chooseTile");
@@ -154,7 +158,7 @@ describe("byggmästaren", () => {
       board: [["base/LR", 0, 0, 0]], hands: [["base/LR"], ["base/L"]], pile: ["base/L"],
       figures: [{ id: M("p1"), x: 0, y: 0, feature: "road0" }, { id: B("p1"), x: 0, y: 0, feature: "road0" }],
     });
-    const r = play(eng, s, place$(0, 1, 180), NOFIG, CONFIRM).state;
+    const r = play(eng, s, place$(0, 1, 180), NOFIG, CONFIRM, EXTRA("take"), CONFIRM).state;
     expect(score(r, "p1")).toBe(2);
     expect(inSupply(r, B("p1"))).toBe(true);
     expect(inSupply(r, M("p1"))).toBe(true);

@@ -10,6 +10,14 @@
 //   just lagts, där spelaren redan har en följare (liten eller stor). Läggs en bricka som bygger
 //   vidare på området får spelaren en extra tur, en gång per tur (ingen kedja: den extra turen ger
 //   ingen ny). Även en bricka som bygger vidare och samtidigt gör området färdigt ger extra tur.
+//   Den extra turen är frivillig (s. 36 och not 58): när spelaren bekräftat och alla andra faser efter
+//   poängräkningen är klara (motorkroken `beforeNextTurn`) går turen in i fasen "tb-extra" med
+//     expansion "traders-builders" action "extraTurn" data { choice: "take" | "skip" }
+//   (bara om spelaren har en bricka kvar att lägga). Väljs "take" börjar den extra turen när spelaren
+//   bekräftat igen. Värden som hoppar över en frånvarande spelare ger ingen extra tur.
+//   Äter draken byggmästaren (Princess & Dragon) samma tur som brickan byggde vidare på hans område
+//   gäller den extra turen ändå: den följer av att brickan byggde vidare där byggmästaren stod (steg 9a,
+//   "had a builder"), på samma sätt som när området blev färdigt och byggmästaren gick hem (s. 37).
 //   Pjäsen går hem när området räknas (motorn lämnar tillbaka alla pjäser på ett färdigt område)
 //   eller när spelaren inte längre har någon följare där (städas i afterTilePlaced).
 // - Grisen ("pig") ställs på ett fält där spelaren redan har en bonde. Den räknas inte vid
@@ -18,8 +26,8 @@
 // - Byggmästaren och grisen är vanliga placeFigure-steg (joinsOwn: motorn erbjuder dem bara på
 //   områden där spelaren redan har en egen följare). De räknas inte vid majoritet (STRENGTH 0).
 
-import type { ExpansionModule } from "../../shared/expansion";
-import type { Figure, PlayerId, Pos } from "../../shared/state";
+import type { ExpansionModule, HookContext } from "../../shared/expansion";
+import type { ExpansionStepData, Figure, PlayerId, Pos, Step } from "../../shared/state";
 import type { TileSet } from "../../shared/tiles";
 import type { EngineHookContext } from "../../engine/context";
 import { playerOf } from "../../engine/context";
@@ -35,12 +43,20 @@ export type Good = (typeof GOODS)[number];
 export const goodsCounter = (g: string) => `goods.${g}`;
 
 const ID = "traders-builders";
+export const EXTRA_PHASE = "tb-extra";
+export const EXTRA_ACTION = "extraTurn";
 
 interface TbExt {
   /** Spelaren har lagt en bricka som byggde vidare på sin byggmästares område denna tur. */
   extra: boolean;
   /** Spelaren som just fått en extra tur (turens andra del), eller null. */
   second: PlayerId | null;
+  /** Spelaren vars bricka byggde vidare (gäller när `extra` är sant). */
+  extraFor?: PlayerId;
+  /** Valet att ta den extra turen har erbjudits. */
+  offered?: boolean;
+  /** Spelaren har valt att ta den extra turen. */
+  take?: boolean;
 }
 
 function ext(ctx: EngineHookContext): TbExt {
@@ -118,18 +134,68 @@ export const tradersBuildersModule: ExpansionModule = {
       for (const f of s.figures) {
         if (f.kind !== BUILDER_KIND || f.owner !== ctx.player || f.location.at !== "feature") continue;
         const area = an.areaAt(f.location.pos, f.location.feature);
-        if (area && area.tiles.some((t) => t.x === pos.x && t.y === pos.y)) e.extra = true;
+        if (area && area.tiles.some((t) => t.x === pos.x && t.y === pos.y)) {
+          e.extra = true;
+          e.extraFor = ctx.player;
+          delete e.offered;
+          delete e.take;
+        }
       }
     },
 
+    extraSteps(c, phase): Step[] {
+      if (phase !== EXTRA_PHASE) return [];
+      return (["take", "skip"] as const).map((choice) => ({
+        type: "expansion", expansion: ID, action: EXTRA_ACTION, data: { choice } satisfies ExpansionStepData,
+      }));
+    },
+
+    applyStep(c, step) {
+      const ctx = c as EngineHookContext;
+      const e = ext(ctx);
+      const choice = (step.data as ExpansionStepData | null)?.choice;
+      if (ctx.state.turn.phase !== EXTRA_PHASE || step.action !== EXTRA_ACTION || (choice !== "take" && choice !== "skip"))
+        return "error.illegalStep";
+      if (choice === "take") e.take = true;
+      else {
+        e.extra = false;
+        delete e.extraFor;
+        delete e.offered;
+      }
+      ctx.state.turn.phase = "confirm";
+      return null;
+    },
+
+    // Frågas när turen bekräftas. Den extra turen tas bara om spelaren valt den (fasen "tb-extra").
     extraTurn(c) {
       const ctx = c as EngineHookContext;
       const e = ext(ctx);
-      const again = e.extra;
+      const again = e.take === true && e.extraFor === ctx.player;
+      delete e.take;
+      if (!again) return false;
       e.extra = false;
+      delete e.extraFor;
+      delete e.offered;
       // Spärren mot kedjor får inte nollställas av en andra förfrågan i samma tur (fas efter poängräkningen).
-      if (again) e.second = ctx.player;
-      return again;
+      e.second = ctx.player;
+      return true;
+    },
+
+    // Erbjud den extra turen när alla andra faser efter poängräkningen är klara.
+    beforeNextTurn(c: HookContext) {
+      const ctx = c as EngineHookContext;
+      const e = ext(ctx);
+      if (!e.extra) return undefined;
+      const hasTile = playerOf(ctx.state, ctx.player).hand.length > 0 || ctx.state.drawPile.length > 0;
+      // Redan erbjuden (värden hoppar över en frånvarande spelare), någon annans eller utan bricka: ingen extra tur.
+      if (e.offered || e.extraFor !== ctx.player || !hasTile) {
+        e.extra = false;
+        delete e.extraFor;
+        delete e.offered;
+        return undefined;
+      }
+      e.offered = true;
+      return EXTRA_PHASE;
     },
 
     finalScoring(c) {
@@ -160,5 +226,5 @@ export const tradersBuildersModule: ExpansionModule = {
         }
       }
     },
-  },
+  } as ExpansionModule["hooks"],
 };
