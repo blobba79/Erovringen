@@ -127,7 +127,8 @@ export const tradersBuildersModule: ExpansionModule = {
       const e = ext(ctx);
       const again = e.extra;
       e.extra = false;
-      e.second = again ? ctx.player : null;
+      // Spärren mot kedjor får inte nollställas av en andra förfrågan i samma tur (fas efter poängräkningen).
+      if (again) e.second = ctx.player;
       return again;
     },
 

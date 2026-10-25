@@ -20,8 +20,8 @@ Expansionen ger spelet två nya figurer, draken och fen, och fyra sorters bricko
 - Varje figur på en bricka som draken landar på äts upp och går tillbaka till sin ägare, utan poäng. Neutrala figurer, som magikern och häxan, påverkas inte.
 - Vid start kan du välja den äldre varianten, där draken flyttas efter poängräkningen.
 
-## Älva
-- Om du inte placerar en följare får du i stället flytta fen till en bricka där en av dina egna följare står.
+## Fen
+- Om du inte placerar en följare får du i stället flytta fen intill en av dina egna följare.
 - Du får **1 poäng** i början av din tur om fen står vid en av dina följare.
 - Du får **3 poäng** när en väg, stad eller annan sak där din följare står vid fen räknas.
 - Draken kan inte gå in på fens bricka, så figurerna där är skyddade.

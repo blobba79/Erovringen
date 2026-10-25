@@ -180,6 +180,9 @@ function dragonTargets(ctx: EngineHookContext): Pos[] {
 /** Spelaren som flyttar draken härnäst: start hos den som har tur, sedan i sittordning. */
 function mover(ctx: EngineHookContext): PlayerId {
   const m = ext(ctx).move as DragonMove;
+  // Spelare som tagits bort av värden (utan att vara den som flyttade) hoppas över.
+  const here = new Set(ctx.state.players.map((p) => p.id));
+  m.order = m.order.filter((p, i) => i < m.count || here.has(p));
   return m.order[m.count] ?? ctx.state.turn.player;
 }
 
@@ -193,6 +196,8 @@ function endMove(ctx: EngineHookContext): void {
 /** Nästa flyttare, eller slut om draken inte kan gå vidare eller alla steg är gjorda. */
 function advanceMove(ctx: EngineHookContext): void {
   const m = ext(ctx).move as DragonMove;
+  const here = new Set(ctx.state.players.map((p) => p.id));
+  m.order = m.order.filter((p, i) => i < m.count || here.has(p));
   if (m.count >= m.order.length || dragonTargets(ctx).length === 0) endMove(ctx);
   else setActor(ctx);
 }
@@ -288,22 +293,20 @@ function seduceOptions(ctx: EngineHookContext): Step[] {
   return out;
 }
 
-/** Områden där en följare av sorten får ställas via porten: ofärdiga, utan följare, ett mål per område. */
+/** Rutor där en följare av sorten får ställas via porten: i ofärdiga områden utan följare, ett mål per ruta och område. */
 function portalTargets(ctx: EngineHookContext, kind: string): { pos: Pos; feature: string; choice: string }[] {
   const def = followerDefs(ctx).find((d) => d.kind === kind);
   if (!def) return [];
   const dragon = dragonPos(ctx);
   const an = analyze(ctx.state.board, ctx.state.figures, ctx.types);
   const out: { pos: Pos; feature: string; choice: string }[] = [];
-  const used = new Set<string>();
   for (const area of an.areas) {
     if (area.complete || !def.placeableOn.includes(area.kind) || area.figures.some((f) => f.owner !== null)) continue;
-    const nodes = area.nodes.filter((n) => !(dragon && samePos(n.pos, dragon)));
-    // Helst en ruta som inget annat mål använder, så att målen går att skilja åt på kartan.
-    const node = nodes.find((n) => !used.has(posKey(n.pos))) ?? nodes[0];
-    if (!node) continue;
-    used.add(posKey(node.pos));
-    out.push({ pos: { ...node.pos }, feature: node.feature, choice: area.kind });
+    // Ett mål per ruta och område: spelaren väljer rutan (s. 59), vilket spelar roll för draken och fen.
+    for (const n of area.nodes) {
+      if (dragon && samePos(n.pos, dragon)) continue;
+      out.push({ pos: { ...n.pos }, feature: n.feature, choice: area.kind });
+    }
   }
   return out;
 }

@@ -11,6 +11,7 @@ import { STATE_VERSION, actorOf, stepWarnings as engineStepWarnings } from "../e
 import type { EngineApi } from "../engine/index";
 import { activeModules, baseExt, engineHook, makeCtx } from "../engine/context";
 import { finishTurn, returnTiles } from "../engine/turn";
+import { returnToSupply } from "../engine/scoring";
 import { currentTile } from "../engine/turnstate";
 import { chooseBotStep } from "./bot";
 import { createTranslator } from "../i18n/index";
@@ -739,7 +740,12 @@ export class Room {
       }
     }
     if (advance && !s.finished) finishTurn(env, s, events);
-    if (remove) s.figures = s.figures.filter((f) => f.owner !== remove);
+    if (remove) {
+      // Via returnToSupply, så att fen som stod intill en av pjäserna blir kvar på rutan och fortsätter spärra den.
+      const rctx = makeCtx(env, s, s.turn.player, events);
+      for (const f of s.figures.filter((x) => x.owner === remove && x.location.at !== "supply")) returnToSupply(rctx, f);
+      s.figures = s.figures.filter((f) => f.owner !== remove);
+    }
     if (actorOnly) {
       const ctx = makeCtx(env, s, s.turn.player, events);
       for (const m of activeModules(env, s.setup)) engineHook(m, "skipActor")?.(ctx);

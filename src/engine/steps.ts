@@ -7,7 +7,7 @@ import type { ExpansionModule } from "../shared/expansion";
 import { activeModules, engineHook, makeCtx, playerOf, type EngineHookContext, type Env } from "./context";
 import { exchangeAllowed, figureSteps } from "./legal";
 import { hasAnyPlacement, isLegalPlacement } from "./placement";
-import { addScore, adjustedPoints, areaValue, returnToSupply } from "./scoring";
+import { addScore, adjustedPoints, areaValue, notifyAreaScored, returnToSupply } from "./scoring";
 import { chosenIndex, phaseForHand } from "./turnstate";
 import { baseExt } from "./context";
 import { posKey } from "./geometry";
@@ -91,7 +91,10 @@ export function applyCore(env: Env, state: GameState, step: Step, events: GameEv
       if (!offered || !fig || fig.location.at !== "feature") return "error.illegalFigure";
       const an = analyze(state.board, state.figures, env.types);
       const area = an.areaAt(fig.location.pos, fig.location.feature);
-      if (area) addScore(ctx, player, adjustedPoints(ctx, area, areaValue(an, area), false), "return", area);
+      if (area) {
+        notifyAreaScored(ctx, area, false); // fen ger 3 poäng även när abboten tas hem (s. 54)
+        addScore(ctx, player, adjustedPoints(ctx, area, areaValue(an, area), false), "return", area);
+      }
       returnToSupply(ctx, fig);
       turn.pending.push(step);
       turn.phase = phaseAfterFigure(ctx, mods);
