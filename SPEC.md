@@ -269,6 +269,7 @@ För varje extra pjäs som ska placeras visar storskärmen siffror på de bricko
     3. The Gold Mines
     4. Mage & Witch
     5. Crop Circles II (de sex brickorna som ingår i Big Box)
+- **Storskärmen:** antal brickor kvar står i rutan med spelarnas namn och poäng, lite större. Bakom varje spelare syns pjäserna den har kvar att ställa ut, och neutrala pjäser som ännu inte står på kartan (t.ex. draken, fen, magikern, häxan) visas för sig. Översikten över vilka brickor som är kvar slås på och av från vilken spelares telefon som helst. Muspekaren döljs efter 10 sekunder utan rörelse. Det finns knappar för helskärm och för att avsluta programmet.
 - **Spelreglerna ska vara lätta att nå i spelet:** en knapp **Regler** på telefonen, i lobbyn och under spelet, visar en kort och begriplig sammanfattning av grundspelet och varje expansion som är med, på svenska eller engelska.
 - **Tills vidare utelämnas** The Messengers och The Robbers. Bygg så att de går att lägga till senare.
 - Expansioner som bygger på fysisk skicklighet tas inte med.

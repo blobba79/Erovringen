@@ -24,6 +24,8 @@ export interface AndroidHost {
   log(level: "info" | "warn" | "error", line: string): void;
   /** Spelrummet är redo att ta emot anslutningar och anrop. */
   ready(): void;
+  /** Stäng appen (storskärmens avsluta-knapp). Saknas i äldre versioner av appen. */
+  quit?(): void;
 }
 
 /** Spelrummets sida av bryggan, som `window.erovringenRoom`. Appen anropar med `evaluateJavascript`. */
