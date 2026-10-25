@@ -69,7 +69,7 @@ export function newGame(env: Env, setup: GameSetup): GameState {
         const p = state.players[(startIdx + k) % state.players.length]!;
         if (state.drawPile.length) p.hand.push(state.drawPile.shift() as string);
       }
-  beginTurn(state, first, []);
+  beginTurn(env, state, first, []);
   return state;
 }
 

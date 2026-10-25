@@ -1,6 +1,6 @@
 // Tillåtna delsteg just nu.
 
-import type { GameState, Step } from "../shared/state";
+import type { GameState, Pos, Step } from "../shared/state";
 import { analyze } from "./features";
 import { rotatedAt } from "./board";
 import { activeModules, actorOf, engineHook, makeCtx, playerOf, type Env } from "./context";
@@ -16,6 +16,12 @@ export function exchangeAllowed(env: Env, state: GameState): boolean {
   return hand.length > 0 && !hand.some((t) => hasAnyPlacement(env, state, turn.player, t));
 }
 
+/** Står draken på rutan (eller annat som en modul anmäler)? Då får ingen pjäs ställas ut där. */
+export function figureBlocked(env: Env, state: GameState, pos: Pos): boolean {
+  const ctx = makeCtx(env, state, state.turn.player, []);
+  return activeModules(env, state.setup).some((m) => engineHook(m, "figureBlocked")?.(ctx, pos));
+}
+
 /** Pjäser som får ställas på brickan som just lagts. */
 export function figureSteps(env: Env, state: GameState): Step[] {
   const placed = placedStep(state);
@@ -23,6 +29,7 @@ export function figureSteps(env: Env, state: GameState): Step[] {
   const player = state.turn.player;
   const rt = rotatedAt(state.board, env.types, placed.pos);
   if (!rt) return [];
+  if (figureBlocked(env, state, placed.pos)) return [];
   const an = analyze(state.board, state.figures, env.types);
   const out: Step[] = [];
   const seen = new Set<string>();
