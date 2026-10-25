@@ -10,12 +10,14 @@
 //   Målet är ett ofärdigt väg- eller stadsområde, inte det pjäsen står på och inte det den andra
 //   pjäsen står på. Finns inget mål måste en pjäs som ligger på kartan tas bort (valfri av dem);
 //   ligger ingen på kartan händer ingenting (fasen hoppas över).
+//   Slår en färja (The Ferries) ihop deras vägar flyttas en av dem på samma sätt, när färjestegen är klara
+//   och före bekräftelsen (motorkroken `afterExpansionStep`).
 // - Poäng (i scoreFeature, efter I&C): magikern +1 per bricka, häxan halverar (uppåt). Vid
 //   slutpoäng gäller samma sak för ofärdiga områden (OKLART för häxan; JCloisterZone-beteende).
 // - Pjäserna går hem när området räknas (motorn skickar hem alla pjäser på ett färdigt område).
 // - Modulen måste registreras efter Inns & Cathedrals (ordningen avgör poängordningen).
 
-import type { ExpansionModule, FeatureRef } from "../../shared/expansion";
+import type { ExpansionModule, FeatureRef, HookContext } from "../../shared/expansion";
 import type { ExpansionStepData, Figure, Pos, Step } from "../../shared/state";
 import type { TileSet } from "../../shared/tiles";
 import type { EngineHookContext } from "../../engine/context";
@@ -66,6 +68,19 @@ function options(ctx: EngineHookContext): Option[] {
   return out;
 }
 
+/** Står magikern och häxan på samma (ofärdiga) område just nu? */
+function together(ctx: EngineHookContext): boolean {
+  const s = ctx.state;
+  const an = analyze(s.board, s.figures, ctx.types);
+  const [a, b] = figs(ctx).map((f) => (f.location.at === "feature" ? an.areaAt(f.location.pos, f.location.feature) : undefined));
+  return !!a && !!b && a.id === b.id;
+}
+
+/** Fasen att gå tillbaka till när magikerns val gjorts efter ett steg i en annan modul (färjorna). */
+interface MageExt {
+  returnTo?: string;
+}
+
 const samePos = (a?: Pos, b?: Pos) => (!a && !b) || (!!a && !!b && a.x === b.x && a.y === b.y);
 
 export const mageWitchModule: ExpansionModule = {
@@ -83,12 +98,20 @@ export const mageWitchModule: ExpansionModule = {
       const s = ctx.state;
       const placed = s.board[`${pos.x},${pos.y}`];
       const symbol = !!placed && !!ctx.types.get(placed.type)?.symbols?.includes("mage");
-      const an = analyze(s.board, s.figures, ctx.types);
-      const [a, b] = figs(ctx).map((f) => (f.location.at === "feature" ? an.areaAt(f.location.pos, f.location.feature) : undefined));
-      const together = !!a && !!b && a.id === b.id;
-      if (!symbol && !together) return;
+      if (!symbol && !together(ctx)) return;
       if (options(ctx).length === 0) return;
       enterPhase(s, MAGE_PHASE);
+    },
+
+    // En färja som lagts eller flyttats kan slå ihop magikerns och häxans vägar (s. 154-155): när färjestegen
+    // är klara (turen väntar på bekräftelse) flyttas en av dem, och sedan fortsätter turen till bekräftelsen.
+    afterExpansionStep(c: HookContext, step: Extract<Step, { type: "expansion" }>) {
+      const ctx = c as EngineHookContext;
+      const s = ctx.state;
+      if (step.expansion === ID || s.turn.phase !== "confirm") return;
+      if (!together(ctx) || options(ctx).length === 0) return;
+      ((s.ext as Record<string, MageExt | undefined>)[ID] ??= {}).returnTo = "confirm";
+      s.turn.phase = MAGE_PHASE;
     },
 
     extraSteps(c, phase): Step[] {
@@ -109,7 +132,11 @@ export const mageWitchModule: ExpansionModule = {
         f.location = { at: "feature", pos: { ...d.pos! }, feature: d.feature! };
         ctx.emit({ type: "figurePlaced", figure: f.id, location: f.location });
       } else returnToSupply(ctx, f);
-      leavePhase(ctx.state);
+      const e = (ctx.state.ext as Record<string, MageExt | undefined>)[ID];
+      if (e?.returnTo) {
+        ctx.state.turn.phase = e.returnTo;
+        delete e.returnTo;
+      } else leavePhase(ctx.state);
       return null;
     },
 
@@ -125,5 +152,5 @@ export const mageWitchModule: ExpansionModule = {
     },
 
     // Anropas efter poängräkningen i slutet av turen: pjäser på färdiga områden går hem.
-  },
+  } as ExpansionModule["hooks"],
 };

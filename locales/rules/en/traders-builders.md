@@ -13,7 +13,7 @@ The expansion gives you the builder that grants a double turn, the pig that rais
 Instead of a follower you may place your builder or your pig on the tile you just placed.
 
 - **The builder** may only stand on a road or in a city where you already have one of your own followers (thief or knight). How far away that follower stands does not matter, and other players' followers do not stop you. The builder does not count in a majority.
-- **Double turn:** when you later place a tile that extends the road or city where your builder stands, you may take an extra turn. It is optional. First you do the whole first part (place a tile, place a piece, score), then you get a new tile and a second round. There is never a third turn.
+- **Double turn:** when you later place a tile that extends the road or city where your builder stands, you may take an extra turn. It is optional: after you confirm your move, the game asks whether you want to take the extra turn or skip it. First you do the whole first part (place a tile, place a piece, score), then you get a new tile and a second round. There is never a third turn. If the dragon eats your builder in the same turn that your tile extended its road, you may still take the extra turn.
 - **The pig** may only stand on a field where you already have one of your own farmers.
 
 The builder and the pig return to you if your last thief, knight or farmer leaves the place. The builder also returns when the road or city is scored.

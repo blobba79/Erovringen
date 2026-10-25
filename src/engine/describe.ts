@@ -19,6 +19,11 @@ export interface AreaDescription {
   owners: PlayerId[];
   /** Vad området ger om det räknades nu (slutpoängen för ofärdiga områden). */
   value: number;
+  /**
+   * Fält: vad varje ägare med majoritet får (4 per färdig stad för den som har en gris, annars 3). `value` är
+   * detsamma om alla får lika mycket, annars grundvärdet. Tom för andra områden.
+   */
+  valueByOwner: Record<PlayerId, number>;
   /** Stad/väg: öppna kanter. */
   openEdges: { pos: Pos; edge: Edge }[];
   /** Kloster/trädgård: de tomma rutorna av de åtta omkring, och hur många som är fyllda. */
@@ -29,15 +34,36 @@ export interface AreaDescription {
   adjacentCities: FeatureRef[];
 }
 
+/**
+ * Fält: vad varje ägare med majoritet får om området räknades nu. Den som har en gris (Traders & Builders)
+ * får 4 per färdig stad i stället för 3 (grisens påslag är 1 per stad). Tom för andra områden.
+ */
+function fieldValues(an: Analysis, area: Area, owners: PlayerId[]): Record<PlayerId, number> {
+  if (area.kind !== "field") return {};
+  const cities = completedCitiesAround(an, area);
+  const out: Record<PlayerId, number> = {};
+  for (const o of owners) {
+    const pig = area.figures.some((f) => f.kind === "pig" && f.owner === o);
+    out[o] = (pig ? 4 : 3) * cities;
+  }
+  return out;
+}
+
 export function describeArea(an: Analysis, area: Area): AreaDescription {
+  const owners = majorityOwners(area);
+  const byOwner = fieldValues(an, area, owners);
+  const amounts = Object.values(byOwner);
+  // Ett fält ger olika mycket om bara en av ägarna har en gris: `value` är då grundvärdet (3 per stad).
+  const value = amounts.length > 0 && amounts.every((v) => v === amounts[0]) ? (amounts[0] as number) : areaValue(an, area);
   return {
     kind: area.kind,
     nodes: area.nodes,
     tiles: area.tiles,
     complete: area.complete,
     figures: area.figures,
-    owners: majorityOwners(area),
-    value: areaValue(an, area),
+    owners,
+    value,
+    valueByOwner: byOwner,
     openEdges: area.openEdges,
     openSquares: area.openSquares,
     filledSquares: area.kind === "cloister" || area.kind === "garden" ? 8 - area.openSquares.length : 0,

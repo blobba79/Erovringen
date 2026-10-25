@@ -18,8 +18,9 @@
 //     expansion "flying-machines" action "land"  data { pos, feature }
 //   Området numreras på storskärmen som alla mål på kartan.
 // - Följaren som landat är en vanlig följare och poängsätts av motorn.
+// - Ångra är spärrat så fort steget "fly" gjorts (motorkroken `canUndo`): slaget gäller (s. 139-140).
 
-import type { ExpansionModule } from "../../shared/expansion";
+import type { ExpansionModule, HookContext } from "../../shared/expansion";
 import type { ExpansionStepData, Pos, Step } from "../../shared/state";
 import type { TileSet } from "../../shared/tiles";
 import type { EngineHookContext } from "../../engine/context";
@@ -186,5 +187,11 @@ export const flyingMachinesModule: ExpansionModule = {
       }
       return "error.illegalStep";
     },
-  },
+
+    // Tärningsslaget gäller när det väl är gjort (s. 139-140): efter "fly" går turen bara framåt. Annars
+    // kunde spelaren se slaget, ångra och välja annorlunda (eller lägga brickan någon annanstans).
+    canUndo(c: HookContext) {
+      return !c.state.turn.pending.some((p) => p.type === "expansion" && p.expansion === ID && p.action === "fly");
+    },
+  } as ExpansionModule["hooks"],
 };

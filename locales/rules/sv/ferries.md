@@ -11,7 +11,8 @@ Färjorna binder ihop vägar som slutar vid sjöar, så att vägar kan korsa vat
 - Därefter måste du ta en färja och lägga den så att den förbinder två av brickans vägändar till en sammanhängande väg. En vägände vid en sjö utan färja är stängd.
 - Du lägger färjan även om du inte placerade någon följare.
 - Lägger du en bricka som förlänger en väg som innehåller en färja får du, om du vill, flytta den färjan. Finns det två färjor på vägen får du bara flytta den som ligger närmast din nya bricka. Går vägar åt flera håll får du flytta den första färjan i varje riktning.
-- Varje färja får flyttas högst en gång per tur.
+- Varje färja får flyttas högst en gång per tur. Byggmästarens dubbeltur räknas som en tur.
+- Slår en färja som läggs eller flyttas ihop magikerns och häxans vägar måste en av dem flyttas, precis som när en bricka gör det.
 - Vägar som blir färdiga genom att en färja läggs eller flyttas räknas på vanligt sätt.
 
 ## Poäng

@@ -49,9 +49,27 @@ export function evaluate(eng: EngineApi, state: GameState, me: PlayerId): number
 /** Så många val i en expansions egen fas (porten, draken) provspelas när ett steg följs av ett val. */
 const MAX_FOLLOW_UPS = 12;
 
+/**
+ * En kopia med ett annat slumpfrö, så att ett provspelat tärningsslag inte är det verkliga. Ögonblicksbilden
+ * (som bekräftelsen spelar om turen från) får samma frö, annars skulle omspelningen slå ett annat slag.
+ */
+function withOtherDice(state: GameState): GameState {
+  const s = structuredClone(state);
+  const snap = (s.ext.base as { snapshot?: GameState } | undefined)?.snapshot;
+  const rng = Math.floor(Math.random() * 0xffffffff);
+  if (snap && snap.rng === s.rng) snap.rng = rng;
+  else if (snap) return state; // annan slumpanvändning i turen före slaget: lämna som det är
+  s.rng = rng;
+  return s;
+}
+
 /** Provspelar ett delsteg och resten av turen (utan pjäs, sedan bekräfta). Null om steget inte går. */
 function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step, depth = 0): number | null {
-  let r = eng.apply(state, me, step);
+  // Tärningen i The Flying Machines följer av slumpfröet i tillståndet: provspelningen får inte se det
+  // verkliga slaget (och det går inte att ångra), så den slår om med ett annat frö.
+  const trial =
+    step.type === "expansion" && step.expansion === "flying-machines" && step.action === "fly" ? withOtherDice(state) : state;
+  let r = eng.apply(trial, me, step);
   for (let guard = 0; guard < 6 && r.ok; guard++) {
     const s = r.state;
     if (s.finished || actorOf(s) !== me) return evaluate(eng, s, me);
@@ -64,6 +82,8 @@ function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step,
       r = eng.apply(s, me, next);
       continue;
     }
+    // En ny tur har börjat för samma spelare (byggmästarens extra tur): värdera läget som det är.
+    if (legal.some((x) => x.type === "chooseTile" || x.type === "placeTile" || x.type === "exchangeTile")) return evaluate(eng, s, me);
     const own = legal.filter((x) => x.type === "expansion");
     if (own.length === 0) return null;
     // Ett val av flera (var porten ska stå, vart draken går): ta det bästa, ett steg djupt.
@@ -150,6 +170,14 @@ export function chooseBotStep(eng: EngineApi, state: GameState, rnd: Rnd = Math.
   // Val som ändrar för alla (Crop Circles II lägg till eller ta bort): provspelning ger ingen skillnad, så slumpa med lätt övervikt för att lägga till.
   const modes = options.filter((s) => s.type === "expansion" && s.action === "mode");
   if (modes.length > 0) return (rnd() < 0.7 ? modes[0] : modes[modes.length - 1]) as Step;
+  // Byggmästarens extra tur: datorspelaren tar den alltid.
+  const extra = options.find(
+    (s) => s.type === "expansion" && s.expansion === "traders-builders" && (s.data as { choice?: string } | null)?.choice === "take",
+  );
+  if (extra) return extra;
+  // Guldtackor: alla val ger samma poäng i värderingen, så ta det första, som är tackan med färre rivaler.
+  const gold = options.find((s) => s.type === "expansion" && s.expansion === "gold-mines" && s.action === "takeGold");
+  if (gold) return gold;
   let best: { step: Step; value: number } | null = null;
   for (const step of options) {
     const v = finishValue(eng, state, me, step);
