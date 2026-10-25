@@ -4,6 +4,7 @@ import type { ExpansionModule, HookContext } from "../shared/expansion";
 import type { Edge } from "../shared/tiles";
 import type { Figure, GameEvent, GameSetup, GameState, PlayerId, Pos } from "../shared/state";
 import type { TileTypes } from "./board";
+import type { Area } from "./features";
 
 /** Det som är fast för en motorinstans. */
 export interface Env {
@@ -72,6 +73,18 @@ export interface EngineHooks {
   skipActor(ctx: EngineHookContext): void;
   /** Falskt = spelaren som har tur får inte ångra just nu (någon annan har redan valt). */
   canUndo(ctx: EngineHookContext): boolean;
+  /**
+   * När en tur börjar (`ctx.player` är spelaren som fått turen): t.ex. fens poäng i The Princess & the
+   * Dragon. `extra` är sant om turen är byggmästarens extra tur (andra delen av en dubbeltur).
+   */
+  turnStarted(ctx: EngineHookContext, extra: boolean): void;
+  /** Sant = ingen pjäs får ställas ut på rutan (draken står där). Läses av `figureSteps`. */
+  figureBlocked(ctx: EngineHookContext, pos: Pos): boolean;
+  /**
+   * Ett område räknas (färdigt under spelet eller vid slutet), före poängen och före att pjäserna
+   * går hem. Modulen får dela ut egna poäng (fen).
+   */
+  areaScored(ctx: EngineHookContext, area: Area, final: boolean): void;
 }
 
 export const engineHook = <K extends keyof EngineHooks>(m: ExpansionModule, k: K): EngineHooks[K] | undefined =>

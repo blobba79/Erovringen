@@ -38,6 +38,9 @@ export interface GameResult {
 
 const json = (x: unknown) => JSON.stringify(x);
 
+/** Dragbrickor som ligger åt sidan tills draken kommer i spel (The Princess & the Dragon). */
+const aside = (s: GameState) => (s.ext["princess-dragon"] as { aside?: string[] } | undefined)?.aside?.length ?? 0;
+
 /** Kastar vid brott mot en invariant. */
 export function checkInvariants(eng: EngineApi, s: GameState, initial: { tiles: number; figures: Map<string, number> }): void {
   // Brickor: karta + hög + händer + kastade är alltid lika många.
@@ -45,7 +48,7 @@ export function checkInvariants(eng: EngineApi, s: GameState, initial: { tiles: 
   const river = s.ext.river as { waitingStart?: string } | undefined;
   const tiles =
     Object.keys(s.board).length + s.drawPile.length + s.players.reduce((n, p) => n + p.hand.length, 0) + discarded +
-    (river?.waitingStart ? 1 : 0);
+    (river?.waitingStart ? 1 : 0) + aside(s);
   if (tiles !== initial.tiles) throw new Error(`brickor ${tiles} != ${initial.tiles}`);
   // Flodfasen: högst handSize brickor per spelare, och bara flodbrickor (och den inblandade
   // startbrickan) på hand; inga vanliga brickor läggs före sjön.
@@ -74,6 +77,20 @@ export function checkInvariants(eng: EngineApi, s: GameState, initial: { tiles: 
       if (!t) throw new Error(`pjäs ${f.id} på tom ruta`);
     }
   }
+  // Draken och följare delar aldrig ruta; fen står intill en pjäs på kartan eller på en ruta med bricka.
+  const dragon = s.figures.find((f) => f.kind === "dragon");
+  if (dragon?.location.at === "tile") {
+    const dp = dragon.location.pos;
+    if (!s.board[`${dp.x},${dp.y}`]) throw new Error("draken på tom ruta");
+    for (const f of s.figures)
+      if (f.owner !== null && f.location.at === "feature" && f.location.pos.x === dp.x && f.location.pos.y === dp.y)
+        throw new Error(`pjäs ${f.id} på drakens ruta`);
+  }
+  const fairy = s.figures.find((f) => f.kind === "fairy");
+  if (fairy?.location.at === "figure") {
+    const fl = fairy.location;
+    if (s.figures.find((f) => f.id === fl.figure)?.location.at !== "feature") throw new Error("fen intill en pjäs som inte står på kartan");
+  }
   for (const [k, n] of initial.figures) if (counts.get(k) !== n) throw new Error(`pjäser ${k}: ${counts.get(k)} != ${n}`);
   // Högst en pjäs per kloster/trädgård och en per vanligt område (kollas bara ibland, det är dyrt).
   if (Object.keys(s.board).length % 7 === 0) {
@@ -97,7 +114,7 @@ export function playGame(
   let s = eng.newGame(setup);
   const all = [...s.players.flatMap((p) => p.hand), ...s.drawPile];
   const initial = {
-    tiles: Object.keys(s.board).length + all.length + ((s.ext.river as { waitingStart?: string } | undefined)?.waitingStart ? 1 : 0),
+    tiles: Object.keys(s.board).length + all.length + aside(s) + ((s.ext.river as { waitingStart?: string } | undefined)?.waitingStart ? 1 : 0),
     figures: new Map<string, number>(),
   };
   for (const f of s.figures) initial.figures.set(`${f.owner}|${f.kind}`, (initial.figures.get(`${f.owner}|${f.kind}`) ?? 0) + 1);
@@ -131,7 +148,7 @@ export function playGame(
     checkInvariants(eng, s, initial);
   }
   if (s.drawPile.length || s.players.some((p) => p.hand.length)) throw new Error("spelet slutade med brickor kvar");
-  const used = Object.keys(s.board).length + (s.ext.base as { discarded: string[] }).discarded.length;
+  const used = Object.keys(s.board).length + (s.ext.base as { discarded: string[] }).discarded.length + aside(s);
   if (used !== initial.tiles) throw new Error(`alla brickor ska vara lagda eller kastade: ${used} != ${initial.tiles}`);
   if (eng.legalSteps(s).length !== 0) throw new Error("steg efter spelets slut");
   return { state: s, turns, stepsTaken: n, events };

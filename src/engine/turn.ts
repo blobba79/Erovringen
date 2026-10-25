@@ -7,9 +7,12 @@ import { shuffle } from "./rng";
 import { scoreCompleted, scoreFinal } from "./scoring";
 import { phaseForHand, placedStep } from "./turnstate";
 
-export function beginTurn(state: GameState, player: PlayerId, events: GameEvent[]): void {
+export function beginTurn(env: Env, state: GameState, player: PlayerId, events: GameEvent[], extra = false): void {
   state.turn = { player, phase: phaseForHand(playerOf(state, player).hand.length), pending: [] };
   events.push({ type: "turnStarted", player });
+  // Moduler som vill göra något när en tur börjar (fens poäng). `extra`: byggmästarens extra tur.
+  const ctx = makeCtx(env, state, player, events);
+  for (const m of activeModules(env, state.setup)) engineHook(m, "turnStarted")?.(ctx, extra);
 }
 
 /** Fyll handen från högen upp till handstorleken. */
@@ -91,11 +94,11 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
     const handled = engineHook(m, "dealAfterTurn")?.(ctx, again);
     if (handled === undefined) continue;
     if (handled === null) endGame(env, state, events);
-    else beginTurn(state, handled, events);
+    else beginTurn(env, state, handled, events, again && handled === player);
     return;
   }
   refillHand(state, player, events);
   const next = again && playerOf(state, player).hand.length > 0 ? player : nextPlayerWithTiles(state, player);
   if (next === null) endGame(env, state, events);
-  else beginTurn(state, next, events);
+  else beginTurn(env, state, next, events, again && next === player);
 }

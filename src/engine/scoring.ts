@@ -3,7 +3,7 @@
 import type { FeatureRef } from "../shared/expansion";
 import type { Figure, PlayerId } from "../shared/state";
 import type { EngineHookContext } from "./context";
-import { activeModules, playerOf } from "./context";
+import { activeModules, engineHook, playerOf } from "./context";
 import type { Analysis, Area } from "./features";
 
 /** Pjäsernas vikt vid majoritet. Standard 1; stora pjäser räknas som två. */
@@ -67,8 +67,21 @@ export function addScore(ctx: EngineHookContext, player: PlayerId, points: numbe
 
 export function returnToSupply(ctx: EngineHookContext, f: Figure): void {
   const real = ctx.state.figures.find((x) => x.id === f.id)!;
+  const was = real.location;
   real.location = { at: "supply" };
   ctx.emit({ type: "figureReturned", figure: f.id });
+  // Pjäser som stod intill den (fen) blir kvar på rutan.
+  if (was.at === "feature")
+    for (const o of ctx.state.figures) {
+      if (o.location.at !== "figure" || o.location.figure !== real.id) continue;
+      o.location = { at: "tile", pos: { ...was.pos } };
+      ctx.emit({ type: "figurePlaced", figure: o.id, location: o.location });
+    }
+}
+
+/** Anropar modulernas `areaScored` (fens 3 poäng) för ett område som räknas. */
+function notifyAreaScored(ctx: EngineHookContext, area: Area, final: boolean): void {
+  for (const m of activeModules(ctx.env, ctx.state.setup)) engineHook(m, "areaScored")?.(ctx, area, final);
 }
 
 /** Poäng för färdiga områden under spelet: ägarna får poäng och pjäserna (utom fältpjäserna) går hem. */
@@ -77,6 +90,7 @@ export function scoreCompleted(ctx: EngineHookContext, an: Analysis, areas: Area
     if (!area.complete || area.kind === "river") continue;
     const ref = area.nodes[0] as FeatureRef;
     ctx.emit({ type: "featureCompleted", pos: ref.pos, feature: ref.feature });
+    notifyAreaScored(ctx, area, false);
     const owners = majorityOwners(area);
     if (owners.length) {
       const pts = adjustedPoints(ctx, area, areaValue(an, area), false);
@@ -91,6 +105,7 @@ export function scoreCompleted(ctx: EngineHookContext, an: Analysis, areas: Area
 export function scoreFinal(ctx: EngineHookContext, an: Analysis): void {
   for (const area of an.areas) {
     if (area.kind === "river" || area.figures.length === 0) continue;
+    notifyAreaScored(ctx, area, true);
     const owners = majorityOwners(area);
     if (!owners.length) continue;
     const pts = adjustedPoints(ctx, area, areaValue(an, area), true);

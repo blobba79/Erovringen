@@ -46,20 +46,36 @@ export function evaluate(eng: EngineApi, state: GameState, me: PlayerId): number
   return (mine ? total(mine) : 0) - OPPONENT_WEIGHT * opp - scarcity(state, me);
 }
 
+/** Så många val i en expansions egen fas (porten, draken) provspelas när ett steg följs av ett val. */
+const MAX_FOLLOW_UPS = 12;
+
 /** Provspelar ett delsteg och resten av turen (utan pjäs, sedan bekräfta). Null om steget inte går. */
-function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step): number | null {
+function finishValue(eng: EngineApi, state: GameState, me: PlayerId, step: Step, depth = 0): number | null {
   let r = eng.apply(state, me, step);
   for (let guard = 0; guard < 6 && r.ok; guard++) {
     const s = r.state;
     if (s.finished || actorOf(s) !== me) return evaluate(eng, s, me);
     const legal = eng.legalSteps(s);
-    // I en expansions egen fas finns varken "confirm" eller "noFigure": ta bekräfta, annars första egna steget.
+    // I en expansions egen fas finns varken "confirm" eller "noFigure": ta bekräfta, annars ett eget steg.
     const next =
       legal.find((x) => x.type === (s.turn.phase === "confirm" ? "confirm" : "noFigure")) ??
-      legal.find((x) => x.type === "confirm") ??
-      legal.find((x) => x.type === "expansion");
-    if (!next) return null;
-    r = eng.apply(s, me, next);
+      legal.find((x) => x.type === "confirm");
+    if (next) {
+      r = eng.apply(s, me, next);
+      continue;
+    }
+    const own = legal.filter((x) => x.type === "expansion");
+    if (own.length === 0) return null;
+    // Ett val av flera (var porten ska stå, vart draken går): ta det bästa, ett steg djupt.
+    if (own.length > 1 && depth < 1) {
+      let best: number | null = null;
+      for (const o of own.slice(0, MAX_FOLLOW_UPS)) {
+        const v = finishValue(eng, s, me, o, depth + 1);
+        if (v !== null && (best === null || v > best)) best = v;
+      }
+      return best;
+    }
+    r = eng.apply(s, me, own[0] as Step);
   }
   return r.ok ? evaluate(eng, r.state, me) : null;
 }

@@ -13,9 +13,9 @@ function setupFor(i: number) {
   const n = 2 + (i % 5); // 2-6 spelare
   const variant = i % 7 === 3 ? "afterRiver" : "shuffle";
   // Varannan omgång med alla färdiga expansioner.
-  const expansions: ExpansionId[] = i % 2 ? ["base", "river", "abbot", "inns-cathedrals", "traders-builders", "gold-mines", "mage-witch", "ferries", "flying-machines", "crop-circles-2"] : ["base", "river", "abbot", "traders-builders", "gold-mines", "mage-witch", "ferries", "flying-machines", "crop-circles-2"];
+  const expansions: ExpansionId[] = i % 2 ? ["base", "river", "abbot", "inns-cathedrals", "traders-builders", "gold-mines", "mage-witch", "princess-dragon", "ferries", "flying-machines", "crop-circles-2"] : ["base", "river", "abbot", "traders-builders", "gold-mines", "mage-witch", "princess-dragon", "ferries", "flying-machines", "crop-circles-2"];
   return setupOf(expansions, {
-    n, seed: 1000 + i, handSize: i % 11 === 5 ? 3 : 1, variants: { "river.startTile": variant },
+    n, seed: 1000 + i, handSize: i % 11 === 5 ? 3 : 1, variants: { "river.startTile": variant, "princess-dragon.dragonTiming": i % 3 === 1 ? "after" : "before" },
   });
 }
 
