@@ -24,7 +24,7 @@
 //       expansion "princess-dragon" action "seduce"  data { pos, feature, figure }  (prinsessa: bara om
 //         brickans prinsessestad hänger ihop med en stad som har en följare; vilken följare som helst,
 //         även egen; byggmästare/gris hos ägaren går hem om följaren var ägarens sista i staden)
-//     Fasen "portal": expansion "princess-dragon" action "portalPlace" data { pos, feature } ställer en
+//     Fasen "portal": expansion "princess-dragon" action "portalPlace" data { pos, feature, choice: <områdets sort> } ställer en
 //     följare av vald sort på ett ofärdigt, ledigt område var som helst (ett mål per område; inte på
 //     rutan där draken står, inte på färdiga områden). Efter prinsessan, porten och fen är pjässteget
 //     klart (ingen pjäs får ställas ut eller flyttas mer den turen).
@@ -34,7 +34,8 @@
 //     Draken går till en grannruta med bricka, aldrig en ruta den redan varit på under flytten
 //     (startrutan räknas), aldrig fens ruta. Den äter alla följare och byggmästare/grisar på rutan som
 //     den går in på (inte neutrala pjäser, inte fen), och en byggmästare/gris hos en spelare som inte har
-//     någon följare kvar på området går också hem. Kan den inte gå vidare slutar flytten. Variant
+//     någon följare kvar på området går också hem. Värden kan hoppa över eller ta bort den som flyttar
+//     (motorkroken `skipActor`): hens steg faller bort och nästa flyttar. Kan den inte gå vidare slutar flytten. Variant
 //     "princess-dragon.dragonTiming": "before" (HiG, standard) = efter pjässteget, före poängräkningen
 //     (fasen kommer före "confirm"); "after" (RGG) = efter poängräkningen (när spelaren bekräftat).
 //     Ångra hör till spelaren som har tur så länge ingen annan flyttat draken.
@@ -46,7 +47,7 @@
 // - OKLART: tar draken byggmästaren samma tur som brickan byggt vidare på hans område får ändå
 //   byggmästaren sin extra tur (Traders & Builders sätter den vid placeringen).
 
-import type { ExpansionModule, RuleVariantDefinition } from "../../shared/expansion";
+import type { ExpansionModule, HookContext, RuleVariantDefinition } from "../../shared/expansion";
 import type { ExpansionStepData, Figure, PlayerId, Pos, Step } from "../../shared/state";
 import type { TileSet } from "../../shared/tiles";
 import { activeModules, engineHook, playerOf, type EngineHookContext, type EngineHooks } from "../../engine/context";
@@ -78,6 +79,8 @@ interface DragonMove {
   visited: Pos[];
   /** Antal steg som gjorts. */
   count: number;
+  /** Vem som flyttar varje steg, i ordning (sex platser; en plats faller bort om värden hoppar över spelaren). */
+  order: PlayerId[];
 }
 
 interface Ext {
@@ -176,10 +179,22 @@ function dragonTargets(ctx: EngineHookContext): Pos[] {
 
 /** Spelaren som flyttar draken härnäst: start hos den som har tur, sedan i sittordning. */
 function mover(ctx: EngineHookContext): PlayerId {
-  const s = ctx.state;
   const m = ext(ctx).move as DragonMove;
-  const i = s.players.findIndex((p) => p.id === s.turn.player);
-  return s.players[(i + m.count) % s.players.length]!.id;
+  return m.order[m.count] ?? ctx.state.turn.player;
+}
+
+/** Flytten är slut (sex steg, återvändsgränd eller inga flyttare kvar): vidare till nästa fas. */
+function endMove(ctx: EngineHookContext): void {
+  delete ext(ctx).move;
+  delete ctx.state.turn.actor;
+  ctx.state.turn.phase = timing(ctx) === "after" ? "confirm" : phaseAfterDragon(ctx);
+}
+
+/** Nästa flyttare, eller slut om draken inte kan gå vidare eller alla steg är gjorda. */
+function advanceMove(ctx: EngineHookContext): void {
+  const m = ext(ctx).move as DragonMove;
+  if (m.count >= m.order.length || dragonTargets(ctx).length === 0) endMove(ctx);
+  else setActor(ctx);
 }
 
 function setActor(ctx: EngineHookContext): void {
@@ -193,7 +208,13 @@ function startMove(ctx: EngineHookContext): boolean {
   const from = dragonPos(ctx);
   if (!from) return false;
   const e = ext(ctx);
-  e.move = { visited: [{ ...from }], count: 0 };
+  const ps = ctx.state.players.map((p) => p.id);
+  const first = ps.indexOf(ctx.state.turn.player);
+  e.move = {
+    visited: [{ ...from }],
+    count: 0,
+    order: Array.from({ length: DRAGON_MOVES }, (_, k) => ps[(first + k) % ps.length] as PlayerId),
+  };
   if (dragonTargets(ctx).length === 0) {
     delete e.move;
     return false;
@@ -268,16 +289,21 @@ function seduceOptions(ctx: EngineHookContext): Step[] {
 }
 
 /** Områden där en följare av sorten får ställas via porten: ofärdiga, utan följare, ett mål per område. */
-function portalTargets(ctx: EngineHookContext, kind: string): { pos: Pos; feature: string }[] {
+function portalTargets(ctx: EngineHookContext, kind: string): { pos: Pos; feature: string; choice: string }[] {
   const def = followerDefs(ctx).find((d) => d.kind === kind);
   if (!def) return [];
   const dragon = dragonPos(ctx);
   const an = analyze(ctx.state.board, ctx.state.figures, ctx.types);
-  const out: { pos: Pos; feature: string }[] = [];
+  const out: { pos: Pos; feature: string; choice: string }[] = [];
+  const used = new Set<string>();
   for (const area of an.areas) {
     if (area.complete || !def.placeableOn.includes(area.kind) || area.figures.some((f) => f.owner !== null)) continue;
-    const node = area.nodes.find((n) => !(dragon && samePos(n.pos, dragon)));
-    if (node) out.push({ pos: { ...node.pos }, feature: node.feature });
+    const nodes = area.nodes.filter((n) => !(dragon && samePos(n.pos, dragon)));
+    // Helst en ruta som inget annat mål använder, så att målen går att skilja åt på kartan.
+    const node = nodes.find((n) => !used.has(posKey(n.pos))) ?? nodes[0];
+    if (!node) continue;
+    used.add(posKey(node.pos));
+    out.push({ pos: { ...node.pos }, feature: node.feature, choice: area.kind });
   }
   return out;
 }
@@ -387,6 +413,17 @@ export const princessDragonModule: ExpansionModule = {
       s.drawPile = s.drawPile.filter((t) => !isDragon(t));
     },
 
+    // Värden hoppar över (eller tar bort) den som flyttar draken: hens steg faller bort och nästa flyttar.
+    skipActor(c: HookContext) {
+      const ctx = c as EngineHookContext;
+      const m = ext(ctx).move;
+      if (!m || ctx.state.turn.phase !== DRAGON_PHASE) return;
+      m.order.splice(m.count, 1);
+      const here = new Set(ctx.state.players.map((p) => p.id));
+      m.order = m.order.filter((p, i) => i < m.count || here.has(p));
+      advanceMove(ctx);
+    },
+
     afterTilePlaced(c, pos) {
       const ctx = c as EngineHookContext;
       const s = ctx.state;
@@ -464,16 +501,12 @@ export const princessDragonModule: ExpansionModule = {
           ctx.emit({ type: "figurePlaced", figure: dragon.id, location: dragon.location });
           ctx.emit({ type: "expansion", expansion: ID, event: "move", data: { player: who, from, to, step: m.count } });
           eat(ctx, to);
-          if (m.count >= DRAGON_MOVES || dragonTargets(ctx).length === 0) {
-            delete e.move;
-            delete s.turn.actor;
-            s.turn.phase = timing(ctx) === "after" ? "confirm" : phaseAfterDragon(ctx);
-          } else setActor(ctx);
+          advanceMove(ctx);
           return null;
         }
         default:
           return "error.illegalStep";
       }
     },
-  },
+  } as ExpansionModule["hooks"],
 };

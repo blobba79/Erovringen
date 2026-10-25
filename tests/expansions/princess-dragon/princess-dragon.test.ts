@@ -3,6 +3,7 @@ import type { GameEvent, GameState, Step } from "../../../src/shared/state";
 import type { ExpansionId } from "../../../src/shared/tiles";
 import { princessDragonModule } from "../../../src/expansions/princess-dragon/index";
 import { actorOf } from "../../../src/engine/index";
+import { engineHook, makeCtx } from "../../../src/engine/context";
 import { realEngine, setupOf } from "../../engine/helpers";
 import { CONFIRM, NOFIG, fig$, inSupply, place$, play, scenario, score, type Rot } from "../../engine/scenario";
 import { makeRng, playGame, type Strategy } from "../../players/random-player";
@@ -17,7 +18,7 @@ type ExStep = Extract<Step, { type: "expansion" }>;
 const ex = (action: string, data: unknown): ExStep => ({ type: "expansion", expansion: "princess-dragon", action, data });
 const mv = (x: number, y: number) => ex("move", { pos: { x, y } });
 const portal = (choice: string) => ex("portal", { choice });
-const portalAt = (x: number, y: number, feature: string) => ex("portalPlace", { pos: { x, y }, feature });
+const portalAt = (x: number, y: number, feature: string, choice: string) => ex("portalPlace", { pos: { x, y }, feature, choice });
 const fairyTo = (figure: string, x: number, y: number, feature: string) => ex("fairy", { pos: { x, y }, feature, figure });
 const seduce = (figure: string, x: number, y: number, feature: string) => ex("seduce", { pos: { x, y }, feature, figure });
 
@@ -379,6 +380,45 @@ describe("ångra", () => {
   });
 });
 
+describe("värden hoppar över den som flyttar draken", () => {
+  const start = () => {
+    const s = sc({ n: 3, board: GRID, hands: [[PD("RFr.d")], ["base/L"], ["base/L"]] });
+    dragonAt(s, 1, 1);
+    return play(eng, s, place$(3, 0, 0), NOFIG).state;
+  };
+  const skip = (s: GameState, remove?: string): GameState => {
+    const t = structuredClone(s);
+    if (remove) t.players = t.players.filter((p) => p.id !== remove);
+    engineHook(princessDragonModule, "skipActor")?.(makeCtx(eng.env, t, t.turn.player, []));
+    return t;
+  };
+
+  test("hoppas p2 över flyttar p3 i stället, och sedan p1 igen", () => {
+    let s = act(start(), mv(1, 0)).state;
+    expect(s.turn.actor).toBe("p2");
+    s = skip(s);
+    expect(s.turn.actor).toBe("p3");
+    expect(phase(s)).toBe("dragon");
+    s = act(s, pd(s)[0]!).state;
+    expect(s.turn.actor).toBeUndefined(); // p1
+  });
+
+  test("tas p2 bort faller hens senare platser också bort, och flytten slutar när ingen är kvar", () => {
+    let s = act(start(), mv(1, 0)).state;
+    s = skip(s, "p2");
+    expect(s.turn.actor).toBe("p3");
+    const actors: string[] = ["p1"];
+    while (phase(s) === "dragon") {
+      actors.push(actorOf(s));
+      s = act(s, pd(s)[0]!).state;
+    }
+    // p2:s båda platser är borta; flytten har fyra steg (p1 har redan gjort ett).
+    expect(actors.slice(0, 3)).toEqual(["p1", "p3", "p1"]);
+    expect(actors).not.toContain("p2");
+    expect(s.turn.actor).toBeUndefined();
+  });
+});
+
 describe("vad draken äter", () => {
   const ALL: ExpansionId[] = ["base", "abbot", "inns-cathedrals", "traders-builders", "mage-witch", "gold-mines", "princess-dragon"];
   // Två spelare; p1 lägger drakbrickan (3,0) och flyttar först: draken på (1,1) går norrut till (1,0).
@@ -489,7 +529,7 @@ describe("magisk port", () => {
   });
 
   test("ställ en följare på det valda området; pjässteget är då klart", () => {
-    const s = play(eng, start(), place$(3, 0, 0), portal("meeple"), portalAt(0, 5, "city0")).state;
+    const s = play(eng, start(), place$(3, 0, 0), portal("meeple"), portalAt(0, 5, "city0", "city")).state;
     expect(loc(s, M("p1"))).toEqual({ at: "feature", pos: { x: 0, y: 5 }, feature: "city0" });
     expect(phase(s)).toBe("confirm");
   });
@@ -524,7 +564,7 @@ describe("magisk port", () => {
     const p = play(eng, s, place$(3, 0, 0)).state;
     expect(pd(p).map((x) => (x.data as { choice?: string }).choice).sort()).toEqual(["abbot", "large-meeple", "meeple"]);
     const q = play(eng, p, portal("abbot")).state;
-    expect(pd(q).map((x) => x.data)).toEqual([{ pos: { x: 8, y: 8 }, feature: "cloister" }]);
+    expect(pd(q).map((x) => x.data)).toEqual([{ pos: { x: 8, y: 8 }, feature: "cloister", choice: "cloister" }]);
   });
 });
 
