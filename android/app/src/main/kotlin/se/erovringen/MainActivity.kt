@@ -63,6 +63,7 @@ class MainActivity : Activity() {
         screenView = screen
         roomView = room
         bridge.webView = room
+        bridge.onQuit = { finishAndRemoveTask() }
         room.addJavascriptInterface(bridge, "ErovringenHost")
         root.addView(screen, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         // Den dolda sidan måste vara kvar i vyhierarkin och synlig för att fortsätta köra.

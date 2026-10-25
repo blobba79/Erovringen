@@ -77,6 +77,8 @@ export interface PhoneState {
   selectedTile: number | null;
   /** Statistik när spelet är slut. */
   stats: GameStats | null;
+  /** Visas brickorna som är kvar på storskärmen? (Servern håller läget.) */
+  remainingShown: boolean;
 }
 
 type Listener = () => void;
@@ -116,6 +118,7 @@ export class Client {
       warnings: [],
       selectedTile: null,
       stats: null,
+      remainingShown: false,
     };
     this.transport = factory({
       open: () => this.onOpen(),
@@ -207,6 +210,9 @@ export class Client {
         return;
       case "stats":
         this.set({ stats: m.stats });
+        return;
+      case "remainingShown":
+        this.set({ remainingShown: m.on });
         return;
       case "waitingFor":
         this.set({ waiting: m.seats });
@@ -350,6 +356,11 @@ export class Client {
     saveWarnings(this.deps.storage, on);
     this.set({ warningsOn: on, ...(on ? {} : { warnings: [] }) });
     this.send({ type: "setWarnings", on });
+  }
+
+  /** Slå på eller av brickorna som är kvar på storskärmen. */
+  showRemaining(on: boolean): void {
+    this.send({ type: "showRemaining", on });
   }
 
   showToAll(handIndex: number): void {

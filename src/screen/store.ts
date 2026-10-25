@@ -29,6 +29,7 @@ export interface Model {
   dice?: DiceShown;
   /** Nyckel för senast visade tärningen (så att samma händelse inte visas två gånger). */
   lastDice?: string;
+  remainingShown: boolean;
   waiting: LobbySeat[];
   /** Alla platser saknas (omstart): visa en QR-kod i taget. */
   restart: boolean;
@@ -37,7 +38,7 @@ export interface Model {
   errorKey?: string;
 }
 
-export const initialModel: Model = { connected: false, lang: "en", waiting: [], restart: false, stateVersion: 0, prevFigures: [] };
+export const initialModel: Model = { connected: false, lang: "en", remainingShown: false, waiting: [], restart: false, stateVersion: 0, prevFigures: [] };
 
 export function reduce(m: Model, msg: ServerMessage): Model {
   switch (msg.type) {
@@ -62,6 +63,8 @@ export function reduce(m: Model, msg: ServerMessage): Model {
       return { ...m, reaction: { seq: (m.reaction?.seq ?? 0) + 1, player: msg.player, emoji: msg.emoji } };
     case "shownTile":
       return { ...m, shownTile: { player: msg.player, tile: msg.tile } };
+    case "remainingShown":
+      return { ...m, remainingShown: msg.on };
     case "stats":
       return { ...m, stats: msg.stats };
     case "camera":

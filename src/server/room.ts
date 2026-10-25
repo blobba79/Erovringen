@@ -58,6 +58,8 @@ export interface RoomOptions {
   cameraIntervalMs?: number;
   /** Adressen spelarna når servern på, t.ex. "http://192.168.1.5:8765". */
   baseUrl?: string;
+  /** Anropas när storskärmen på den egna datorn begär att programmet avslutas (spelet är då sparat). */
+  onQuit?: () => void;
   /** Klocka i ms, utbytbar i tester (speltid och reaktionstakt). */
   now?: () => number;
   /** Varningar för nybörjare; standard är motorns `stepWarnings`. Utbytbar i tester. */
@@ -134,6 +136,8 @@ export class Room {
   private botTimer: ReturnType<typeof setTimeout> | null = null;
   private botFailures = 0;
   private disposed = false;
+  /** Visas brickorna som är kvar på storskärmen? Sparas inte. */
+  private remainingShown = false;
   private readonly botConn: Conn = {
     local: false,
     send: (m) => {
@@ -208,6 +212,7 @@ export class Room {
         return this.rejoin(conn, msg.seatToken);
     }
     if (!bound) return this.error(conn, "error.notJoined");
+    if (msg.type === "quit" && bound.kind === "screen") return this.quit(conn);
     if (bound.kind === "screen") return this.error(conn, "error.screenCannotSend");
     const seat = bound.seat;
     switch (msg.type) {
@@ -229,6 +234,8 @@ export class Room {
         return this.react(conn, seat, msg.emoji);
       case "setWarnings":
         return this.setWarnings(seat, msg.on);
+      case "showRemaining":
+        return this.showRemaining(msg.on);
       case "hostAction":
         return this.hostAction(conn, seat, msg.player, msg.action);
       case "addBot":
@@ -261,6 +268,18 @@ export class Room {
     this.send(conn, this.screenInfo());
     if (this.phase === "lobby") this.send(conn, this.lobbyMsg());
     else this.syncGame(conn);
+  }
+
+  private quit(conn: Conn): void {
+    if (!conn.local) return this.error(conn, "error.screenLocalOnly");
+    this.log.info("storskärmen begärde att programmet avslutas");
+    this.save();
+    this.opts.onQuit?.();
+  }
+
+  private showRemaining(on: unknown): void {
+    this.remainingShown = on === true;
+    this.sendAll({ type: "remainingShown", on: this.remainingShown });
   }
 
   private join(conn: Conn, msg: Extract<ClientMessage, { type: "join" }>): void {
@@ -446,6 +465,8 @@ export class Room {
     this.phase = "playing";
     this.log.info(`fortsatte det sparade spelet ${id} (${replayed ? "uppspelat" : "ögonblicksbild"})`);
     this.camera = this.fitCamera();
+    this.remainingShown = false;
+    this.sendAll({ type: "remainingShown", on: false });
     this.broadcastGame(true);
     if (state.finished) this.sendStats();
   }
@@ -477,6 +498,8 @@ export class Room {
     saveOptions(this.store, this.options);
     this.log.info(`spelet startade med ${this.seats.length} spelare, frö ${seed}, expansioner ${o.expansions.join(",")}`);
     this.camera = this.fitCamera();
+    this.remainingShown = false;
+    this.sendAll({ type: "remainingShown", on: false });
     this.broadcastGame(true);
   }
 
@@ -981,6 +1004,7 @@ export class Room {
     const b = this.bindings.get(conn);
     if (!state || !b) return;
     this.send(conn, { type: "state", state: toPublicState(state) });
+    this.send(conn, { type: "remainingShown", on: this.remainingShown });
     const stats = this.statsMessage();
     if (stats) this.send(conn, stats);
     if (b.kind === "seat") {
