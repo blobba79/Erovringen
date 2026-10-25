@@ -9,7 +9,7 @@ import type { GameEvent, GameState, PlayerId, Pos, Step } from "../shared/state"
 import type { ExpansionModule } from "../shared/expansion";
 import { STATE_VERSION, actorOf, stepWarnings as engineStepWarnings } from "../engine/index";
 import type { EngineApi } from "../engine/index";
-import { baseExt } from "../engine/context";
+import { activeModules, baseExt, engineHook, makeCtx } from "../engine/context";
 import { finishTurn, returnTiles } from "../engine/turn";
 import { currentTile } from "../engine/turnstate";
 import { chooseBotStep } from "./bot";
@@ -669,7 +669,7 @@ export class Room {
     if (++this.botFailures >= BOT_MAX_FAILURES) {
       this.botFailures = 0;
       this.log.warn(`${seat.player} fastnade, turen hoppas över`);
-      return this.advanceTurn(state, null);
+      return this.advanceTurn(state, null, seat.player);
     }
     this.scheduleBot();
   }
@@ -686,7 +686,7 @@ export class Room {
         if (this.phase !== "playing" || !this.state) return this.error(conn, "error.gameNotStarted");
         if (this.state.turn.player !== player && actorOf(this.state) !== player) return this.error(conn, "error.cannotSkip");
         this.log.info(`värden hoppade över ${player}`);
-        return this.advanceTurn(this.state, null);
+        return this.advanceTurn(this.state, null, player);
       }
       case "remove": {
         if (this.phase === "lobby") {
@@ -698,7 +698,7 @@ export class Room {
         if (!this.state) return;
         if (this.seats.length <= 1) return this.error(conn, "error.cannotRemoveLast");
         this.log.info(`värden tog bort ${player}`);
-        return this.advanceTurn(this.state, player);
+        return this.advanceTurn(this.state, player, player);
       }
       default:
         return this.error(conn, "error.badMessage");
@@ -710,10 +710,13 @@ export class Room {
    * Med `remove` tas dessutom spelaren bort: pjäserna ut ur spelet och brickorna på hand
    * blandas tillbaka i högen.
    */
-  private advanceTurn(state: GameState, remove: PlayerId | null): void {
+  private advanceTurn(state: GameState, remove: PlayerId | null, who: PlayerId = state.turn.player): void {
     const skipped = state.turn.player;
+    // Någon annan än spelaren som har tur väljer (Crop Circles II) och hoppas över: bara hens val faller
+    // bort, modulen går vidare till nästa som ska välja. Turen och de val andra redan gjort ligger kvar.
+    const actorOnly = state.turn.actor !== undefined && state.turn.actor === who && who !== skipped;
     // Pågående tur avbryts bara om det är den frånvarandes tur.
-    const advance = remove === null || remove === skipped;
+    const advance = !actorOnly && (remove === null || remove === skipped);
     const snap = advance ? baseExt(state).snapshot : undefined;
     const s: GameState = structuredClone(snap ?? state);
     const events: GameEvent[] = [];
@@ -736,8 +739,12 @@ export class Room {
       }
     }
     if (advance && !s.finished) finishTurn(env, s, events);
+    if (remove) s.figures = s.figures.filter((f) => f.owner !== remove);
+    if (actorOnly) {
+      const ctx = makeCtx(env, s, s.turn.player, events);
+      for (const m of activeModules(env, s.setup)) engineHook(m, "skipActor")?.(ctx);
+    }
     if (remove) {
-      s.figures = s.figures.filter((f) => f.owner !== remove);
       s.setup.players = s.setup.players.filter((x) => x.id !== remove);
       const seat = this.seats.find((x) => x.player === remove);
       if (seat) this.removeSeat(seat);
