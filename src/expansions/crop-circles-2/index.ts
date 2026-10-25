@@ -114,6 +114,7 @@ function seek(ctx: EngineHookContext, c: Circle, from: number): void {
   const turn = ctx.state.turn;
   for (let i = from; i < c.order.length; i++) {
     const p = c.order[i] as PlayerId;
+    if (!ctx.state.players.some((x) => x.id === p)) continue; // borttagen av värden
     if (targetsFor(ctx, p, c, c.mode as Mode).length === 0) continue;
     c.idx = i;
     if (p === turn.player) delete turn.actor;

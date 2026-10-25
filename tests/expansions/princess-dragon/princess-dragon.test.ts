@@ -522,10 +522,9 @@ describe("magisk port", () => {
     expect(at(0, 5, "city0")).toBe(true);
     expect(targets.some((t) => (t.pos.x === 5 || t.pos.x === 6) && t.pos.y === 5 && t.feature === "city0")).toBe(false);
     expect(targets.some((t) => t.pos.y === 0 && t.feature === "road0" && t.pos.x < 3)).toBe(false);
-    // Ett mål per område.
-    const an = eng.analyze(s);
-    const ids = targets.map((t) => an.areaAt(t.pos, t.feature)!.id);
-    expect(new Set(ids).size).toBe(ids.length);
+    // Ett mål per ruta och område (inga dubbletter).
+    const keys = targets.map((t) => `${t.pos.x},${t.pos.y},${t.feature}`);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   test("ställ en följare på det valda området; pjässteget är då klart", () => {

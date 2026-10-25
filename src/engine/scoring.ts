@@ -80,7 +80,7 @@ export function returnToSupply(ctx: EngineHookContext, f: Figure): void {
 }
 
 /** Anropar modulernas `areaScored` (fens 3 poäng) för ett område som räknas. */
-function notifyAreaScored(ctx: EngineHookContext, area: Area, final: boolean): void {
+export function notifyAreaScored(ctx: EngineHookContext, area: Area, final: boolean): void {
   for (const m of activeModules(ctx.env, ctx.state.setup)) engineHook(m, "areaScored")?.(ctx, area, final);
 }
 
