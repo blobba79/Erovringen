@@ -156,6 +156,49 @@ describe("valet lägg till eller ta bort", () => {
   });
 });
 
+describe("vilken pjäs", () => {
+  const IC = ["base", "crop-circles-2", "inns-cathedrals"] as const;
+  const L2 = { id: "p2:large-meeple:0", x: 0, y: 0, feature: "city0" };
+  test("ta bort: ett steg per följare i området, spelaren väljer vilken", () => {
+    let s = circle([P2N, L2, P3S], { expansions: [...IC] });
+    s = act(s, mode("remove"));
+    const steps = cc(s);
+    expect(steps.map((x) => (x.data as { figure: string }).figure).sort()).toEqual(["p2:large-meeple:0", "p2:meeple:0"]);
+    s = act(s, steps.find((x) => (x.data as { figure: string }).figure === "p2:large-meeple:0")!);
+    expect(supply(s, "p2:large-meeple:0")).toBe(true);
+    expect(where(s, "p2:meeple:0").at).toBe("feature");
+  });
+
+  test("lägg till: vanlig eller stor följare ur förrådet; bara den stora om vanliga saknas", () => {
+    let s = circle([P2N, P3S], { expansions: [...IC] });
+    s = act(s, mode("add"));
+    const kinds = cc(s).filter((x) => x.action === "add").map((x) => (x.data as { choice: string }).choice).sort();
+    expect(kinds).toEqual(["large-meeple", "meeple"]);
+    s = act(s, cc(s).find((x) => x.action === "add" && (x.data as { choice: string }).choice === "large-meeple")!);
+    expect(where(s, "p2:large-meeple:0")).toEqual({ at: "feature", pos: { x: 0, y: 0 }, feature: "city0" });
+    // Inga vanliga kvar i förrådet: bara stor följare erbjuds.
+    let t = circle(
+      [P2N, P3S, ...[1, 2, 3, 4, 5, 6].map((i) => ({ id: `p2:meeple:${i}`, x: 0, y: 0, feature: "field0" }))],
+      { expansions: [...IC] },
+    );
+    t = act(t, mode("add"));
+    expect(cc(t).filter((x) => x.action === "add").map((x) => (x.data as { choice: string }).choice)).toEqual(["large-meeple"]);
+  });
+});
+
+describe("guld före cirkeln", () => {
+  test("guldet delas ut även när poängräkningen följs av en cirkel", () => {
+    const s0 = scenario(eng, {
+      expansions: ["base", "crop-circles-2", "gold-mines"], n: 3, board: BOARD, hands: [[CC("CFC")], ["base/L"], ["base/L"]],
+      figures: [{ ...P2N, feature: "city1" }, { id: "p3:meeple:0", x: 0, y: 0, feature: "city0" }],
+    });
+    s0.figures.find((f) => f.kind === "gold-bar")!.location = { at: "tile", pos: { x: 0, y: 0 } };
+    const s = play(eng, s0, place$(0, 1, 0), NOFIG, CONFIRM).state;
+    expect(s.turn.phase).toBe("crop-circles-2");
+    expect(s.players.find((p) => p.id === "p2")!.counters.gold).toBe(1);
+  });
+});
+
 describe("ångra", () => {
   test("den som har tur kan ångra valet så länge ingen annan har valt", () => {
     let s = circle([P2N, P3S]);

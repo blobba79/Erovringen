@@ -285,5 +285,7 @@
   "step.crop-circles-2.mode.remove": "Everyone removes a follower",
   "step.crop-circles-2.add": "Add a follower here",
   "step.crop-circles-2.remove": "Remove the follower here",
-  "step.crop-circles-2.skip": "Add nothing"
+  "step.crop-circles-2.skip": "Add nothing",
+  "step.crop-circles-2.add.meeple": "Add a follower",
+  "step.crop-circles-2.add.large-meeple": "Add the large follower"
 }

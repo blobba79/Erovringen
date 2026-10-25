@@ -66,6 +66,11 @@ export interface EngineHooks {
    * får sätta `turn.actor`. Turen avslutas när fasen lämnar över till "confirm" och spelaren bekräftar.
    */
   afterScoring(ctx: EngineHookContext): string | undefined;
+  /**
+   * Värden hoppar över (eller tar bort) spelaren i `turn.actor`: modulen går vidare till nästa som ska
+   * välja, eller till nästa fas. En borttagen spelares pjäser är redan borta när kroken anropas.
+   */
+  skipActor(ctx: EngineHookContext): void;
   /** Falskt = spelaren som har tur får inte ångra just nu (någon annan har redan valt). */
   canUndo(ctx: EngineHookContext): boolean;
   /**
@@ -93,6 +98,8 @@ export interface BaseExt {
   snapshot?: GameState;
   /** Expansionsfaser som väntar på sin tur den här turen (se `phases.ts`). */
   phaseQueue?: string[];
+  /** Extra tur som `extraTurn` gav innan en fas efter poängräkningen (Crop Circles II); gäller vid turens slut. */
+  extraTurnPending?: boolean;
 }
 
 export function baseExt(state: GameState): BaseExt {

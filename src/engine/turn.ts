@@ -77,15 +77,19 @@ export function finishTurn(env: Env, state: GameState, events: GameEvent[]): voi
   }
   delete baseExt(state).snapshot;
   state.turn.pending = [];
+  // Alla moduler tillfrågas (de nollställer sina egna flaggor, och Gold Mines delar ut guld), inte bara
+  // fram till första ja. Sker före en eventuell fas efter poängräkningen; resultatet sparas till turens slut.
+  const ext = baseExt(state);
+  const again = activeModules(env, state.setup).map((m) => m.hooks.extraTurn?.(ctx) ?? false).some(Boolean) || ext.extraTurnPending === true;
+  delete ext.extraTurnPending;
   // En modul (Crop Circles II) kan lägga en fas efter poängräkningen; turen avslutas när den är klar.
   for (const m of activeModules(env, state.setup)) {
     const phase = engineHook(m, "afterScoring")?.(ctx);
     if (phase === undefined) continue;
+    if (again) ext.extraTurnPending = true;
     state.turn.phase = phase;
     return;
   }
-  // Alla moduler tillfrågas (de nollställer sina egna flaggor), inte bara fram till första ja.
-  const again = activeModules(env, state.setup).map((m) => m.hooks.extraTurn?.(ctx) ?? false).some(Boolean);
   for (const m of activeModules(env, state.setup)) {
     const handled = engineHook(m, "dealAfterTurn")?.(ctx, again);
     if (handled === undefined) continue;
