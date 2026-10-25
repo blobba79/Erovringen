@@ -3,7 +3,7 @@
 import type { GameState, Pos, Step } from "../shared/state";
 import { analyze } from "./features";
 import { rotatedAt } from "./board";
-import { activeModules, actorOf, engineHook, makeCtx, playerOf, type Env } from "./context";
+import { activeModules, actorOf, baseExt, engineHook, makeCtx, playerOf, type Env } from "./context";
 import { hasAnyPlacement, legalPlacements } from "./placement";
 import { strength } from "./scoring";
 import { currentTile, placedStep } from "./turnstate";
@@ -53,6 +53,8 @@ export function figureSteps(env: Env, state: GameState): Step[] {
 /** Får spelaren som har tur ångra just nu? */
 export function undoAllowed(env: Env, state: GameState): boolean {
   if (state.turn.pending.length === 0) return false;
+  const lock = baseExt(state).undoLock;
+  if (lock !== undefined && state.turn.pending.length <= lock) return false;
   const ctx = makeCtx(env, state, state.turn.player, []);
   return activeModules(env, state.setup).every((m) => engineHook(m, "canUndo")?.(ctx) !== false);
 }

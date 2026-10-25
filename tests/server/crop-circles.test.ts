@@ -167,7 +167,7 @@ describe("botstrategi med actor", () => {
     s.board = { "0,0": { type: "crop-circles-2/CFC", pos: { x: 0, y: 0 }, rotation: 0 } };
     s.figures.find((f) => f.id === "p2:meeple:0")!.location = { at: "feature", pos: { x: 0, y: 0 }, feature: "city0" };
     s.turn = { player: "p1", phase: "crop-circles-2", pending: [], actor: undefined };
-    const ext = { circle: { kind: "city", order: ["p2", "p3", "p1"], idx: 0, others: false } };
+    const ext = { circle: { kind: "city", order: ["p2", "p3", "p1"], idx: 0 } };
     (s.ext as Record<string, unknown>)["crop-circles-2"] = ext;
     // Läget väljs av p1 (en bott får välja både att lägga till och ta bort).
     const step = chooseBotStep(eng, s, () => 0.1);

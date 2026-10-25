@@ -6,6 +6,7 @@ import { CONFIRM, NOFIG, fig$, place$, play, scenario, score, type Rot } from ".
 import { playGame, type Strategy } from "../../players/random-player";
 import { actorOf } from "../../../src/engine/index";
 import { finishTurn } from "../../../src/engine/turn";
+import { removePlayerStep, skipActorStep } from "../../../src/engine/host";
 import type { GameState, Pos, Step } from "../../../src/shared/state";
 import type { ExpansionId } from "../../../src/shared/tiles";
 
@@ -293,15 +294,17 @@ describe("spelaren väljer tacka (en i taget, not 450)", () => {
   test("värden hoppar över den som väljer: hens val görs automatiskt och de andra får välja", () => {
     const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
     const b = act(a, takeGold({ x: 0, y: 0 })); // p2 väljer nu
-    const ctx = { state: structuredClone(b), player: "p1", emit: () => {}, types: eng.types, env: eng.env };
-    const hook = (eng.env.modules.find((m) => m.id === "gold-mines")!.hooks as { skipActor(c: unknown): void }).skipActor;
-    hook(ctx);
+    const state = act(b, skipActorStep());
+    const ctx = { state };
     // p2 tar en tacka på (0,1) automatiskt; p1 har nu själv två rutor att välja mellan.
     expect(ctx.state.turn.phase).toBe("gold-pick");
     expect(ctx.state.turn.actor).toBeUndefined();
     expect([gold(ctx.state, "p1"), gold(ctx.state, "p2")]).toEqual([1, 1]);
     expect(eng.canUndo(ctx.state)).toBe(false); // det som delats ut automatiskt går inte att ångra
     const end = act(ctx.state, goldSteps(ctx.state)[0]!);
+    // Bekräfta spelar om turen med överhoppet och ger samma utdelning (förut error.internal).
+    const done2 = play(eng, end, CONFIRM).state;
+    expect([gold(done2, "p1"), gold(done2, "p2")]).toEqual([2, 2]);
     expect(end.turn.phase).toBe("confirm");
     expect([gold(end, "p1"), gold(end, "p2")]).toEqual([2, 2]);
     expect(barsOn(end)).toEqual([]);
@@ -320,10 +323,7 @@ describe("spelaren väljer tacka (en i taget, not 450)", () => {
   test("en spelare som tagits bort delas det inte ut till", () => {
     const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
     const b = act(a, takeGold({ x: 0, y: 0 }));
-    const s = structuredClone(b);
-    s.players = s.players.filter((p) => p.id !== "p2");
-    const ctx = { state: s, player: "p1", emit: () => {}, types: eng.types, env: eng.env };
-    (eng.env.modules.find((m) => m.id === "gold-mines")!.hooks as { skipActor(c: unknown): void }).skipActor(ctx);
+    const s = act(b, removePlayerStep("p2"));
     // p1 är ensam kvar och väljer själv bland de tre tackorna; p2 får inget.
     expect(s.turn.phase).toBe("gold-pick");
     expect(s.turn.actor).toBeUndefined();
@@ -331,6 +331,27 @@ describe("spelaren väljer tacka (en i taget, not 450)", () => {
     while (st.turn.phase === "gold-pick") st = act(st, goldSteps(st)[0]!);
     expect(gold(st, "p1")).toBe(4);
     expect(st.players.map((p) => p.id)).toEqual(["p1"]);
+    // Bekräfta spelar om borttagningen: p2 kommer inte tillbaka.
+    const fin = play(eng, st, CONFIRM).state;
+    expect(fin.players.map((p) => p.id)).toEqual(["p1"]);
+    expect(gold(fin, "p1")).toBe(4);
+  });
+
+  test("värden hoppar över den som har tur och väljer själv (steg): resten delas ut och turen kan bekräftas", () => {
+    const a = done([[0, 0], [0, 1], [0, 1], [0, 2]], both);
+    expect(a.turn.phase).toBe("gold-pick");
+    expect(a.turn.actor).toBeUndefined();
+    let b = act(a, skipActorStep());
+    // p1:s val görs automatiskt; p2 väljer själv resten.
+    expect(b.turn.actor).toBe("p2");
+    expect(gold(b, "p1")).toBeGreaterThan(0);
+    while (b.turn.phase === "gold-pick") b = act(b, goldSteps(b)[0]!);
+    expect(b.turn.phase).toBe("confirm");
+    expect(gold(b, "p1") + gold(b, "p2")).toBe(4);
+    expect(barsOn(b)).toEqual([]);
+    const c = play(eng, b, CONFIRM).state;
+    expect(gold(c, "p1") + gold(c, "p2")).toBe(4);
+    expect(c.turn.phase).not.toBe("gold-pick");
   });
 });
 

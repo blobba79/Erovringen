@@ -15,8 +15,8 @@
 //   byggmästaren, grisen och neutrala pjäser berörs inte (OKLART för stor följare, byggmästare och gris;
 //   JCloisterZone räknar bara följare). Vid "ta bort" väljer spelaren vilken av sina följare i ett område som tas hem (ett steg per pjäs). Vid "lägg till" väljer hen sort ur förrådet (s. 164: ett steg per område och sort som finns kvar).
 //   Värden kan hoppa över eller ta bort den som väljer (kroken skipActor): bara hens val faller bort.
-// - När alla valt går turen till "confirm" hos den som har tur. Den som har tur kan ångra så länge ingen
-//   annan har valt. Sädescirkeln ger inga poäng.
+// - När alla valt går turen till "confirm" hos den som har tur. Den som har tur kan ångra sina egna val efter
+//   det sista som någon annan valt (motorns undoLock). Sädescirkeln ger inga poäng.
 // - Byggmästarens extra tur: cirkeln avgörs efter varje bricka (varje tur har sitt eget steg 8e).
 
 import type { ExpansionModule, HookContext } from "../../shared/expansion";
@@ -46,8 +46,6 @@ interface Circle {
   order: PlayerId[];
   /** Index i `order` för den som väljer nu. */
   idx: number;
-  /** Någon annan än spelaren som har tur har redan valt: ingen ångra. */
-  others: boolean;
 }
 
 interface Ext {
@@ -183,24 +181,19 @@ export const cropCircles2Module: ExpansionModule = {
         } else returnToSupply(ctx, t.fig as Figure);
       } else return "error.illegalStep";
       ctx.emit({ type: "expansion", expansion: ID, event: step.action, data: { player } });
-      if (player !== s.turn.player) circle.others = true;
       seek(ctx, circle, circle.idx + 1);
       return null;
     },
 
     // Värden hoppar över (eller tar bort) den som väljer: bara hens val hoppas över, de som är kvar får välja.
+    // Gäller även den som har tur, om hen väljer sist: de andras val ligger kvar. Ångra spärras av motorn
+    // (undoLock) så långt tillbaka som någon annans val eller ett värdsteg.
     skipActor(c: HookContext) {
       const ctx = c as EngineHookContext;
       const circle = (ctx.state.ext[ID] as Ext | undefined)?.circle;
-      if (ctx.state.turn.phase !== CIRCLE_PHASE || !circle?.mode) return;
+      if (ctx.state.turn.phase !== CIRCLE_PHASE || !circle?.mode) return false;
       seek(ctx, circle, circle.idx + 1);
-    },
-
-    canUndo(c: HookContext) {
-      const ctx = c as EngineHookContext;
-      const circle = (ctx.state.ext[ID] as Ext | undefined)?.circle;
-      const inCircle = ctx.state.turn.pending.some((p) => p.type === "expansion" && p.expansion === ID);
-      return !(inCircle && circle?.others);
+      return true;
     },
 
     // Efter poängräkningen: en bricka med sädescirkel ger ett val om någon har en följare av sorten.
@@ -211,7 +204,7 @@ export const cropCircles2Module: ExpansionModule = {
       delete e.symbol;
       delete e.circle;
       if (!kind) return undefined;
-      const circle: Circle = { kind, order: orderFrom(ctx, ctx.state.turn.player), idx: 0, others: false };
+      const circle: Circle = { kind, order: orderFrom(ctx, ctx.state.turn.player), idx: 0 };
       if (!ctx.state.players.some((p) => ownTargets(ctx, p.id, kind).length > 0)) return undefined;
       e.circle = circle;
       return CIRCLE_PHASE;

@@ -57,8 +57,6 @@ interface GoldExt {
   taken: string[];
   /** Pågående utdelning "en i taget" (se `Dist`); finns bara medan den väntar på val. */
   dist?: Dist;
-  /** Någon annan än spelaren som har tur har redan valt tacka: ingen ångra. */
-  locked?: boolean;
 }
 
 interface Claim {
@@ -281,7 +279,6 @@ export const goldMinesModule: ExpansionModule = {
         const bar = pick.bars[0] as string;
         d.gone.push(bar);
         give(ctx, pid, bar);
-        if (pid !== ctx.state.turn.player) e.locked = true;
         d.idx = (d.idx + 1) % d.order.length;
         if (!advanceDist(ctx)) ctx.state.turn.phase = "confirm";
         return null;
@@ -320,7 +317,6 @@ export const goldMinesModule: ExpansionModule = {
     extraTurn(c) {
       const ctx = c as EngineHookContext;
       const e = ext(ctx);
-      delete e.locked;
       const list = claims.get(c);
       claims.delete(c);
       if (!list?.length) return false;
@@ -352,16 +348,11 @@ export const goldMinesModule: ExpansionModule = {
     skipActor(c: HookContext) {
       const ctx = c as EngineHookContext;
       const d = ext(ctx).dist;
-      if (!d || ctx.state.turn.phase !== GOLD_PICK_PHASE) return;
+      if (!d || ctx.state.turn.phase !== GOLD_PICK_PHASE) return false;
       const pid = d.order[d.idx];
       if (pid !== undefined && present(ctx, pid)) d.auto.push(pid);
-      // Det som delats ut automatiskt går inte att ångra (omspelningen från ögonblicksbilden skulle tappa det).
-      ext(ctx).locked = true;
       if (!advanceDist(ctx)) ctx.state.turn.phase = "confirm";
-    },
-
-    canUndo(c: HookContext) {
-      return !ext(c as EngineHookContext).locked;
+      return true;
     },
 
     finalScoring(c) {
