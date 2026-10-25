@@ -37,7 +37,7 @@ h1, h2, h3 { margin: 0 0 0.4em; }
 .map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .panel { position: absolute; font-size: 1.1vmax; }
 .panel h3 { font-size: 1.15em; }
-.scores { top: 1.2vmax; left: 1.2vmax; min-width: 22vmax; font-size: 1.8vmax; }
+.scores { top: 1.2vmax; left: 1.2vmax; min-width: 22vmax; font-size: 1.6vmax; }
 .scores ul, .final ol { list-style: none; margin: 0; padding: 0; }
 .scores li, .final li { display: flex; flex-wrap: nowrap; align-items: center; padding: 0.2em 0.3em; border-radius: 0.5em; white-space: nowrap; }
 .scores li.turn { background: var(--c-accent, #e64); }
