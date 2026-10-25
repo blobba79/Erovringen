@@ -7,13 +7,14 @@
 //     expansion "crop-circles-2" action "mode" data { choice: "add" | "remove" }
 // - Därefter väljer varje spelare i tur och ordning, med start hos spelaren till vänster om den som
 //   har tur och den som har tur sist (`turn.actor` är den som väljer):
-//     add:    action "add" data { pos, feature }          (lägg en egen följare från förrådet på ett
+//     add:    action "add" data { pos, feature, kind: "meeple" | "large-meeple" }          (lägg en egen följare, vanlig eller stor, från förrådet på ett
 //                                                           område av sorten där spelaren har en följare;
 //                                                           valfritt, action "skip" hoppar över)
 //     remove: action "remove" data { pos, feature, figure } (ta hem en egen följare från ett område av sorten)
 //   Den som inte kan hoppas över utan att ett steg krävs. Följare = vanlig och stor följare; abboten,
 //   byggmästaren, grisen och neutrala pjäser berörs inte (OKLART för stor följare, byggmästare och gris;
-//   JCloisterZone räknar bara följare). Den nya följaren är alltid en vanlig följare.
+//   JCloisterZone räknar bara följare). Vid "ta bort" väljer spelaren vilken av sina följare i ett område som tas hem (ett steg per pjäs). Vid "lägg till" väljer hen sort ur förrådet (s. 164: ett steg per område och sort som finns kvar).
+//   Värden kan hoppa över eller ta bort den som väljer (kroken skipActor): bara hens val faller bort.
 // - När alla valt går turen till "confirm" hos den som har tur. Den som har tur kan ångra så länge ingen
 //   annan har valt. Sädescirkeln ger inga poäng.
 // - Byggmästarens extra tur: cirkeln avgörs efter varje bricka (varje tur har sitt eget steg 8e).
@@ -32,9 +33,9 @@ const SYMBOL = "crop-circle:";
 export type CircleKind = "city" | "road" | "field";
 type Mode = "add" | "remove";
 
-/** Följare som cirkeln berör och som tas hem; det som läggs till är alltid en vanlig följare. */
-const REMOVABLE = new Set(["meeple", "large-meeple"]);
-const ADDED_KIND = "meeple";
+/** Följare som cirkeln berör: de tas hem, och en av dem (vanlig eller stor) läggs till ur förrådet. */
+const FOLLOWERS = ["meeple", "large-meeple"];
+const REMOVABLE = new Set(FOLLOWERS);
 
 const set: TileSet = (TILE_DATA[ID] as { set: TileSet }).set;
 
@@ -59,8 +60,8 @@ function ext(ctx: EngineHookContext): Ext {
   return ((ctx.state.ext[ID] as Ext | undefined) ?? (ctx.state.ext[ID] = {})) as Ext;
 }
 
-/** Spelarens följare på områden av sorten: ett mål (pjäsens egen plats) per område. */
-function ownTargets(ctx: EngineHookContext, player: PlayerId, kind: CircleKind): { fig: Figure; pos: Pos; feature: string }[] {
+/** Spelarens följare på områden av sorten. `all`: varje följare; annars ett mål (pjäsens egen plats) per område. */
+function ownTargets(ctx: EngineHookContext, player: PlayerId, kind: CircleKind, all = false): { fig: Figure; pos: Pos; feature: string }[] {
   const s = ctx.state;
   const an = analyze(s.board, s.figures, ctx.types);
   const seen = new Set<number>();
@@ -68,20 +69,24 @@ function ownTargets(ctx: EngineHookContext, player: PlayerId, kind: CircleKind):
   for (const fig of s.figures) {
     if (fig.owner !== player || !REMOVABLE.has(fig.kind) || fig.location.at !== "feature") continue;
     const area = an.areaAt(fig.location.pos, fig.location.feature);
-    if (!area || area.kind !== kind || seen.has(area.id)) continue;
+    if (!area || area.kind !== kind || (!all && seen.has(area.id))) continue;
     seen.add(area.id);
     out.push({ fig, pos: { ...fig.location.pos }, feature: fig.location.feature });
   }
   return out;
 }
 
-const hasSupply = (ctx: EngineHookContext, player: PlayerId) =>
-  ctx.state.figures.some((f) => f.owner === player && f.kind === ADDED_KIND && f.location.at === "supply");
+/** Sorterna följare spelaren har kvar i förrådet (vanlig först). */
+const supplyKinds = (ctx: EngineHookContext, player: PlayerId): string[] =>
+  FOLLOWERS.filter((k) => ctx.state.figures.some((f) => f.owner === player && f.kind === k && f.location.at === "supply"));
 
-/** Vad en spelare kan göra i läget `mode`. */
-function targetsFor(ctx: EngineHookContext, player: PlayerId, c: Circle, mode: Mode) {
-  if (mode === "add" && !hasSupply(ctx, player)) return [];
-  return ownTargets(ctx, player, c.kind);
+interface Target { pos: Pos; feature: string; fig?: Figure; kind?: string }
+
+/** Vad en spelare kan göra i läget `mode`: att ta bort väljer varje egen följare, att lägga till väljer område och sort. */
+function targetsFor(ctx: EngineHookContext, player: PlayerId, c: Circle, mode: Mode): Target[] {
+  if (mode === "remove") return ownTargets(ctx, player, c.kind, true);
+  const kinds = supplyKinds(ctx, player);
+  return ownTargets(ctx, player, c.kind).flatMap((t) => kinds.map((kind) => ({ pos: t.pos, feature: t.feature, kind })));
 }
 
 function stepsFor(ctx: EngineHookContext, player: PlayerId, c: Circle): Step[] {
@@ -91,7 +96,7 @@ function stepsFor(ctx: EngineHookContext, player: PlayerId, c: Circle): Step[] {
     type: "expansion",
     expansion: ID,
     action: mode,
-    data: (mode === "remove" ? { pos: t.pos, feature: t.feature, figure: t.fig.id } : { pos: t.pos, feature: t.feature }) as ExpansionStepData,
+    data: (mode === "remove" ? { pos: t.pos, feature: t.feature, figure: t.fig!.id } : { pos: t.pos, feature: t.feature, kind: t.kind }) as ExpansionStepData,
   }));
   if (mode === "add") out.push({ type: "expansion", expansion: ID, action: "skip", data: {} });
   return out;
@@ -167,19 +172,27 @@ export const cropCircles2Module: ExpansionModule = {
         if (mode !== "add") return "error.illegalStep";
       } else if (step.action === mode) {
         const t = targetsFor(ctx, player, circle, mode).find(
-          (x) => x.feature === d.feature && d.pos && x.pos.x === d.pos.x && x.pos.y === d.pos.y && (mode === "add" || x.fig.id === d.figure),
+          (x) => x.feature === d.feature && d.pos && x.pos.x === d.pos.x && x.pos.y === d.pos.y && (mode === "add" ? x.kind === (d as { kind?: string }).kind : x.fig!.id === d.figure),
         );
         if (!t) return "error.illegalStep";
         if (mode === "add") {
-          const fig = s.figures.find((f) => f.owner === player && f.kind === ADDED_KIND && f.location.at === "supply") as Figure;
+          const fig = s.figures.find((f) => f.owner === player && f.kind === t.kind && f.location.at === "supply") as Figure;
           fig.location = { at: "feature", pos: { ...t.pos }, feature: t.feature };
           ctx.emit({ type: "figurePlaced", figure: fig.id, location: fig.location });
-        } else returnToSupply(ctx, t.fig);
+        } else returnToSupply(ctx, t.fig as Figure);
       } else return "error.illegalStep";
       ctx.emit({ type: "expansion", expansion: ID, event: step.action, data: { player } });
       if (player !== s.turn.player) circle.others = true;
       seek(ctx, circle, circle.idx + 1);
       return null;
+    },
+
+    // Värden hoppar över (eller tar bort) den som väljer: bara hens val hoppas över, de som är kvar får välja.
+    skipActor(c: HookContext) {
+      const ctx = c as EngineHookContext;
+      const circle = (ctx.state.ext[ID] as Ext | undefined)?.circle;
+      if (ctx.state.turn.phase !== CIRCLE_PHASE || !circle?.mode) return;
+      seek(ctx, circle, circle.idx + 1);
     },
 
     canUndo(c: HookContext) {

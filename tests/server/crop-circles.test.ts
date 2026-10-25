@@ -117,18 +117,43 @@ describe("Crop Circles II i rummet", () => {
     room.dispose();
   });
 
-  test("värden kan hoppa över den som ska välja", async () => {
+  test("värden hoppar över den som ska välja: bara hens val faller bort, de andra får välja", async () => {
     const g = await setup();
     const { room, anna, bo } = g;
     await startCircle(g);
-    send(room, anna, expansion("mode", { choice: "add" }));
+    send(room, anna, expansion("mode", { choice: "remove" }));
     expect(room.state!.turn.actor).toBe(g.p2);
-    // Bo tappar anslutningen mitt i valet: Anna (värden) hoppar över hen, cirkeln avbryts och turen går vidare.
     room.disconnect(bo);
     room.handle(anna, { type: "hostAction", player: g.p2, action: "skip" });
-    expect(room.state!.turn.actor).toBeUndefined();
-    expect(room.state!.turn.player).not.toBe(g.p1);
+    // Cirkeln lever kvar: p2:s följare ligger kvar och datorn (p3) väljer nu.
+    expect(room.state!.turn.phase === "crop-circles-2" || room.state!.turn.phase === "confirm").toBe(true);
+    expect(room.state!.turn.player).toBe(g.p1);
+    expect(room.state!.figures.find((f) => f.id === `${g.p2}:meeple:0`)!.location.at).toBe("feature");
+    for (let i = 0; i < 100 && room.state!.turn.phase === "crop-circles-2"; i++) await sleep(5);
+    expect(room.state!.turn.phase).toBe("confirm");
+    expect(room.state!.figures.find((f) => f.id === `${g.p3}:meeple:0`)!.location.at).toBe("supply");
+    room.dispose();
+  });
+
+  test("värden tar bort den som ska välja: pjäserna försvinner, de kvarvarande får välja", async () => {
+    const g = await setup();
+    const { room, anna, bo } = g;
+    await startCircle(g);
+    send(room, anna, expansion("mode", { choice: "remove" }));
+    expect(room.state!.turn.actor).toBe(g.p2);
+    room.disconnect(bo);
+    room.handle(anna, { type: "hostAction", player: g.p2, action: "remove" });
+    const s = room.state!;
+    expect(s.players.map((p) => p.id)).toEqual([g.p1, g.p3]);
+    expect(s.figures.some((f) => f.owner === g.p2)).toBe(false);
+    expect(s.turn.player).toBe(g.p1);
+    expect(s.turn.actor).not.toBe(g.p2);
+    for (let i = 0; i < 100 && room.state!.turn.phase === "crop-circles-2"; i++) await sleep(5);
+    expect(room.state!.turn.phase).toBe("confirm");
+    expect(room.state!.figures.find((f) => f.id === `${g.p3}:meeple:0`)!.location.at).toBe("supply");
+    send(room, anna, { type: "confirm" });
     expect(room.state!.turn.phase).not.toBe("crop-circles-2");
+    expect(room.state!.turn.player).not.toBe(g.p2);
     room.dispose();
   });
 });
