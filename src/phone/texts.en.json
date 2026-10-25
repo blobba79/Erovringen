@@ -23,6 +23,8 @@
   "phone.pickTile": "Tap the tile you want to play.",
   "phone.playTile": "Play this tile",
   "phone.react": "React",
+  "phone.showRemaining": "Show tiles left",
+  "phone.hideRemaining": "Hide tiles left",
   "phone.rules": "Rules",
   "rules.title": "Rules",
   "rules.back": "Back to the list",

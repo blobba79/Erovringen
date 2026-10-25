@@ -44,6 +44,9 @@ export function Tools({ s, phase, mine }: { s: PhoneState; phase: string; mine: 
         <button type="button" class={panel === "react" ? "on" : ""} onClick={() => toggle("react")}>
           {t("phone.react")}
         </button>
+        <button type="button" class={s.remainingShown ? "on" : ""} onClick={() => c.showRemaining(!s.remainingShown)}>
+          {t(s.remainingShown ? "phone.hideRemaining" : "phone.showRemaining")}
+        </button>
         <RulesButton expansions={s.state?.setup.expansions ?? []} lang={s.lang} />
       </div>
       {panel === "react" && (

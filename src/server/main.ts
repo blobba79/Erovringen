@@ -15,12 +15,21 @@ const dir = baseDir();
 const logger = createFileLogger({ dir: join(dir, "logg"), console: false });
 const port = Number(process.env.PORT) || DEFAULT_PORT;
 
+let stopServer = () => {};
 const running = createServer({
   port,
   routes: { "/": screenPage, "/p": phonePage },
-  room: { savedDir: join(dir, "sparade") },
+  room: {
+    savedDir: join(dir, "sparade"),
+    onQuit: () => {
+      logger.info("avslutar");
+      stopServer();
+      setTimeout(() => process.exit(0), 200);
+    },
+  },
   logger,
 });
+stopServer = () => running.stop();
 
 console.log(`Erövringen ${VERSION} är igång.`);
 console.log("Stäng det här fönstret för att avsluta programmet.");

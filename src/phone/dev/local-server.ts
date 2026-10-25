@@ -168,6 +168,9 @@ export function localServer(opts: LocalServerOptions = {}): TransportFactory {
           warningsOn = m.on;
           sendWarnings();
           break;
+        case "showRemaining":
+          to({ type: "remainingShown", on: m.on });
+          break;
         default:
           break; // preview, map, inspect, showToAll, hostAction: ingen storskärm här
       }

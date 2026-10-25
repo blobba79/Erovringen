@@ -19,7 +19,7 @@ export function createEmbeddedRoom(host: AndroidHost, opts: { gameCode?: string;
     warn: (m) => safeLog(host, "warn", m),
     error: (m) => safeLog(host, "error", m),
   };
-  const room = new Room({ store: hostFileStore(host), logger, ...(opts.gameCode ? { gameCode: opts.gameCode } : {}), ...(opts.seed ? { seed: opts.seed } : {}) });
+  const room = new Room({ store: hostFileStore(host), logger, onQuit: () => host.quit?.(), ...(opts.gameCode ? { gameCode: opts.gameCode } : {}), ...(opts.seed ? { seed: opts.seed } : {}) });
   const conns = new Map<string, Conn>();
 
   const api: EmbeddedRoom = {

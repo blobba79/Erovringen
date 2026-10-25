@@ -28,6 +28,10 @@ class RoomBridge(
     @Volatile
     var webView: WebView? = null
 
+    /** Anropas på huvudtråden när spelrummet ber om att appen stängs. */
+    @Volatile
+    var onQuit: (() -> Unit)? = null
+
     private val lock = Any()
     private var ready = false
     private val queue = ArrayList<String>()
@@ -75,6 +79,13 @@ class RoomBridge(
     @JavascriptInterface
     fun log(level: String, line: String) {
         appLog.write(if (level == "warn" || level == "error") level else "info", "[rum] $line")
+    }
+
+    /** Storskärmens avsluta-knapp: spelet är redan sparat. */
+    @JavascriptInterface
+    fun quit() {
+        appLog.info("Avslutar på begäran från storskärmen")
+        main.post { onQuit?.invoke() }
     }
 
     @JavascriptInterface
