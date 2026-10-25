@@ -28,6 +28,16 @@
         "5174"
       ],
       "port": 5174
+    },
+    {
+      "name": "storskarm-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "bun",
+        "--port=3200",
+        "src/screen/dev/index.html"
+      ],
+      "port": 3200
     }
   ]
 }

@@ -103,7 +103,7 @@ h1, h2, h3 { margin: 0 0 0.4em; }
 @keyframes dice-in { from { opacity: 0; transform: translateX(-50%) scale(0.8); } }
 
 body.idle, body.idle * { cursor: none; }
-.tiles-left { font-size: 0.8em; font-weight: 400; opacity: 0.8; margin-left: 0.6em; }
+.tiles-left { font-size: 1em; font-weight: 700; color: var(--accent, #FFD23F); margin-left: 0.6em; }
 .supply { display: flex; flex-wrap: wrap; gap: 0.1em 0.5em; flex-basis: 100%; padding-left: 1.4em; }
 .neutral { margin-top: 0.4em; padding-top: 0.3em; border-top: 0.1vmax solid color-mix(in srgb, var(--c-text, #fff) 30%, transparent); }
 .neutral .supply { padding-left: 0; }
