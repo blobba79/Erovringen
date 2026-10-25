@@ -7,7 +7,7 @@
 //     expansion "crop-circles-2" action "mode" data { choice: "add" | "remove" }
 // - Därefter väljer varje spelare i tur och ordning, med start hos spelaren till vänster om den som
 //   har tur och den som har tur sist (`turn.actor` är den som väljer):
-//     add:    action "add" data { pos, feature, kind: "meeple" | "large-meeple" }          (lägg en egen följare, vanlig eller stor, från förrådet på ett
+//     add:    action "add" data { pos, feature, choice: "meeple" | "large-meeple" }          (lägg en egen följare, vanlig eller stor, från förrådet på ett
 //                                                           område av sorten där spelaren har en följare;
 //                                                           valfritt, action "skip" hoppar över)
 //     remove: action "remove" data { pos, feature, figure } (ta hem en egen följare från ett område av sorten)
@@ -96,7 +96,7 @@ function stepsFor(ctx: EngineHookContext, player: PlayerId, c: Circle): Step[] {
     type: "expansion",
     expansion: ID,
     action: mode,
-    data: (mode === "remove" ? { pos: t.pos, feature: t.feature, figure: t.fig!.id } : { pos: t.pos, feature: t.feature, kind: t.kind }) as ExpansionStepData,
+    data: (mode === "remove" ? { pos: t.pos, feature: t.feature, figure: t.fig!.id } : { pos: t.pos, feature: t.feature, choice: t.kind }) as ExpansionStepData,
   }));
   if (mode === "add") out.push({ type: "expansion", expansion: ID, action: "skip", data: {} });
   return out;
@@ -172,7 +172,7 @@ export const cropCircles2Module: ExpansionModule = {
         if (mode !== "add") return "error.illegalStep";
       } else if (step.action === mode) {
         const t = targetsFor(ctx, player, circle, mode).find(
-          (x) => x.feature === d.feature && d.pos && x.pos.x === d.pos.x && x.pos.y === d.pos.y && (mode === "add" ? x.kind === (d as { kind?: string }).kind : x.fig!.id === d.figure),
+          (x) => x.feature === d.feature && d.pos && x.pos.x === d.pos.x && x.pos.y === d.pos.y && (mode === "add" ? x.kind === d.choice : x.fig!.id === d.figure),
         );
         if (!t) return "error.illegalStep";
         if (mode === "add") {

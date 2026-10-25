@@ -172,9 +172,9 @@ describe("vilken pjäs", () => {
   test("lägg till: vanlig eller stor följare ur förrådet; bara den stora om vanliga saknas", () => {
     let s = circle([P2N, P3S], { expansions: [...IC] });
     s = act(s, mode("add"));
-    const kinds = cc(s).filter((x) => x.action === "add").map((x) => (x.data as { kind: string }).kind).sort();
+    const kinds = cc(s).filter((x) => x.action === "add").map((x) => (x.data as { choice: string }).choice).sort();
     expect(kinds).toEqual(["large-meeple", "meeple"]);
-    s = act(s, cc(s).find((x) => x.action === "add" && (x.data as { kind: string }).kind === "large-meeple")!);
+    s = act(s, cc(s).find((x) => x.action === "add" && (x.data as { choice: string }).choice === "large-meeple")!);
     expect(where(s, "p2:large-meeple:0")).toEqual({ at: "feature", pos: { x: 0, y: 0 }, feature: "city0" });
     // Inga vanliga kvar i förrådet: bara stor följare erbjuds.
     let t = circle(
@@ -182,7 +182,7 @@ describe("vilken pjäs", () => {
       { expansions: [...IC] },
     );
     t = act(t, mode("add"));
-    expect(cc(t).filter((x) => x.action === "add").map((x) => (x.data as { kind: string }).kind)).toEqual(["large-meeple"]);
+    expect(cc(t).filter((x) => x.action === "add").map((x) => (x.data as { choice: string }).choice)).toEqual(["large-meeple"]);
   });
 });
 

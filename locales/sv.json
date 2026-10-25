@@ -300,5 +300,7 @@
   "step.crop-circles-2.mode.remove": "Alla tar bort en följare",
   "step.crop-circles-2.add": "Lägg till en följare här",
   "step.crop-circles-2.remove": "Ta bort följaren här",
-  "step.crop-circles-2.skip": "Lägg inte till något"
+  "step.crop-circles-2.skip": "Lägg inte till något",
+  "step.crop-circles-2.add.meeple": "Lägg till en följare",
+  "step.crop-circles-2.add.large-meeple": "Lägg till den stora följaren"
 }
